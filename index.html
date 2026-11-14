@@ -31,6 +31,10 @@
     font-family:'Segoe UI',Arial,sans-serif;
 }
 
+html {
+    scroll-behavior:smooth;
+}
+
 body {
     background:var(--light);
     color:var(--navy);
@@ -59,12 +63,13 @@ button {
 }
 
 .public-header {
-    height:80px;
+    min-height:80px;
     display:flex;
     align-items:center;
     justify-content:space-between;
     padding:0 8%;
     border-bottom:1px solid var(--border);
+    background:white;
 }
 
 .brand {
@@ -84,7 +89,20 @@ button {
 
 .public-actions {
     display:flex;
+    align-items:center;
     gap:12px;
+}
+
+.support-link {
+    color:var(--text);
+    font-size:14px;
+    font-weight:600;
+    text-decoration:none;
+    margin-right:12px;
+}
+
+.support-link:hover {
+    color:var(--turquoise);
 }
 
 .btn {
@@ -110,14 +128,18 @@ button {
     color:var(--navy);
 }
 
+.btn-secondary:hover {
+    background:#DCE6EF;
+}
+
 .welcome-hero {
-    min-height:calc(100vh - 80px);
+    min-height:650px;
     background:
     radial-gradient(circle at 85% 25%,rgba(0,184,169,.18),transparent 30%),
     linear-gradient(125deg,#102A43,#173F5F);
     display:flex;
     align-items:center;
-    padding:65px 9%;
+    padding:75px 9%;
     color:white;
 }
 
@@ -173,12 +195,69 @@ button {
     background:rgba(255,255,255,.1);
 }
 
-.welcome-footer {
-    position:absolute;
-    bottom:20px;
-    right:8%;
+/* =================================
+   PROFESSIONAL FOOTER
+================================= */
+
+.public-footer {
+    background:#0B1F33;
+    color:white;
+    padding:40px 8% 20px;
+}
+
+.footer-content {
+    max-width:1200px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:25px;
+    flex-wrap:wrap;
+}
+
+.footer-brand {
+    font-size:21px;
+    font-weight:900;
+}
+
+.footer-brand span {
+    color:var(--turquoise);
+}
+
+.footer-tagline {
     color:#BCCCDC;
+    font-size:13px;
+    margin-top:6px;
+}
+
+.footer-links {
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+}
+
+.footer-links a,
+.footer-links button {
+    color:#D9E2EC;
+    font-size:13px;
+    text-decoration:none;
+    background:none;
+    border:none;
+}
+
+.footer-links a:hover,
+.footer-links button:hover {
+    color:var(--turquoise);
+}
+
+.footer-bottom {
+    max-width:1200px;
+    margin:28px auto 0;
+    padding-top:18px;
+    border-top:1px solid rgba(255,255,255,.12);
+    color:#829AB1;
     font-size:12px;
+    text-align:center;
 }
 
 /* =================================
@@ -275,6 +354,7 @@ button {
 
 .auth-submit:disabled {
     opacity:.6;
+    cursor:not-allowed;
 }
 
 .auth-switch {
@@ -317,6 +397,50 @@ button {
     display:block;
     background:#FDECEC;
     color:#A32626;
+}
+
+/* =================================
+   LEGAL INFORMATION MODAL
+================================= */
+
+.legal-box {
+    background:white;
+    width:100%;
+    max-width:650px;
+    padding:35px;
+    border-radius:13px;
+    max-height:85vh;
+    overflow-y:auto;
+    position:relative;
+}
+
+.legal-box h2 {
+    margin-bottom:15px;
+    color:var(--navy);
+}
+
+.legal-box h3 {
+    margin:20px 0 8px;
+    font-size:16px;
+}
+
+.legal-box p {
+    color:var(--text);
+    font-size:14px;
+    line-height:1.8;
+    margin-bottom:12px;
+}
+
+.legal-close {
+    position:sticky;
+    top:0;
+    float:right;
+    background:var(--light);
+    border:none;
+    border-radius:50%;
+    width:32px;
+    height:32px;
+    font-size:21px;
 }
 
 /* =================================
@@ -478,6 +602,7 @@ button {
     border-radius:50%;
     right:-45px;
     top:-100px;
+    pointer-events:none;
 }
 
 .welcome-banner small {
@@ -697,8 +822,8 @@ button {
 @media(max-width:550px) {
 
     .public-header {
-        padding:0 18px;
-        height:70px;
+        padding:0 15px;
+        min-height:70px;
     }
 
     .public-header .brand {
@@ -714,8 +839,12 @@ button {
         font-size:12px;
     }
 
+    .support-link {
+        display:none;
+    }
+
     .welcome-hero {
-        min-height:calc(100vh - 70px);
+        min-height:600px;
         padding:55px 24px;
     }
 
@@ -725,10 +854,6 @@ button {
 
     .welcome-content p {
         font-size:15px;
-    }
-
-    .welcome-footer {
-        display:none;
     }
 
     .auth-box {
@@ -751,6 +876,20 @@ button {
         display:none;
     }
 
+    .footer-content {
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .footer-links {
+        justify-content:center;
+        gap:17px;
+    }
+
+    .legal-box {
+        padding:25px 20px;
+    }
+
 }
 </style>
 </head>
@@ -770,6 +909,11 @@ button {
         </div>
 
         <div class="public-actions">
+
+            <a href="mailto:brightmindstutorials@gmail.com"
+               class="support-link">
+                Support
+            </a>
 
             <button class="btn btn-secondary"
                 onclick="openAuth('login')">
@@ -821,11 +965,54 @@ button {
 
         </div>
 
-        <div class="welcome-footer">
-            Learn. Understand. Excel.
+    </main>
+
+    <!-- PUBLIC FOOTER -->
+
+    <footer class="public-footer">
+
+        <div class="footer-content">
+
+            <div>
+                <div class="footer-brand">
+                    BRIGHT <span>MINDS.</span>
+                </div>
+
+                <div class="footer-tagline">
+                    Learn. Understand. Excel.
+                </div>
+            </div>
+
+            <div class="footer-links">
+
+                <a href="mailto:brightmindstutorials@gmail.com">
+                    Contact Us
+                </a>
+
+                <a href="mailto:brightmindstutorials@gmail.com">
+                    Support
+                </a>
+
+                <button onclick="showLegal('privacy')">
+                    Privacy Policy
+                </button>
+
+                <button onclick="showLegal('terms')">
+                    Terms of Use
+                </button>
+
+            </div>
+
         </div>
 
-    </main>
+        <div class="footer-bottom">
+
+            © <span id="publicYear"></span>
+            Bright Minds Tutorials. All rights reserved.
+
+        </div>
+
+    </footer>
 
 </div>
 
@@ -853,8 +1040,6 @@ button {
         <div class="sidebar-label">WORKSPACE</div>
 
         <div class="sidebar-menu" id="sidebarMenu">
-
-            <!-- Menu is created according to account role -->
 
         </div>
 
@@ -902,8 +1087,6 @@ button {
 
 
         <div class="content" id="dashboardContent">
-
-            <!-- Dashboard content is loaded here -->
 
         </div>
 
@@ -1000,6 +1183,24 @@ button {
 </div>
 
 
+<!-- =================================
+     LEGAL INFORMATION MODAL
+================================= -->
+
+<div class="modal" id="legalModal">
+
+    <div class="legal-box">
+
+        <button class="legal-close"
+            onclick="closeLegal()">×</button>
+
+        <div id="legalContent"></div>
+
+    </div>
+
+</div>
+
+
 <script>
 
 /* =================================
@@ -1013,6 +1214,9 @@ let currentMode = "login";
 
 const welcomePage = document.getElementById("welcomePage");
 const appPage = document.getElementById("appPage");
+
+document.getElementById("publicYear").textContent =
+    new Date().getFullYear();
 
 try {
 
@@ -1030,6 +1234,178 @@ try {
     console.error("Supabase setup error:", error);
 
 }
+
+
+/* =================================
+   LEGAL INFORMATION
+================================= */
+
+function showLegal(type) {
+
+    const content = document.getElementById("legalContent");
+
+    if (type === "privacy") {
+
+        content.innerHTML = `
+
+            <h2>Privacy Policy</h2>
+
+            <p><strong>Bright Minds Tutorials</strong></p>
+
+            <p>
+                We value your privacy. This policy explains how
+                information may be handled when you use our learning platform.
+            </p>
+
+            <h3>1. Information We Collect</h3>
+
+            <p>
+                When you register, we may collect your name,
+                email address and account information.
+                Learning activity and enrolment information may
+                also be stored as you use the platform.
+            </p>
+
+            <h3>2. How Information Is Used</h3>
+
+            <p>
+                Information is used to create and manage accounts,
+                provide access to learning materials, manage enrolments,
+                communicate important updates and support students.
+            </p>
+
+            <h3>3. Data Storage</h3>
+
+            <p>
+                The platform uses Supabase services for authentication
+                and database functionality. Information is processed
+                and stored through the services configured by
+                Bright Minds Tutorials.
+            </p>
+
+            <h3>4. Information Sharing</h3>
+
+            <p>
+                Personal information is not intended to be sold.
+                Information may be accessed by authorised platform
+                administrators when necessary to provide educational
+                services and manage accounts.
+            </p>
+
+            <h3>5. Account Security</h3>
+
+            <p>
+                Users should keep their passwords confidential.
+                Contact the platform if you suspect unauthorised
+                access to your account.
+            </p>
+
+            <h3>6. Contact</h3>
+
+            <p>
+                For privacy-related questions, contact:
+                brightmindstutorials@gmail.com
+            </p>
+
+            <p>
+                This policy should be reviewed and updated as the
+                platform develops and before public launch.
+            </p>
+
+        `;
+
+    } else {
+
+        content.innerHTML = `
+
+            <h2>Terms of Use</h2>
+
+            <p><strong>Bright Minds Tutorials</strong></p>
+
+            <p>
+                By creating an account or using this platform,
+                you agree to follow these terms.
+            </p>
+
+            <h3>1. Account Registration</h3>
+
+            <p>
+                Users must provide accurate registration information
+                and maintain the confidentiality of their login details.
+            </p>
+
+            <h3>2. Educational Use</h3>
+
+            <p>
+                Learning materials, lessons and assessments are
+                provided for educational purposes.
+            </p>
+
+            <h3>3. Account Responsibility</h3>
+
+            <p>
+                Users are responsible for activities carried out
+                through their accounts. Accounts must not be shared
+                or used to impersonate another person.
+            </p>
+
+            <h3>4. Learning Materials</h3>
+
+            <p>
+                Materials provided through Bright Minds Tutorials
+                must not be redistributed, republished or sold
+                without appropriate permission.
+            </p>
+
+            <h3>5. Acceptable Use</h3>
+
+            <p>
+                Users must not attempt to disrupt the platform,
+                access restricted areas without permission,
+                interfere with other users or misuse assessments.
+            </p>
+
+            <h3>6. Platform Availability</h3>
+
+            <p>
+                We aim to provide reliable access to the platform,
+                but uninterrupted availability cannot be guaranteed.
+                Features may be updated or temporarily unavailable.
+            </p>
+
+            <h3>7. Contact</h3>
+
+            <p>
+                For questions about these terms, contact:
+                brightmindstutorials@gmail.com
+            </p>
+
+            <p>
+                These terms should be reviewed for applicable
+                legal requirements before public launch.
+            </p>
+
+        `;
+
+    }
+
+    document.getElementById("legalModal").classList.add("active");
+
+}
+
+function closeLegal() {
+
+    document.getElementById("legalModal").classList.remove("active");
+
+}
+
+document.getElementById("legalModal").addEventListener("click", function(e) {
+
+    if (e.target === this) {
+        closeLegal();
+    }
+
+});
 
 
 /* =================================
@@ -1245,7 +1621,13 @@ document.getElementById("authForm").addEventListener("submit", async function(e)
 
 async function resetPassword() {
 
-    if (!supabaseClient) return;
+    if (!supabaseClient) {
+
+        showMessage("Supabase is not configured.", "error");
+
+        return;
+
+    }
 
     const email = document.getElementById("email").value.trim();
 
@@ -1305,14 +1687,18 @@ async function loadApplication(user) {
 
         if (error) throw error;
 
-        currentUser = user;
-        currentProfile = profile;
+        if (!profile) {
+            throw new Error("No account profile was found.");
+        }
 
         if (profile.role !== "admin" && profile.role !== "student") {
 
             throw new Error("Your account has an unrecognised role.");
 
         }
+
+        currentUser = user;
+        currentProfile = profile;
 
         welcomePage.classList.add("hidden");
 
@@ -1393,6 +1779,8 @@ function navigateDashboard(page) {
     });
 
     document.getElementById("sidebar").classList.remove("open");
+
+    if (!currentProfile) return;
 
     if (currentProfile.role === "admin") {
 
@@ -1617,11 +2005,6 @@ async function loadStudentCourses() {
 
     try {
 
-        /*
-         * RLS should ensure students can only retrieve
-         * their own enrolment records.
-         */
-
         const { data: enrolments, error } =
             await supabaseClient
                 .from("enrollments")
@@ -1633,8 +2016,11 @@ async function loadStudentCourses() {
             enrolment.status === "active"
         );
 
-        document.getElementById("courseCount").textContent =
-            activeEnrolments.length;
+        const courseCount = document.getElementById("courseCount");
+
+        if (courseCount) {
+            courseCount.textContent = activeEnrolments.length;
+        }
 
         if (activeEnrolments.length === 0) {
 
