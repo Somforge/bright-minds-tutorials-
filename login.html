@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | Bright Minds Tutorials</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+
+    <style>
+        :root {
+            --navy: #102A43;
+            --turquoise: #00B8A9;
+            --light: #F4F7FA;
+            --text: #243B53;
+            --muted: #627D98;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            padding: 38px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(16, 42, 67, 0.09);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand h1 {
+            color: var(--navy);
+            font-size: 25px;
+            letter-spacing: 1px;
+        }
+
+        .brand span {
+            color: var(--turquoise);
+        }
+
+        .brand p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        h2 {
+            color: var(--navy);
+            font-size: 23px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        label {
+            display: block;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #D9E2EC;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--turquoise);
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            background: var(--turquoise);
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #009D91;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .forgot {
+            display: block;
+            text-align: right;
+            color: var(--turquoise);
+            font-size: 13px;
+            text-decoration: none;
+            margin-top: -7px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .error {
+            display: block;
+            background: #FDECEC;
+            color: #B42318;
+        }
+
+        .success {
+            display: block;
+            background: #E7F8F5;
+            color: #087F70;
+        }
+
+        .bottom {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .bottom a {
+            color: var(--turquoise);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .home {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #829AB1;
+            font-size: 11px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 28px 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="brand">
+        <h1>BRIGHT <span>MINDS</span></h1>
+        <p>Learn. Understand. Excel.</p>
+    </div>
+
+    <h2>Welcome back</h2>
+    <p class="subtitle">
+        Sign in to access your Bright Minds learning dashboard.
+    </p>
+
+    <div id="message" class="message"></div>
+
+    <form id="loginForm">
+
+        <label for="email">Email address</label>
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter your email address"
+            required
+        >
+
+        <label for="password">Password</label>
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            required
+        >
+
+        <a href="#" class="forgot" id="forgotPassword">
+            Forgot your password?
+        </a>
+
+        <button type="submit" id="loginButton">
+            Sign In
+        </button>
+
+    </form>
+
+    <div class="bottom">
+        Don't have an account?
+        <a href="register.html">Create an account</a>
+    </div>
+
+    <a href="index.html" class="home">
+        ← Back to homepage
+    </a>
+
+    <div class="footer">
+        © <span id="year"></span> Bright Minds Tutorials.
+        All rights reserved.
+    </div>
+
+</div>
+
+<script>
+    const messageBox = document.getElementById("message");
+    const loginForm = document.getElementById("loginForm");
+    const loginButton = document.getElementById("loginButton");
+
+    document.getElementById("year").textContent =
+        new Date().getFullYear();
+
+    if (!window.BRIGHT_MINDS_CONFIG) {
+        showMessage("The application configuration could not be loaded. Please contact support.", "error");
+        loginButton.disabled = true;
+    }
+
+    const supabaseClient = window.BRIGHT_MINDS_CONFIG
+        ? window.supabase.createClient(
+            window.BRIGHT_MINDS_CONFIG.SUPABASE_URL,
+            window.BRIGHT_MINDS_CONFIG.SUPABASE_KEY
+        )
+        : null;
+
+    function showMessage(message, type) {
+        messageBox.textContent = message;
+        messageBox.className = "message " + type;
+    }
+
+    // If the user is already signed in, take them to the dashboard.
+    async function checkExistingSession() {
+        if (!supabaseClient) return;
+
+        const { data, error } = await supabaseClient.auth.getSession();
+
+        if (!error && data.session) {
+            window.location.href = "index.html";
+        }
+    }
+
+    checkExistingSession();
+
+    // Sign in
+    loginForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        if (!supabaseClient) return;
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        loginButton.disabled = true;
+        loginButton.textContent = "Signing in...";
+
+        messageBox.className = "message";
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            showMessage(error.message, "error");
+            loginButton.disabled = false;
+            loginButton.textContent = "Sign In";
+            return;
+        }
+
+        if (data.session) {
+            window.location.href = "index.html";
+        }
+    });
+
+    // Password recovery
+    document.getElementById("forgotPassword").addEventListener("click", async function(event) {
+        event.preventDefault();
+
+        if (!supabaseClient) return;
+
+        const email = document.getElementById("email").value.trim();
+
+        if (!email) {
+            showMessage("Enter your email address first, then select Forgot your password.", "error");
+            return;
+        }
+
+        showMessage("Sending password reset instructions...", "success");
+
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin +
+                window.location.pathname.replace("login.html", "index.html")
+        });
+
+        if (error) {
+            showMessage(error.message, "error");
+        } else {
+            showMessage("If an account exists for this email, password reset instructions will be sent to it.", "success");
+        }
+    });
+</script>
+
+</body>
+</html>
