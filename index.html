@@ -1,939 +1,939 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Bright Minds Tutorials</title>
-<meta name="description" content="Bright Minds Tutorials — Learn. Understand. Excel.">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./supabase-config.js"></script>
-
-<style>
+<meta name="theme-color" content="#102A43"><title>Bright Minds Tutorials | Learn. Understand. Excel.</title><meta name="description" content="Welcome to Bright Minds Tutorials. A learning environment built around understanding, curiosity and academic excellence."><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script><style>
 :root {
-    --navy:#102A43;
-    --navy2:#173F5F;
-    --turquoise:#00B8A9;
-    --light:#F4F7FA;
-    --white:#FFFFFF;
-    --text:#334E68;
-    --muted:#829AB1;
-    --border:#E5EAF0;
-    --green:#16A36A;
-    --red:#D64545;
+    --navy: #102A43;
+    --navy-light: #173F5F;
+    --turquoise: #00B8A9;
+    --turquoise-dark: #00998E;
+    --background: #F5F8FA;
+    --white: #FFFFFF;
+    --text: #334E68;
+    --muted: #829AB1;
+    --border: #E5EAF0;
+    --shadow: 0 15px 45px rgba(16,42,67,.08);
 }
 
 * {
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Segoe UI',Arial,sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 html {
-    scroll-behavior:smooth;
+    scroll-behavior: smooth;
 }
 
 body {
-    background:var(--light);
-    color:var(--navy);
-    min-height:100vh;
+    font-family: "DM Sans", sans-serif;
+    background: var(--background);
+    color: var(--navy);
+    min-height: 100vh;
 }
 
-button,input {
-    font:inherit;
+button, input {
+    font: inherit;
 }
 
 button {
-    cursor:pointer;
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
 }
 
 .hidden {
-    display:none!important;
+    display: none !important;
 }
 
-/* =================================
-   PUBLIC WELCOME PAGE
-================================= */
+/* ==================================
+   PUBLIC HOMEPAGE
+================================== */
 
 #welcomePage {
-    min-height:100vh;
-    background:white;
+    background: white;
+    min-height: 100vh;
 }
 
 .public-header {
-    min-height:80px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 8%;
-    border-bottom:1px solid var(--border);
-    background:white;
+    height: 82px;
+    padding: 0 8%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 100;
 }
 
 .brand {
-    font-size:24px;
-    font-weight:900;
-    letter-spacing:-1px;
-    color:var(--navy);
+    font-family: "Manrope", sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--navy);
 }
 
 .brand span {
-    color:var(--turquoise);
-}
-
-.public-header .brand {
-    font-size:23px;
+    color: var(--turquoise);
 }
 
 .public-actions {
-    display:flex;
-    align-items:center;
-    gap:12px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
 }
 
 .support-link {
-    color:var(--text);
-    font-size:14px;
-    font-weight:600;
-    text-decoration:none;
-    margin-right:12px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 12px;
 }
 
 .support-link:hover {
-    color:var(--turquoise);
+    color: var(--turquoise);
 }
 
 .btn {
-    padding:13px 23px;
-    border:none;
-    border-radius:7px;
-    font-weight:700;
-    transition:.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 7px;
+    padding: 13px 23px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: .2s ease;
 }
 
 .btn-primary {
-    background:var(--turquoise);
-    color:white;
+    background: var(--turquoise);
+    color: white;
 }
 
 .btn-primary:hover {
-    background:#009B90;
-    transform:translateY(-2px);
+    background: var(--turquoise-dark);
+    transform: translateY(-2px);
 }
 
 .btn-secondary {
-    background:#EAF0F5;
-    color:var(--navy);
+    background: #EDF2F7;
+    color: var(--navy);
 }
 
 .btn-secondary:hover {
-    background:#DCE6EF;
+    background: #DCE6EF;
 }
 
-.welcome-hero {
-    min-height:650px;
+.mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--navy);
+    font-size: 25px;
+}
+
+/* HERO */
+
+.hero {
+    min-height: 650px;
+    padding: 90px 9%;
+    display: flex;
+    align-items: center;
     background:
-    radial-gradient(circle at 85% 25%,rgba(0,184,169,.18),transparent 30%),
-    linear-gradient(125deg,#102A43,#173F5F);
-    display:flex;
-    align-items:center;
-    padding:75px 9%;
-    color:white;
+        radial-gradient(circle at 85% 20%, rgba(0,184,169,.18), transparent 28%),
+        radial-gradient(circle at 70% 100%, rgba(0,184,169,.10), transparent 35%),
+        linear-gradient(120deg, #102A43, #173F5F);
+    color: white;
+    position: relative;
+    overflow: hidden;
 }
 
-.welcome-content {
-    max-width:760px;
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 470px;
+    height: 470px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    right: -160px;
+    bottom: -240px;
 }
 
-.welcome-label {
-    display:inline-block;
-    color:#55DFD1;
-    font-weight:800;
-    letter-spacing:3px;
-    font-size:12px;
-    margin-bottom:25px;
+.hero::after {
+    content: "";
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    right: -85px;
+    bottom: -165px;
 }
 
-.welcome-content h1 {
-    font-size:clamp(42px,6vw,72px);
-    line-height:1.12;
-    letter-spacing:-2px;
-    margin-bottom:25px;
+.hero-content {
+    max-width: 780px;
+    position: relative;
+    z-index: 2;
 }
 
-.welcome-content h1 span {
-    color:#39D5C5;
+.hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #54DED1;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 26px;
 }
 
-.welcome-content p {
-    color:#D9E2EC;
-    font-size:18px;
-    line-height:1.8;
-    max-width:590px;
-    margin-bottom:35px;
+.hero-label::before {
+    content: "";
+    width: 28px;
+    height: 2px;
+    background: var(--turquoise);
 }
 
-.welcome-buttons {
-    display:flex;
-    gap:14px;
-    flex-wrap:wrap;
+.hero h1 {
+    font-family: "Manrope", sans-serif;
+    font-size: clamp(43px, 6.2vw, 75px);
+    line-height: 1.13;
+    letter-spacing: -3px;
+    font-weight: 800;
+    margin-bottom: 27px;
 }
 
-.welcome-buttons .btn {
-    padding:16px 27px;
+.hero h1 span {
+    color: #42D7C8;
 }
 
-.welcome-outline {
-    background:transparent;
-    border:1px solid rgba(255,255,255,.5);
-    color:white;
+.hero-description {
+    max-width: 600px;
+    font-size: 17px;
+    line-height: 1.9;
+    color: #D9E2EC;
+    margin-bottom: 36px;
 }
 
-.welcome-outline:hover {
-    background:rgba(255,255,255,.1);
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
 }
 
-/* =================================
-   PROFESSIONAL FOOTER
-================================= */
+.hero-buttons .btn {
+    padding: 16px 26px;
+}
+
+.btn-outline {
+    color: white;
+    border: 1px solid rgba(255,255,255,.45);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background: rgba(255,255,255,.1);
+}
+
+/* INTRODUCTION */
+
+.introduction {
+    padding: 95px 9%;
+    background: white;
+}
+
+.intro-container {
+    max-width: 1150px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 75px;
+    align-items: center;
+}
+
+.section-label {
+    color: var(--turquoise-dark);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 17px;
+}
+
+.intro-text h2 {
+    font-family: "Manrope", sans-serif;
+    font-size: clamp(29px, 4vw, 43px);
+    line-height: 1.25;
+    letter-spacing: -1.5px;
+    margin-bottom: 22px;
+}
+
+.intro-text p {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 15px;
+}
+
+.intro-card {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 35px;
+}
+
+.intro-card h3 {
+    font-size: 21px;
+    margin-bottom: 25px;
+}
+
+.principle {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+.principle:last-child {
+    margin-bottom: 0;
+}
+
+.principle-icon {
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #DDF8F5;
+    color: #008F83;
+    border-radius: 9px;
+    font-size: 20px;
+}
+
+.principle h4 {
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.principle p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+/* CALL TO ACTION */
+
+.cta {
+    padding: 75px 9%;
+    background: #EAF8F6;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 700px;
+    margin: auto;
+}
+
+.cta h2 {
+    font-family: "Manrope", sans-serif;
+    font-size: clamp(27px, 4vw, 39px);
+    margin-bottom: 15px;
+}
+
+.cta p {
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 15px;
+    margin-bottom: 27px;
+}
+
+/* FOOTER */
 
 .public-footer {
-    background:#0B1F33;
-    color:white;
-    padding:40px 8% 20px;
+    background: #0B1F33;
+    color: white;
+    padding: 48px 8% 22px;
 }
 
 .footer-content {
-    max-width:1200px;
-    margin:auto;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:25px;
-    flex-wrap:wrap;
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
 }
 
 .footer-brand {
-    font-size:21px;
-    font-weight:900;
+    font-family: "Manrope", sans-serif;
+    font-size: 23px;
+    font-weight: 800;
 }
 
 .footer-brand span {
-    color:var(--turquoise);
+    color: var(--turquoise);
 }
 
 .footer-tagline {
-    color:#BCCCDC;
-    font-size:13px;
-    margin-top:6px;
+    color: #BCCCDC;
+    font-size: 13px;
+    margin-top: 7px;
 }
 
 .footer-links {
-    display:flex;
-    gap:22px;
-    flex-wrap:wrap;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 23px;
 }
 
 .footer-links a,
 .footer-links button {
-    color:#D9E2EC;
-    font-size:13px;
-    text-decoration:none;
-    background:none;
-    border:none;
+    color: #D9E2EC;
+    font-size: 13px;
+    background: none;
+    border: none;
 }
 
 .footer-links a:hover,
 .footer-links button:hover {
-    color:var(--turquoise);
+    color: var(--turquoise);
 }
 
 .footer-bottom {
-    max-width:1200px;
-    margin:28px auto 0;
-    padding-top:18px;
-    border-top:1px solid rgba(255,255,255,.12);
-    color:#829AB1;
-    font-size:12px;
-    text-align:center;
+    max-width: 1200px;
+    margin: 30px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.12);
+    text-align: center;
+    color: #829AB1;
+    font-size: 12px;
 }
 
-/* =================================
-   AUTHENTICATION MODAL
-================================= */
+/* ==================================
+   LEGAL MODAL
+================================== */
 
 .modal {
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:5000;
-    background:rgba(5,20,35,.75);
-    justify-content:center;
-    align-items:center;
-    padding:18px;
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    background: rgba(5,20,35,.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
 }
 
 .modal.active {
-    display:flex;
+    display: flex;
 }
-
-.auth-box {
-    background:white;
-    width:100%;
-    max-width:430px;
-    padding:35px;
-    border-radius:14px;
-    position:relative;
-    max-height:90vh;
-    overflow-y:auto;
-    box-shadow:0 25px 70px rgba(0,0,0,.2);
-}
-
-.close-modal {
-    position:absolute;
-    right:18px;
-    top:12px;
-    background:none;
-    border:none;
-    font-size:28px;
-    color:var(--muted);
-}
-
-.auth-logo {
-    font-size:19px;
-    font-weight:900;
-    margin-bottom:25px;
-}
-
-.auth-logo span {
-    color:var(--turquoise);
-}
-
-.auth-box h2 {
-    font-size:27px;
-    margin-bottom:6px;
-}
-
-.auth-description {
-    color:var(--muted);
-    font-size:14px;
-    margin-bottom:25px;
-}
-
-.auth-box label {
-    display:block;
-    font-size:13px;
-    font-weight:700;
-    margin-bottom:7px;
-}
-
-.auth-box input {
-    width:100%;
-    padding:13px;
-    border:1px solid var(--border);
-    border-radius:7px;
-    margin-bottom:18px;
-    outline:none;
-}
-
-.auth-box input:focus {
-    border-color:var(--turquoise);
-}
-
-.auth-submit {
-    width:100%;
-    background:var(--navy);
-    color:white;
-    border:none;
-    border-radius:7px;
-    padding:14px;
-    font-weight:700;
-}
-
-.auth-submit:disabled {
-    opacity:.6;
-    cursor:not-allowed;
-}
-
-.auth-switch {
-    text-align:center;
-    color:var(--muted);
-    margin-top:20px;
-    font-size:14px;
-}
-
-.auth-switch button,
-.forgot-button {
-    border:none;
-    background:none;
-    color:var(--turquoise);
-    font-weight:700;
-}
-
-.forgot-button {
-    display:block;
-    margin:-7px 0 17px auto;
-    font-size:13px;
-}
-
-.auth-message {
-    display:none;
-    padding:12px;
-    border-radius:7px;
-    margin-bottom:17px;
-    font-size:13px;
-    overflow-wrap:anywhere;
-}
-
-.auth-message.success {
-    display:block;
-    background:#E6FAF0;
-    color:#176B43;
-}
-
-.auth-message.error {
-    display:block;
-    background:#FDECEC;
-    color:#A32626;
-}
-
-/* =================================
-   LEGAL INFORMATION MODAL
-================================= */
 
 .legal-box {
-    background:white;
-    width:100%;
-    max-width:650px;
-    padding:35px;
-    border-radius:13px;
-    max-height:85vh;
-    overflow-y:auto;
-    position:relative;
-}
-
-.legal-box h2 {
-    margin-bottom:15px;
-    color:var(--navy);
-}
-
-.legal-box h3 {
-    margin:20px 0 8px;
-    font-size:16px;
-}
-
-.legal-box p {
-    color:var(--text);
-    font-size:14px;
-    line-height:1.8;
-    margin-bottom:12px;
+    background: white;
+    width: 100%;
+    max-width: 650px;
+    padding: 35px;
+    border-radius: 13px;
+    max-height: 85vh;
+    overflow-y: auto;
 }
 
 .legal-close {
-    position:sticky;
-    top:0;
-    float:right;
-    background:var(--light);
-    border:none;
-    border-radius:50%;
-    width:32px;
-    height:32px;
-    font-size:21px;
+    float: right;
+    border: none;
+    background: #EDF2F7;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 21px;
 }
 
-/* =================================
-   APPLICATION LAYOUT
-================================= */
+.legal-box h2 {
+    margin-bottom: 18px;
+}
+
+.legal-box h3 {
+    font-size: 16px;
+    margin: 22px 0 8px;
+}
+
+.legal-box p {
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 12px;
+}
+
+/* ==================================
+   APPLICATION DASHBOARD
+================================== */
 
 #appPage {
-    min-height:100vh;
+    min-height: 100vh;
 }
 
 .sidebar {
-    position:fixed;
-    top:0;
-    left:0;
-    width:255px;
-    height:100vh;
-    background:var(--navy);
-    color:white;
-    padding:27px 17px;
-    display:flex;
-    flex-direction:column;
-    z-index:1000;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 255px;
+    height: 100vh;
+    background: var(--navy);
+    color: white;
+    padding: 27px 17px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    overflow-y: auto;
+    transition: transform .25s ease;
 }
 
 .sidebar-brand {
-    padding:0 12px 35px;
-    border-bottom:1px solid rgba(255,255,255,.12);
+    padding: 0 12px 30px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
 }
 
 .sidebar-brand .brand {
-    color:white;
-    font-size:22px;
+    color: white;
+    font-size: 22px;
 }
 
 .sidebar-brand small {
-    display:block;
-    color:#9FB3C8;
-    margin-top:5px;
-    font-size:11px;
-    letter-spacing:1px;
+    display: block;
+    color: #9FB3C8;
+    margin-top: 5px;
+    font-size: 11px;
+    letter-spacing: 1px;
 }
 
 .sidebar-label {
-    color:#829AB1;
-    font-size:10px;
-    font-weight:800;
-    letter-spacing:2px;
-    padding:25px 12px 12px;
+    color: #829AB1;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    padding: 25px 12px 12px;
 }
 
 .sidebar-menu {
-    display:flex;
-    flex-direction:column;
-    gap:5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .sidebar-menu button {
-    text-align:left;
-    padding:13px 14px;
-    border:none;
-    border-radius:7px;
-    color:#D9E2EC;
-    background:transparent;
-    font-size:14px;
-    font-weight:600;
+    text-align: left;
+    padding: 13px 14px;
+    border: none;
+    border-radius: 7px;
+    color: #D9E2EC;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .sidebar-menu button:hover,
 .sidebar-menu button.active {
-    background:rgba(0,184,169,.18);
-    color:#54E0D2;
+    background: rgba(0,184,169,.18);
+    color: #54E0D2;
 }
 
 .sidebar-bottom {
-    margin-top:auto;
-    border-top:1px solid rgba(255,255,255,.12);
-    padding-top:18px;
+    margin-top: auto;
+    border-top: 1px solid rgba(255,255,255,.12);
+    padding-top: 18px;
 }
 
 .sidebar-bottom button {
-    width:100%;
-    padding:13px;
-    background:rgba(255,255,255,.08);
-    border:none;
-    border-radius:7px;
-    color:white;
-    text-align:left;
+    width: 100%;
+    padding: 13px;
+    background: rgba(255,255,255,.08);
+    border: none;
+    border-radius: 7px;
+    color: white;
+    text-align: left;
 }
 
 .main-area {
-    margin-left:255px;
-    min-height:100vh;
+    margin-left: 255px;
+    min-height: 100vh;
 }
 
 .topbar {
-    height:75px;
-    background:white;
-    border-bottom:1px solid var(--border);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 35px;
+    height: 75px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 35px;
 }
 
 .topbar h2 {
-    font-size:19px;
+    font-size: 19px;
+}
+
+.mobile-menu {
+    display: none;
+    border: none;
+    background: none;
+    font-size: 24px;
+    color: var(--navy);
 }
 
 .user-profile {
-    display:flex;
-    align-items:center;
-    gap:12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .avatar {
-    width:39px;
-    height:39px;
-    border-radius:50%;
-    background:#DDF8F5;
-    color:#008F83;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-weight:800;
+    width: 39px;
+    height: 39px;
+    border-radius: 50%;
+    background: #DDF8F5;
+    color: #008F83;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 800;
 }
 
 .user-details strong {
-    display:block;
-    font-size:13px;
+    display: block;
+    font-size: 13px;
 }
 
 .user-details small {
-    color:var(--muted);
-    font-size:11px;
+    color: var(--muted);
+    font-size: 11px;
 }
 
 .content {
-    padding:35px;
-    max-width:1500px;
-    margin:auto;
+    padding: 35px;
+    max-width: 1500px;
+    margin: auto;
 }
 
 .welcome-banner {
-    background:linear-gradient(120deg,var(--navy),var(--navy2));
-    color:white;
-    padding:32px;
-    border-radius:13px;
-    margin-bottom:30px;
-    position:relative;
-    overflow:hidden;
-}
-
-.welcome-banner:after {
-    content:"";
-    position:absolute;
-    width:220px;
-    height:220px;
-    border:35px solid rgba(0,184,169,.15);
-    border-radius:50%;
-    right:-45px;
-    top:-100px;
-    pointer-events:none;
+    background: linear-gradient(120deg,var(--navy),var(--navy-light));
+    color: white;
+    padding: 32px;
+    border-radius: 13px;
+    margin-bottom: 30px;
 }
 
 .welcome-banner small {
-    color:#55DFD1;
-    font-weight:800;
-    letter-spacing:2px;
+    color: #55DFD1;
+    font-weight: 800;
+    letter-spacing: 2px;
 }
 
 .welcome-banner h1 {
-    font-size:27px;
-    margin:10px 0;
+    font-size: 27px;
+    margin: 10px 0;
 }
 
 .welcome-banner p {
-    color:#D9E2EC;
-    font-size:14px;
-}
-
-.section-title {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin:30px 0 17px;
-}
-
-.section-title h3 {
-    font-size:19px;
-}
-
-.section-title p {
-    color:var(--muted);
-    font-size:12px;
+    color: #D9E2EC;
+    font-size: 14px;
+    line-height: 1.7;
 }
 
 .stats-grid {
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:18px;
-    margin-bottom:30px;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 18px;
+    margin-bottom: 30px;
 }
 
 .stat-card {
-    background:white;
-    border:1px solid var(--border);
-    border-radius:11px;
-    padding:23px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 23px;
 }
 
-.stat-card .stat-icon {
-    width:42px;
-    height:42px;
-    background:#E6FAF8;
-    color:#009B90;
-    border-radius:9px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:21px;
-    margin-bottom:15px;
+.stat-icon {
+    width: 42px;
+    height: 42px;
+    background: #E6FAF8;
+    color: #009B90;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    margin-bottom: 15px;
 }
 
 .stat-card strong {
-    display:block;
-    font-size:27px;
+    display: block;
+    font-size: 27px;
 }
 
 .stat-card span {
-    color:var(--muted);
-    font-size:13px;
+    color: var(--muted);
+    font-size: 13px;
 }
 
 .course-grid {
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:18px;
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 18px;
 }
 
-.course-card {
-    background:white;
-    border:1px solid var(--border);
-    border-radius:11px;
-    padding:23px;
+.course-card,
+.panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 23px;
 }
 
-.course-card .course-icon {
-    width:43px;
-    height:43px;
-    background:#E6FAF8;
-    border-radius:9px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:21px;
-    margin-bottom:15px;
+.course-icon {
+    width: 43px;
+    height: 43px;
+    background: #E6FAF8;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    margin-bottom: 15px;
 }
 
 .course-card h4 {
-    margin-bottom:8px;
+    margin-bottom: 8px;
 }
 
-.course-card p {
-    color:var(--muted);
-    font-size:13px;
-    margin-bottom:15px;
+.course-card p,
+.panel p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 15px;
 }
 
 .course-card button {
-    background:var(--navy);
-    color:white;
-    border:none;
-    padding:10px 16px;
-    border-radius:6px;
-    font-size:12px;
-    font-weight:700;
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .empty-state {
-    background:white;
-    border:1px dashed #CBD5E1;
-    border-radius:11px;
-    padding:45px 20px;
-    text-align:center;
-    color:var(--muted);
-}
-
-.empty-state .empty-icon {
-    font-size:38px;
-    margin-bottom:12px;
+    background: white;
+    border: 1px dashed #CBD5E1;
+    border-radius: 11px;
+    padding: 45px 20px;
+    text-align: center;
+    color: var(--muted);
 }
 
 .empty-state h3 {
-    color:var(--navy);
-    margin-bottom:7px;
+    color: var(--navy);
+    margin: 10px 0;
 }
 
-.panel {
-    background:white;
-    border:1px solid var(--border);
-    border-radius:11px;
-    padding:25px;
-    margin-bottom:20px;
+.empty-state p {
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 0 17px;
+}
+
+.section-title h3 {
+    font-size: 19px;
+}
+
+.section-title p {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.admin-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #E6FAF8;
+    color: #008F83;
+    font-size: 11px;
+    font-weight: 800;
+    border-radius: 20px;
 }
 
 .panel h3 {
-    margin-bottom:10px;
+    margin-bottom: 12px;
 }
 
-.panel p {
-    color:var(--muted);
-    font-size:14px;
-    line-height:1.7;
-}
+/* ==================================
+   RESPONSIVE
+================================== */
 
-/* =================================
-   ADMIN DASHBOARD
-================================= */
-
-.admin-badge {
-    display:inline-block;
-    padding:5px 10px;
-    background:#E6FAF8;
-    color:#008F83;
-    font-size:11px;
-    font-weight:800;
-    border-radius:20px;
-}
-
-/* =================================
-   MOBILE
-================================= */
-
-.mobile-menu {
-    display:none;
-    border:none;
-    background:none;
-    font-size:24px;
-    color:var(--navy);
-}
-
-@media(max-width:850px) {
+@media(max-width:900px) {
+    .intro-container {
+        gap: 35px;
+    }
 
     .sidebar {
-        transform:translateX(-100%);
-        transition:.25s;
+        transform: translateX(-100%);
     }
 
     .sidebar.open {
-        transform:translateX(0);
+        transform: translateX(0);
     }
 
     .main-area {
-        margin-left:0;
+        margin-left: 0;
     }
 
     .mobile-menu {
-        display:block;
+        display: block;
     }
-
-    .topbar {
-        padding:0 18px;
-    }
-
-    .content {
-        padding:20px;
-    }
-
-    .stats-grid {
-        grid-template-columns:1fr 1fr;
-    }
-
-    .course-grid {
-        grid-template-columns:1fr;
-    }
-
 }
 
-@media(max-width:550px) {
-
+@media(max-width:650px) {
     .public-header {
-        padding:0 15px;
-        min-height:70px;
+        padding: 0 18px;
+        height: 72px;
     }
 
     .public-header .brand {
-        font-size:18px;
-    }
-
-    .public-actions {
-        gap:6px;
-    }
-
-    .public-actions .btn {
-        padding:10px 12px;
-        font-size:12px;
+        font-size: 19px;
     }
 
     .support-link {
-        display:none;
+        display: none;
     }
 
-    .welcome-hero {
-        min-height:600px;
-        padding:55px 24px;
+    .public-actions {
+        gap: 7px;
     }
 
-    .welcome-content h1 {
-        font-size:43px;
+    .public-actions .btn {
+        padding: 10px 12px;
+        font-size: 12px;
     }
 
-    .welcome-content p {
-        font-size:15px;
+    .hero {
+        min-height: 570px;
+        padding: 65px 25px;
     }
 
-    .auth-box {
-        padding:27px 22px;
+    .hero h1 {
+        font-size: 44px;
+        letter-spacing: -2px;
     }
 
-    .stats-grid {
-        grid-template-columns:1fr;
+    .hero-description {
+        font-size: 15px;
     }
 
-    .welcome-banner {
-        padding:25px;
+    .introduction {
+        padding: 65px 24px;
     }
 
-    .welcome-banner h1 {
-        font-size:23px;
+    .intro-container {
+        grid-template-columns: 1fr;
     }
 
-    .user-details {
-        display:none;
+    .intro-card {
+        padding: 25px;
+    }
+
+    .cta {
+        padding: 60px 24px;
     }
 
     .footer-content {
-        flex-direction:column;
-        text-align:center;
+        flex-direction: column;
+        text-align: center;
     }
 
     .footer-links {
-        justify-content:center;
-        gap:17px;
+        justify-content: center;
+        gap: 17px;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .topbar {
+        padding: 0 18px;
+    }
+
+    .user-details {
+        display: none;
+    }
+
+    .stats-grid,
+    .course-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome-banner {
+        padding: 25px;
+    }
+
+    .welcome-banner h1 {
+        font-size: 23px;
     }
 
     .legal-box {
-        padding:25px 20px;
+        padding: 25px 20px;
     }
-
 }
-</style>
-</head>
+</style></head><body><!-- ==================================
+     PUBLIC HOMEPAGE
+================================== --><div id="welcomePage"><header class="public-header">
 
-<body>
+    <a href="index.html" class="brand">
+        BRIGHT <span>MINDS.</span>
+    </a>
 
-<!-- =================================
-     PUBLIC WELCOME PAGE
-================================= -->
+    <nav class="public-actions">
 
-<div id="welcomePage">
+        <a href="mailto:brightmindstutorials@gmail.com"
+           class="support-link">
+            Support
+        </a>
 
-    <header class="public-header">
+        <a href="login.html" class="btn btn-secondary">
+            Sign In
+        </a>
 
-        <div class="brand">
-            BRIGHT <span>MINDS.</span>
-        </div>
+        <a href="register.html" class="btn btn-primary">
+            Create Account
+        </a>
 
-        <div class="public-actions">
+    </nav>
 
-            <a href="mailto:brightmindstutorials@gmail.com"
-               class="support-link">
-                Support
-            </a>
+</header>
 
-            <button class="btn btn-secondary"
-                onclick="openAuth('login')">
-                Sign In
-            </button>
 
-            <button class="btn btn-primary"
-                onclick="openAuth('signup')">
-                Create Account
-            </button>
+<main>
 
-        </div>
+    <section class="hero">
 
-    </header>
+        <div class="hero-content">
 
-    <main class="welcome-hero">
-
-        <div class="welcome-content">
-
-            <div class="welcome-label">
+            <div class="hero-label">
                 BRIGHT MINDS TUTORIALS
             </div>
 
@@ -942,275 +942,280 @@ button {
                 <span>Excel with confidence.</span>
             </h1>
 
-            <p>
+            <p class="hero-description">
                 Welcome to a learning environment built around
                 understanding, curiosity and academic excellence.
-                Access your learning materials, lessons and
-                assessments in one place.
+                Develop your knowledge, strengthen your skills
+                and take the next step in your educational journey.
             </p>
 
-            <div class="welcome-buttons">
+            <div class="hero-buttons">
 
-                <button class="btn btn-primary"
-                    onclick="openAuth('signup')">
+                <a href="register.html" class="btn btn-primary">
                     Get Started →
-                </button>
-
-                <button class="btn welcome-outline"
-                    onclick="openAuth('login')">
-                    Sign In to Continue
-                </button>
-
-            </div>
-
-        </div>
-
-    </main>
-
-    <!-- PUBLIC FOOTER -->
-
-    <footer class="public-footer">
-
-        <div class="footer-content">
-
-            <div>
-                <div class="footer-brand">
-                    BRIGHT <span>MINDS.</span>
-                </div>
-
-                <div class="footer-tagline">
-                    Learn. Understand. Excel.
-                </div>
-            </div>
-
-            <div class="footer-links">
-
-                <a href="mailto:brightmindstutorials@gmail.com">
-                    Contact Us
                 </a>
 
-                <a href="mailto:brightmindstutorials@gmail.com">
-                    Support
+                <a href="login.html" class="btn btn-outline">
+                    Access Learning Portal
                 </a>
-
-                <button onclick="showLegal('privacy')">
-                    Privacy Policy
-                </button>
-
-                <button onclick="showLegal('terms')">
-                    Terms of Use
-                </button>
 
             </div>
 
         </div>
 
-        <div class="footer-bottom">
+    </section>
 
-            © <span id="publicYear"></span>
-            Bright Minds Tutorials. All rights reserved.
+
+    <section class="introduction">
+
+        <div class="intro-container">
+
+            <div class="intro-text">
+
+                <div class="section-label">
+                    WELCOME TO BRIGHT MINDS
+                </div>
+
+                <h2>
+                    Education is more than memorising facts.
+                </h2>
+
+                <p>
+                    At Bright Minds Tutorials, we believe meaningful
+                    learning begins with understanding. Our aim is
+                    to encourage curiosity, develop strong foundations
+                    and help learners approach their studies with
+                    confidence.
+                </p>
+
+                <p>
+                    Through a structured learning environment,
+                    students can access their learning resources
+                    and continue developing their academic potential.
+                </p>
+
+            </div>
+
+
+            <div class="intro-card">
+
+                <h3>Our learning philosophy</h3>
+
+                <div class="principle">
+
+                    <div class="principle-icon">◎</div>
+
+                    <div>
+                        <h4>Understand</h4>
+                        <p>
+                            Build a strong foundation by understanding
+                            concepts rather than simply memorising them.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="principle">
+
+                    <div class="principle-icon">✦</div>
+
+                    <div>
+                        <h4>Develop</h4>
+                        <p>
+                            Strengthen knowledge through practice,
+                            curiosity and consistent learning.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="principle">
+
+                    <div class="principle-icon">↗</div>
+
+                    <div>
+                        <h4>Excel</h4>
+                        <p>
+                            Apply what you learn with confidence
+                            and continue striving for excellence.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
-    </footer>
-
-</div>
+    </section>
 
 
-<!-- =================================
-     APPLICATION DASHBOARD
-================================= -->
+    <section class="cta">
 
-<div id="appPage" class="hidden">
+        <div class="cta-content">
 
-    <aside class="sidebar" id="sidebar">
+            <div class="section-label">
+                TAKE THE NEXT STEP
+            </div>
 
-        <div class="sidebar-brand">
+            <h2>
+                Your journey towards excellence starts here.
+            </h2>
 
-            <div class="brand">
+            <p>
+                Create your account to access the Bright Minds
+                learning portal and begin your learning journey.
+            </p>
+
+            <a href="register.html" class="btn btn-primary">
+                Create Your Account →
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="public-footer">
+
+    <div class="footer-content">
+
+        <div>
+
+            <div class="footer-brand">
                 BRIGHT <span>MINDS.</span>
             </div>
 
-            <small id="sidebarSubtitle">
-                LEARNING PORTAL
-            </small>
+            <div class="footer-tagline">
+                Learn. Understand. Excel.
+            </div>
 
         </div>
 
-        <div class="sidebar-label">WORKSPACE</div>
 
-        <div class="sidebar-menu" id="sidebarMenu">
+        <div class="footer-links">
 
-        </div>
+            <a href="mailto:brightmindstutorials@gmail.com">
+                Contact Us
+            </a>
 
-        <div class="sidebar-bottom">
+            <a href="mailto:brightmindstutorials@gmail.com">
+                Support
+            </a>
 
-            <button onclick="logout()">
-                ↪ &nbsp; Sign Out
+            <button onclick="showLegal('privacy')">
+                Privacy Policy
+            </button>
+
+            <button onclick="showLegal('terms')">
+                Terms of Use
             </button>
 
         </div>
 
-    </aside>
+    </div>
 
 
-    <main class="main-area">
+    <div class="footer-bottom">
+        © <span id="publicYear"></span>
+        Bright Minds Tutorials. All rights reserved.
+    </div>
 
-        <header class="topbar">
+</footer>
 
-            <div style="display:flex;align-items:center;gap:15px;">
+</div><!-- ==================================
+     DASHBOARD
+================================== --><div id="appPage" class="hidden"><aside class="sidebar" id="sidebar">
 
-                <button class="mobile-menu"
-                    onclick="toggleSidebar()">
-                    ☰
-                </button>
+    <div class="sidebar-brand">
 
-                <h2 id="pageHeading">Dashboard</h2>
-
-            </div>
-
-            <div class="user-profile">
-
-                <div class="avatar" id="userAvatar">B</div>
-
-                <div class="user-details">
-
-                    <strong id="topUserName">Student</strong>
-
-                    <small id="topUserRole">Student Account</small>
-
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <div class="content" id="dashboardContent">
-
-        </div>
-
-    </main>
-
-</div>
-
-
-<!-- =================================
-     AUTHENTICATION MODAL
-================================= -->
-
-<div class="modal" id="authModal">
-
-    <div class="auth-box">
-
-        <button class="close-modal"
-            onclick="closeAuth()">×</button>
-
-        <div class="auth-logo">
+        <div class="brand">
             BRIGHT <span>MINDS.</span>
         </div>
 
-        <h2 id="authTitle">Welcome Back</h2>
+        <small id="sidebarSubtitle">LEARNING PORTAL</small>
 
-        <p class="auth-description" id="authDescription">
-            Sign in to your learning account.
-        </p>
+    </div>
 
-        <div id="authMessage" class="auth-message"></div>
+    <div class="sidebar-label">WORKSPACE</div>
 
-        <form id="authForm">
+    <div class="sidebar-menu" id="sidebarMenu"></div>
 
-            <div id="nameField" class="hidden">
+    <div class="sidebar-bottom">
 
-                <label for="fullName">Full Name</label>
+        <button onclick="logout()">
+            ↪ &nbsp; Sign Out
+        </button>
 
-                <input
-                    type="text"
-                    id="fullName"
-                    placeholder="Enter your full name"
-                    autocomplete="name"
-                >
+    </div>
 
-            </div>
+</aside>
 
-            <label for="email">Email Address</label>
 
-            <input
-                type="email"
-                id="email"
-                placeholder="Enter your email"
-                required
-                autocomplete="email"
-            >
+<main class="main-area">
 
-            <label for="password">Password</label>
+    <header class="topbar">
 
-            <input
-                type="password"
-                id="password"
-                placeholder="Enter your password"
-                required
-                autocomplete="current-password"
-            >
+        <div style="display:flex;align-items:center;gap:15px;">
 
-            <button type="button"
-                class="forgot-button"
-                id="forgotButton"
-                onclick="resetPassword()">
-                Forgot password?
+            <button class="mobile-menu"
+                onclick="toggleSidebar()"
+                aria-label="Open navigation">
+                ☰
             </button>
 
-            <button type="submit"
-                class="auth-submit"
-                id="authSubmit">
-                Sign In
-            </button>
-
-        </form>
-
-        <div class="auth-switch" id="authSwitch">
-
-            Don't have an account?
-
-            <button onclick="openAuth('signup')">
-                Register
-            </button>
+            <h2 id="pageHeading">Dashboard</h2>
 
         </div>
 
-    </div>
+        <div class="user-profile">
+
+            <div class="avatar" id="userAvatar">B</div>
+
+            <div class="user-details">
+
+                <strong id="topUserName">Student</strong>
+
+                <small id="topUserRole">Student Account</small>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <div class="content" id="dashboardContent"></div>
+
+</main>
+
+</div><!-- ==================================
+     LEGAL MODAL
+================================== --><div class="modal" id="legalModal"><div class="legal-box">
+
+    <button class="legal-close"
+        onclick="closeLegal()"
+        aria-label="Close">
+        ×
+    </button>
+
+    <div id="legalContent"></div>
 
 </div>
 
+</div><script>
 
-<!-- =================================
-     LEGAL INFORMATION MODAL
-================================= -->
+/* ==================================
+   INITIALISATION
+================================== */
 
-<div class="modal" id="legalModal">
-
-    <div class="legal-box">
-
-        <button class="legal-close"
-            onclick="closeLegal()">×</button>
-
-        <div id="legalContent"></div>
-
-    </div>
-
-</div>
-
-
-<script>
-
-/* =================================
-   GENERAL SETUP
-================================= */
+"use strict";
 
 let supabaseClient = null;
 let currentUser = null;
 let currentProfile = null;
-let currentMode = "login";
 
 const welcomePage = document.getElementById("welcomePage");
 const appPage = document.getElementById("appPage");
@@ -1218,27 +1223,29 @@ const appPage = document.getElementById("appPage");
 document.getElementById("publicYear").textContent =
     new Date().getFullYear();
 
-try {
 
-    if (!window.BRIGHT_MINDS_CONFIG) {
-        throw new Error("Supabase configuration is missing.");
-    }
+if (
+    window.BRIGHT_MINDS_CONFIG &&
+    window.BRIGHT_MINDS_CONFIG.SUPABASE_URL &&
+    window.BRIGHT_MINDS_CONFIG.SUPABASE_KEY &&
+    window.supabase
+) {
 
     supabaseClient = window.supabase.createClient(
         window.BRIGHT_MINDS_CONFIG.SUPABASE_URL,
         window.BRIGHT_MINDS_CONFIG.SUPABASE_KEY
     );
 
-} catch (error) {
+} else {
 
-    console.error("Supabase setup error:", error);
+    console.error("Bright Minds Supabase configuration is unavailable.");
 
 }
 
 
-/* =================================
+/* ==================================
    LEGAL INFORMATION
-================================= */
+================================== */
 
 function showLegal(type) {
 
@@ -1254,62 +1261,51 @@ function showLegal(type) {
 
             <p>
                 We value your privacy. This policy explains how
-                information may be handled when you use our learning platform.
+                information may be handled when you use our platform.
             </p>
 
-            <h3>1. Information We Collect</h3>
+            <h3>1. Information Collected</h3>
 
             <p>
-                When you register, we may collect your name,
-                email address and account information.
-                Learning activity and enrolment information may
-                also be stored as you use the platform.
+                We may collect your name, email address and account
+                information when you register. Enrolment and learning
+                activity information may also be stored.
             </p>
 
             <h3>2. How Information Is Used</h3>
 
             <p>
-                Information is used to create and manage accounts,
-                provide access to learning materials, manage enrolments,
-                communicate important updates and support students.
+                Information is used to manage accounts, provide
+                educational services, manage enrolments and communicate
+                important updates.
             </p>
 
             <h3>3. Data Storage</h3>
 
             <p>
-                The platform uses Supabase services for authentication
-                and database functionality. Information is processed
-                and stored through the services configured by
-                Bright Minds Tutorials.
+                The platform uses Supabase for authentication and
+                database services.
             </p>
 
             <h3>4. Information Sharing</h3>
 
             <p>
                 Personal information is not intended to be sold.
-                Information may be accessed by authorised platform
-                administrators when necessary to provide educational
-                services and manage accounts.
+                Authorised administrators may access information
+                when necessary to provide educational services.
             </p>
 
             <h3>5. Account Security</h3>
 
             <p>
                 Users should keep their passwords confidential.
-                Contact the platform if you suspect unauthorised
-                access to your account.
+                Contact us if you suspect unauthorised access.
             </p>
 
             <h3>6. Contact</h3>
 
             <p>
-                For privacy-related questions, contact:
-                brightmindstutorials@gmail.com
-            </p>
-
-            <p>
-                This policy should be reviewed and updated as the
-                platform develops and before public launch.
+                Email: brightmindstutorials@gmail.com
             </p>
 
         `;
@@ -1323,15 +1319,15 @@ function showLegal(type) {
             <p><strong>Bright Minds Tutorials</strong></p>
 
             <p>
-                By creating an account or using this platform,
-                you agree to follow these terms.
+                By using this platform, you agree to use it responsibly
+                and comply with these terms.
             </p>
 
             <h3>1. Account Registration</h3>
 
             <p>
-                Users must provide accurate registration information
-                and maintain the confidentiality of their login details.
+                Users should provide accurate registration information
+                and keep their login credentials confidential.
             </p>
 
             <h3>2. Educational Use</h3>
@@ -1344,45 +1340,35 @@ function showLegal(type) {
             <h3>3. Account Responsibility</h3>
 
             <p>
-                Users are responsible for activities carried out
-                through their accounts. Accounts must not be shared
-                or used to impersonate another person.
+                Users are responsible for activity carried out
+                through their accounts.
             </p>
 
             <h3>4. Learning Materials</h3>
 
             <p>
-                Materials provided through Bright Minds Tutorials
-                must not be redistributed, republished or sold
-                without appropriate permission.
+                Materials must not be redistributed, republished
+                or sold without appropriate permission.
             </p>
 
             <h3>5. Acceptable Use</h3>
 
             <p>
-                Users must not attempt to disrupt the platform,
-                access restricted areas without permission,
-                interfere with other users or misuse assessments.
+                Users must not attempt to access restricted areas
+                without permission or interfere with other users.
             </p>
 
             <h3>6. Platform Availability</h3>
 
             <p>
-                We aim to provide reliable access to the platform,
-                but uninterrupted availability cannot be guaranteed.
-                Features may be updated or temporarily unavailable.
+                Continuous availability cannot be guaranteed.
+                Features may occasionally be updated or unavailable.
             </p>
 
             <h3>7. Contact</h3>
 
             <p>
-                For questions about these terms, contact:
-                brightmindstutorials@gmail.com
-            </p>
-
-            <p>
-                These terms should be reviewed for applicable
-                legal requirements before public launch.
+                Email: brightmindstutorials@gmail.com
             </p>
 
         `;
@@ -1393,284 +1379,26 @@ function showLegal(type) {
 
 }
 
+
 function closeLegal() {
 
     document.getElementById("legalModal").classList.remove("active");
 
 }
 
-document.getElementById("legalModal").addEventListener("click", function(e) {
 
-    if (e.target === this) {
+document.getElementById("legalModal").addEventListener("click", function(event) {
+
+    if (event.target === this) {
         closeLegal();
     }
 
 });
 
 
-/* =================================
-   AUTH MODAL
-================================= */
-
-function openAuth(mode) {
-
-    currentMode = mode;
-
-    document.getElementById("authModal").classList.add("active");
-
-    document.getElementById("authMessage").className = "auth-message";
-
-    document.getElementById("authMessage").textContent = "";
-
-    const nameField = document.getElementById("nameField");
-    const forgot = document.getElementById("forgotButton");
-
-    const title = document.getElementById("authTitle");
-    const description = document.getElementById("authDescription");
-    const submit = document.getElementById("authSubmit");
-    const switchBox = document.getElementById("authSwitch");
-
-    if (mode === "signup") {
-
-        title.textContent = "Create Your Account";
-
-        description.textContent =
-            "Join the Bright Minds learning community.";
-
-        nameField.classList.remove("hidden");
-
-        document.getElementById("fullName").required = true;
-
-        forgot.classList.add("hidden");
-
-        submit.textContent = "Create Account";
-
-        switchBox.innerHTML =
-            'Already have an account? <button type="button" onclick="openAuth(\'login\')">Sign In</button>';
-
-    } else {
-
-        title.textContent = "Welcome Back";
-
-        description.textContent =
-            "Sign in to access your learning portal.";
-
-        nameField.classList.add("hidden");
-
-        document.getElementById("fullName").required = false;
-
-        forgot.classList.remove("hidden");
-
-        submit.textContent = "Sign In";
-
-        switchBox.innerHTML =
-            'Don\'t have an account? <button type="button" onclick="openAuth(\'signup\')">Register</button>';
-
-    }
-
-}
-
-
-function closeAuth() {
-
-    document.getElementById("authModal").classList.remove("active");
-
-}
-
-
-document.getElementById("authModal").addEventListener("click", function(e) {
-
-    if (e.target === this) {
-        closeAuth();
-    }
-
-});
-
-
-function showMessage(message, type) {
-
-    const box = document.getElementById("authMessage");
-
-    box.textContent = message;
-
-    box.className = "auth-message " + type;
-
-}
-
-
-/* =================================
-   REGISTRATION AND LOGIN
-================================= */
-
-document.getElementById("authForm").addEventListener("submit", async function(e) {
-
-    e.preventDefault();
-
-    if (!supabaseClient) {
-
-        showMessage(
-            "Unable to connect to the learning platform. Check the Supabase configuration.",
-            "error"
-        );
-
-        return;
-
-    }
-
-    const email = document.getElementById("email").value.trim();
-
-    const password = document.getElementById("password").value;
-
-    const fullName = document.getElementById("fullName").value.trim();
-
-    const button = document.getElementById("authSubmit");
-
-    button.disabled = true;
-    button.textContent = "Please wait...";
-
-    try {
-
-        if (currentMode === "signup") {
-
-            if (fullName.length < 2) {
-                throw new Error("Please enter your full name.");
-            }
-
-            if (password.length < 8) {
-                throw new Error("Your password must contain at least 8 characters.");
-            }
-
-            const { data, error } = await supabaseClient.auth.signUp({
-
-                email,
-                password,
-
-                options: {
-
-                    data: {
-                        full_name: fullName
-                    },
-
-                    emailRedirectTo:
-                        "https://somforge.github.io/bright-minds-tutorials/"
-
-                }
-
-            });
-
-            if (error) throw error;
-
-            if (data.session) {
-
-                showMessage(
-                    "Account created successfully. Opening your dashboard...",
-                    "success"
-                );
-
-                await loadApplication(data.session.user);
-
-            } else {
-
-                showMessage(
-                    "Your account has been created. Please check your email and confirm your registration before signing in.",
-                    "success"
-                );
-
-            }
-
-        } else {
-
-            const { data, error } =
-                await supabaseClient.auth.signInWithPassword({
-
-                    email,
-                    password
-
-                });
-
-            if (error) throw error;
-
-            showMessage(
-                "Login successful. Opening your dashboard...",
-                "success"
-            );
-
-            await loadApplication(data.user);
-
-        }
-
-    } catch (error) {
-
-        showMessage(error.message, "error");
-
-    } finally {
-
-        button.disabled = false;
-
-        button.textContent =
-            currentMode === "signup" ? "Create Account" : "Sign In";
-
-    }
-
-});
-
-
-/* =================================
-   PASSWORD RECOVERY
-================================= */
-
-async function resetPassword() {
-
-    if (!supabaseClient) {
-
-        showMessage("Supabase is not configured.", "error");
-
-        return;
-
-    }
-
-    const email = document.getElementById("email").value.trim();
-
-    if (!email) {
-
-        showMessage(
-            "Enter your email address first.",
-            "error"
-        );
-
-        return;
-
-    }
-
-    try {
-
-        const { error } =
-            await supabaseClient.auth.resetPasswordForEmail(email, {
-
-                redirectTo:
-                    "https://somforge.github.io/bright-minds-tutorials/"
-
-            });
-
-        if (error) throw error;
-
-        showMessage(
-            "Password recovery instructions have been sent to your email.",
-            "success"
-        );
-
-    } catch (error) {
-
-        showMessage(error.message, "error");
-
-    }
-
-}
-
-
-/* =================================
-   LOAD ACCOUNT AND DETERMINE ROLE
-================================= */
+/* ==================================
+   LOAD AUTHENTICATED APPLICATION
+================================== */
 
 async function loadApplication(user) {
 
@@ -1691,20 +1419,15 @@ async function loadApplication(user) {
             throw new Error("No account profile was found.");
         }
 
-        if (profile.role !== "admin" && profile.role !== "student") {
-
+        if (!["admin", "student"].includes(profile.role)) {
             throw new Error("Your account has an unrecognised role.");
-
         }
 
         currentUser = user;
         currentProfile = profile;
 
         welcomePage.classList.add("hidden");
-
         appPage.classList.remove("hidden");
-
-        closeAuth();
 
         const name = profile.full_name || user.email;
 
@@ -1717,32 +1440,27 @@ async function loadApplication(user) {
             profile.role === "admin" ? "Administrator" : "Student";
 
         if (profile.role === "admin") {
-
             setupAdminDashboard();
-
         } else {
-
             setupStudentDashboard();
-
         }
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Application loading error:", error);
 
-        showMessage(
-            "We could not load your account profile: " + error.message,
-            "error"
-        );
+        alert("Unable to load your account: " + error.message);
+
+        await supabaseClient.auth.signOut();
 
     }
 
 }
 
 
-/* =================================
-   SIDEBAR MENU
-================================= */
+/* ==================================
+   DASHBOARD NAVIGATION
+================================== */
 
 function buildMenu(items) {
 
@@ -1758,7 +1476,9 @@ function buildMenu(items) {
 
         button.dataset.page = item.page;
 
-        button.onclick = () => navigateDashboard(item.page);
+        button.addEventListener("click", () => {
+            navigateDashboard(item.page);
+        });
 
         menu.appendChild(button);
 
@@ -1783,13 +1503,9 @@ function navigateDashboard(page) {
     if (!currentProfile) return;
 
     if (currentProfile.role === "admin") {
-
         renderAdminPage(page);
-
     } else {
-
         renderStudentPage(page);
-
     }
 
 }
@@ -1802,9 +1518,9 @@ function toggleSidebar() {
 }
 
 
-/* =================================
+/* ==================================
    STUDENT DASHBOARD
-================================= */
+================================== */
 
 function setupStudentDashboard() {
 
@@ -1814,15 +1530,10 @@ function setupStudentDashboard() {
     buildMenu([
 
         {label:"Overview",icon:"▦",page:"overview"},
-
         {label:"My Courses",icon:"▤",page:"courses"},
-
         {label:"Assessments",icon:"✎",page:"assessments"},
-
         {label:"My Results",icon:"▥",page:"results"},
-
         {label:"Announcements",icon:"◉",page:"announcements"},
-
         {label:"My Profile",icon:"◎",page:"profile"}
 
     ]);
@@ -1859,52 +1570,34 @@ function renderStudentPage(page) {
             <div class="stats-grid">
 
                 <div class="stat-card">
-
                     <div class="stat-icon">📚</div>
-
                     <strong id="courseCount">—</strong>
-
                     <span>My Courses</span>
-
                 </div>
 
                 <div class="stat-card">
-
                     <div class="stat-icon">📝</div>
-
                     <strong>—</strong>
-
                     <span>Assessments</span>
-
                 </div>
 
                 <div class="stat-card">
-
                     <div class="stat-icon">🏆</div>
-
                     <strong>—</strong>
-
                     <span>Results</span>
-
                 </div>
 
             </div>
 
             <div class="section-title">
-
                 <div>
                     <h3>My Learning</h3>
                     <p>Your enrolled courses</p>
                 </div>
-
             </div>
 
             <div id="studentCourses">
-
-                <div class="empty-state">
-                    Loading your courses...
-                </div>
-
+                <div class="empty-state">Loading your courses...</div>
             </div>
 
         `;
@@ -1973,13 +1666,13 @@ function renderStudentPage(page) {
 
                 <div class="empty-state">
 
-                    <div class="empty-icon">📘</div>
+                    <div style="font-size:38px;">📘</div>
 
                     <h3>${titles[page] || "Coming Soon"}</h3>
 
                     <p>
                         This section is being prepared.
-                        It will become available as we complete the learning platform.
+                        It will become available as development continues.
                     </p>
 
                 </div>
@@ -1993,9 +1686,9 @@ function renderStudentPage(page) {
 }
 
 
-/* =================================
+/* ==================================
    STUDENT COURSE RETRIEVAL
-================================= */
+================================== */
 
 async function loadStudentCourses() {
 
@@ -2008,12 +1701,13 @@ async function loadStudentCourses() {
         const { data: enrolments, error } =
             await supabaseClient
                 .from("enrollments")
-                .select("*");
+                .select("*")
+                .eq("student_id", currentUser.id);
 
         if (error) throw error;
 
-        const activeEnrolments = (enrolments || []).filter(enrolment =>
-            enrolment.status === "active"
+        const activeEnrolments = (enrolments || []).filter(item =>
+            item.status === "active"
         );
 
         const courseCount = document.getElementById("courseCount");
@@ -2028,13 +1722,14 @@ async function loadStudentCourses() {
 
                 <div class="empty-state">
 
-                    <div class="empty-icon">📚</div>
+                    <div style="font-size:38px;">📚</div>
 
                     <h3>No Courses Yet</h3>
 
                     <p>
                         You are not currently enrolled in any courses.
-                        Once your enrolment is approved, your courses will appear here.
+                        Once your enrolment is approved, your courses
+                        will appear here.
                     </p>
 
                 </div>
@@ -2050,16 +1745,7 @@ async function loadStudentCourses() {
         ];
 
         if (courseIds.length === 0) {
-
-            container.innerHTML = `
-                <div class="empty-state">
-                    <h3>Course information unavailable</h3>
-                    <p>Your enrolment records do not contain course references.</p>
-                </div>
-            `;
-
-            return;
-
+            throw new Error("Your enrolment records do not contain course references.");
         }
 
         const { data: courses, error: courseError } =
@@ -2099,7 +1785,7 @@ async function loadStudentCourses() {
                             ${escapeHTML(course.description || "Your learning materials and lessons will be available here.")}
                         </p>
 
-                        <button onclick="alert('The lesson area will be activated in the next development stage.')">
+                        <button onclick="openCourse()">
                             Open Course →
                         </button>
 
@@ -2135,9 +1821,16 @@ async function loadStudentCourses() {
 }
 
 
-/* =================================
+function openCourse() {
+
+    alert("The lesson area will be activated in the next development stage.");
+
+}
+
+
+/* ==================================
    ADMIN DASHBOARD
-================================= */
+================================== */
 
 function setupAdminDashboard() {
 
@@ -2147,19 +1840,12 @@ function setupAdminDashboard() {
     buildMenu([
 
         {label:"Overview",icon:"▦",page:"overview"},
-
         {label:"Students",icon:"♙",page:"students"},
-
         {label:"Courses",icon:"▤",page:"courses"},
-
         {label:"Enrolments",icon:"▣",page:"enrolments"},
-
         {label:"Lessons & Materials",icon:"📚",page:"lessons"},
-
         {label:"Assessments",icon:"✎",page:"assessments"},
-
         {label:"Results",icon:"▥",page:"results"},
-
         {label:"Announcements",icon:"◉",page:"announcements"}
 
     ]);
@@ -2195,7 +1881,9 @@ function renderAdminPage(page) {
 
                 <small>ADMINISTRATION PORTAL</small>
 
-                <h1>Welcome, ${escapeHTML(currentProfile.full_name || "Administrator")}.</h1>
+                <h1>
+                    Welcome, ${escapeHTML(currentProfile.full_name || "Administrator")}.
+                </h1>
 
                 <p>
                     Manage your learning platform, students,
@@ -2204,7 +1892,9 @@ function renderAdminPage(page) {
 
                 <br>
 
-                <span class="admin-badge">FULL ADMINISTRATOR ACCESS</span>
+                <span class="admin-badge">
+                    FULL ADMINISTRATOR ACCESS
+                </span>
 
             </div>
 
@@ -2236,9 +1926,9 @@ function renderAdminPage(page) {
 
                 <p>
                     Use the navigation menu to manage students,
-                    courses, enrolments and learning activities.
-                    The management tools will be connected in the
-                    next development stages.
+                    courses, enrolments and academic activities.
+                    The management tools will be connected in
+                    the next development stages.
                 </p>
 
             </div>
@@ -2251,7 +1941,7 @@ function renderAdminPage(page) {
 
         const descriptions = {
 
-            students:"View students, approve registrations and manage student accounts.",
+            students:"View students and manage student accounts.",
 
             courses:"Create, edit, publish and organise academic courses.",
 
@@ -2275,11 +1965,9 @@ function renderAdminPage(page) {
 
                 <p>${descriptions[page]}</p>
 
-                <br>
-
                 <div class="empty-state">
 
-                    <div class="empty-icon">⚙️</div>
+                    <div style="font-size:38px;">⚙️</div>
 
                     <h3>Management tools coming next</h3>
 
@@ -2299,9 +1987,9 @@ function renderAdminPage(page) {
 }
 
 
-/* =================================
+/* ==================================
    ADMIN STATISTICS
-================================= */
+================================== */
 
 async function loadAdminStats() {
 
@@ -2346,9 +2034,9 @@ async function loadAdminStats() {
 }
 
 
-/* =================================
-   SAFE TEXT DISPLAY
-================================= */
+/* ==================================
+   SAFE HTML OUTPUT
+================================== */
 
 function escapeHTML(value) {
 
@@ -2365,9 +2053,9 @@ function escapeHTML(value) {
 }
 
 
-/* =================================
+/* ==================================
    LOGOUT
-================================= */
+================================== */
 
 async function logout() {
 
@@ -2394,9 +2082,9 @@ async function logout() {
 }
 
 
-/* =================================
-   RESTORE SESSION ON PAGE RELOAD
-================================= */
+/* ==================================
+   RESTORE EXISTING SESSION
+================================== */
 
 async function checkExistingSession() {
 
@@ -2406,7 +2094,7 @@ async function checkExistingSession() {
 
     if (error) {
 
-        console.error(error);
+        console.error("Session retrieval error:", error);
 
         return;
 
@@ -2441,7 +2129,5 @@ if (supabaseClient) {
 
 }
 
-</script>
-
-</body>
+</script></body>
 </html>
