@@ -4,971 +4,1020 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Bright Minds Tutorials | Learn. Understand. Excel.</title>
+<title>Bright Minds Tutorials</title>
+<meta name="description" content="Bright Minds Tutorials — Learn. Understand. Excel.">
 
-<meta name="description" content="Bright Minds Tutorials provides quality tutorials in Mathematics, Physics, Chemistry, Biology and Computer Studies.">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
 
 <style>
 :root {
-    --navy: #102A43;
-    --turquoise: #00B8A9;
-    --white: #FFFFFF;
-    --light: #F5F7FA;
-    --text: #334E68;
+    --navy:#102A43;
+    --navy2:#173F5F;
+    --turquoise:#00B8A9;
+    --light:#F4F7FA;
+    --white:#FFFFFF;
+    --text:#334E68;
+    --muted:#829AB1;
+    --border:#E5EAF0;
+    --green:#16A36A;
+    --red:#D64545;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    scroll-behavior: smooth;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',Arial,sans-serif;
 }
 
 body {
-    color: var(--navy);
-    background: white;
-    line-height: 1.6;
+    background:var(--light);
+    color:var(--navy);
+    min-height:100vh;
 }
 
-a {
-    text-decoration: none;
-    color: inherit;
+button,input {
+    font:inherit;
 }
 
 button {
-    cursor: pointer;
-    font-family: inherit;
+    cursor:pointer;
 }
 
-header {
-    background: white;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 15px rgba(0,0,0,.06);
+.hidden {
+    display:none!important;
 }
 
-nav {
-    max-width: 1200px;
-    margin: auto;
-    padding: 18px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* =================================
+   PUBLIC WELCOME PAGE
+================================= */
+
+#welcomePage {
+    min-height:100vh;
+    background:white;
 }
 
-.logo {
-    font-size: 23px;
-    font-weight: 800;
-    color: var(--navy);
+.public-header {
+    height:80px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 8%;
+    border-bottom:1px solid var(--border);
 }
 
-.logo span {
-    color: var(--turquoise);
+.brand {
+    font-size:24px;
+    font-weight:900;
+    letter-spacing:-1px;
+    color:var(--navy);
 }
 
-.nav-links {
-    display: flex;
-    gap: 25px;
-    align-items: center;
+.brand span {
+    color:var(--turquoise);
 }
 
-.nav-links a {
-    font-size: 14px;
-    font-weight: 600;
+.public-header .brand {
+    font-size:23px;
 }
 
-.nav-links a:hover {
-    color: var(--turquoise);
-}
-
-.nav-button {
-    background: var(--navy);
-    color: white !important;
-    padding: 11px 22px;
-    border-radius: 6px;
-}
-
-.auth-nav {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.auth-nav button {
-    padding: 10px 17px;
-    border-radius: 6px;
-    border: none;
-    font-weight: 700;
-}
-
-.login-nav {
-    background: var(--light);
-    color: var(--navy);
-}
-
-.register-nav {
-    background: var(--turquoise);
-    color: white;
-}
-
-.menu-toggle {
-    display: none;
-    font-size: 26px;
-    cursor: pointer;
-}
-
-.hero {
-    background: linear-gradient(120deg,#102A43,#173F5F);
-    color: white;
-    padding: 110px 25px;
-}
-
-.hero-content {
-    max-width: 1200px;
-    margin: auto;
-    display: grid;
-    grid-template-columns: 1.3fr .7fr;
-    align-items: center;
-    gap: 50px;
-}
-
-.hero-tag {
-    color: #5CE0D2;
-    font-weight: 700;
-    letter-spacing: 2px;
-    font-size: 13px;
-}
-
-.hero h1 {
-    font-size: clamp(38px,5vw,62px);
-    line-height: 1.15;
-    margin: 20px 0;
-}
-
-.hero h1 span {
-    color: #39D5C5;
-}
-
-.hero p {
-    color: #D9E2EC;
-    font-size: 17px;
-    max-width: 550px;
-    margin-bottom: 30px;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
+.public-actions {
+    display:flex;
+    gap:12px;
 }
 
 .btn {
-    padding: 14px 25px;
-    border-radius: 6px;
-    font-weight: 700;
-    display: inline-block;
-    border: none;
+    padding:13px 23px;
+    border:none;
+    border-radius:7px;
+    font-weight:700;
+    transition:.2s;
 }
 
 .btn-primary {
-    background: var(--turquoise);
-    color: white;
+    background:var(--turquoise);
+    color:white;
 }
 
 .btn-primary:hover {
-    background: #009B90;
+    background:#009B90;
+    transform:translateY(-2px);
 }
 
-.btn-outline {
-    border: 1px solid white;
-    color: white;
+.btn-secondary {
+    background:#EAF0F5;
+    color:var(--navy);
 }
 
-.hero-card {
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.15);
-    border-radius: 16px;
-    padding: 40px;
+.welcome-hero {
+    min-height:calc(100vh - 80px);
+    background:
+    radial-gradient(circle at 85% 25%,rgba(0,184,169,.18),transparent 30%),
+    linear-gradient(125deg,#102A43,#173F5F);
+    display:flex;
+    align-items:center;
+    padding:65px 9%;
+    color:white;
 }
 
-.hero-card h3 {
-    font-size: 24px;
-    margin-bottom: 20px;
+.welcome-content {
+    max-width:760px;
 }
 
-.hero-card-item {
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255,255,255,.15);
-    display: flex;
-    gap: 15px;
-    align-items: center;
+.welcome-label {
+    display:inline-block;
+    color:#55DFD1;
+    font-weight:800;
+    letter-spacing:3px;
+    font-size:12px;
+    margin-bottom:25px;
 }
 
-.hero-card-item:last-child {
-    border: none;
+.welcome-content h1 {
+    font-size:clamp(42px,6vw,72px);
+    line-height:1.12;
+    letter-spacing:-2px;
+    margin-bottom:25px;
 }
 
-.hero-icon {
-    font-size: 25px;
+.welcome-content h1 span {
+    color:#39D5C5;
 }
 
-section {
-    padding: 85px 25px;
+.welcome-content p {
+    color:#D9E2EC;
+    font-size:18px;
+    line-height:1.8;
+    max-width:590px;
+    margin-bottom:35px;
 }
 
-.container {
-    max-width: 1200px;
-    margin: auto;
+.welcome-buttons {
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
 }
 
-.section-heading {
-    text-align: center;
-    margin-bottom: 50px;
+.welcome-buttons .btn {
+    padding:16px 27px;
 }
 
-.section-heading small {
-    color: var(--turquoise);
-    font-weight: 800;
-    letter-spacing: 2px;
+.welcome-outline {
+    background:transparent;
+    border:1px solid rgba(255,255,255,.5);
+    color:white;
 }
 
-.section-heading h2 {
-    font-size: 36px;
-    margin: 10px 0;
+.welcome-outline:hover {
+    background:rgba(255,255,255,.1);
 }
 
-.section-heading p {
-    color: #627D98;
-    max-width: 600px;
-    margin: auto;
+.welcome-footer {
+    position:absolute;
+    bottom:20px;
+    right:8%;
+    color:#BCCCDC;
+    font-size:12px;
 }
 
-.about,.why {
-    background: var(--light);
-}
-
-.about-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-}
-
-.about-content h2 {
-    font-size: 35px;
-    margin-bottom: 20px;
-}
-
-.about-content p {
-    color: #627D98;
-    margin-bottom: 15px;
-}
-
-.about-highlight {
-    background: white;
-    border-left: 5px solid var(--turquoise);
-    padding: 30px;
-    border-radius: 8px;
-}
-
-.subject-grid {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 25px;
-}
-
-.subject-card {
-    padding: 30px;
-    border: 1px solid #E5EAF0;
-    border-radius: 12px;
-    transition: .3s;
-}
-
-.subject-card:hover {
-    transform: translateY(-7px);
-    box-shadow: 0 15px 35px rgba(16,42,67,.09);
-    border-color: var(--turquoise);
-}
-
-.subject-icon {
-    width: 55px;
-    height: 55px;
-    background: #E6FAF8;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 27px;
-    margin-bottom: 20px;
-}
-
-.subject-card h3 {
-    margin-bottom: 10px;
-}
-
-.subject-card p {
-    color: #627D98;
-    font-size: 14px;
-}
-
-.features {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 30px;
-}
-
-.feature {
-    text-align: center;
-    padding: 25px;
-}
-
-.feature-icon {
-    font-size: 35px;
-    margin-bottom: 15px;
-}
-
-.feature p {
-    color: #627D98;
-    font-size: 14px;
-}
-
-.cta {
-    background: var(--navy);
-    color: white;
-    text-align: center;
-}
-
-.cta h2 {
-    font-size: 36px;
-    margin-bottom: 15px;
-}
-
-.cta p {
-    color: #D9E2EC;
-    margin-bottom: 25px;
-}
-
-.contact-box {
-    max-width: 650px;
-    margin: auto;
-    text-align: center;
-}
-
-.contact-box p {
-    color: #627D98;
-    margin: 15px 0 25px;
-}
-
-footer {
-    background: #0B1F33;
-    color: white;
-    padding: 35px 25px;
-    text-align: center;
-}
-
-footer p {
-    color: #BCCCDC;
-    font-size: 13px;
-    margin-top: 8px;
-}
-
-/* AUTHENTICATION MODAL */
+/* =================================
+   AUTHENTICATION MODAL
+================================= */
 
 .modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 3000;
-    background: rgba(0,0,0,.65);
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:5000;
+    background:rgba(5,20,35,.75);
+    justify-content:center;
+    align-items:center;
+    padding:18px;
 }
 
 .modal.active {
-    display: flex;
+    display:flex;
 }
 
 .auth-box {
-    background: white;
-    width: 100%;
-    max-width: 430px;
-    padding: 35px;
-    border-radius: 14px;
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
+    background:white;
+    width:100%;
+    max-width:430px;
+    padding:35px;
+    border-radius:14px;
+    position:relative;
+    max-height:90vh;
+    overflow-y:auto;
+    box-shadow:0 25px 70px rgba(0,0,0,.2);
 }
 
 .close-modal {
-    position: absolute;
-    right: 20px;
-    top: 15px;
-    font-size: 26px;
-    border: none;
-    background: none;
-    color: #627D98;
+    position:absolute;
+    right:18px;
+    top:12px;
+    background:none;
+    border:none;
+    font-size:28px;
+    color:var(--muted);
+}
+
+.auth-logo {
+    font-size:19px;
+    font-weight:900;
+    margin-bottom:25px;
+}
+
+.auth-logo span {
+    color:var(--turquoise);
 }
 
 .auth-box h2 {
-    margin-bottom: 5px;
-    font-size: 27px;
+    font-size:27px;
+    margin-bottom:6px;
 }
 
 .auth-description {
-    color: #627D98;
-    margin-bottom: 25px;
-    font-size: 14px;
+    color:var(--muted);
+    font-size:14px;
+    margin-bottom:25px;
 }
 
 .auth-box label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 6px;
-    font-size: 14px;
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:7px;
 }
 
 .auth-box input {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid #D9E2EC;
-    border-radius: 6px;
-    margin-bottom: 17px;
-    outline: none;
-    font-size: 15px;
+    width:100%;
+    padding:13px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    margin-bottom:18px;
+    outline:none;
 }
 
 .auth-box input:focus {
-    border-color: var(--turquoise);
+    border-color:var(--turquoise);
 }
 
 .auth-submit {
-    width: 100%;
-    padding: 14px;
-    background: var(--navy);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 15px;
+    width:100%;
+    background:var(--navy);
+    color:white;
+    border:none;
+    border-radius:7px;
+    padding:14px;
+    font-weight:700;
 }
 
 .auth-submit:disabled {
-    opacity: .6;
-    cursor: not-allowed;
+    opacity:.6;
 }
 
 .auth-switch {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 14px;
-    color: #627D98;
+    text-align:center;
+    color:var(--muted);
+    margin-top:20px;
+    font-size:14px;
 }
 
-.auth-switch button {
-    background: none;
-    border: none;
-    color: var(--turquoise);
-    font-weight: 700;
+.auth-switch button,
+.forgot-button {
+    border:none;
+    background:none;
+    color:var(--turquoise);
+    font-weight:700;
 }
 
-.forgot-password {
-    display: block;
-    text-align: right;
-    margin-top: -8px;
-    margin-bottom: 17px;
-    color: var(--turquoise);
-    font-size: 13px;
-    border: none;
-    background: none;
+.forgot-button {
+    display:block;
+    margin:-7px 0 17px auto;
+    font-size:13px;
 }
 
 .auth-message {
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    font-size: 13px;
-    display: none;
-    overflow-wrap: anywhere;
+    display:none;
+    padding:12px;
+    border-radius:7px;
+    margin-bottom:17px;
+    font-size:13px;
+    overflow-wrap:anywhere;
 }
 
 .auth-message.success {
-    display: block;
-    background: #E6FAF0;
-    color: #176B43;
+    display:block;
+    background:#E6FAF0;
+    color:#176B43;
 }
 
 .auth-message.error {
-    display: block;
-    background: #FDECEC;
-    color: #A32626;
+    display:block;
+    background:#FDECEC;
+    color:#A32626;
 }
 
-.user-status {
-    display: none;
-    background: #E6FAF8;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 15px;
-    color: var(--navy);
-    font-size: 14px;
+/* =================================
+   APPLICATION LAYOUT
+================================= */
+
+#appPage {
+    min-height:100vh;
 }
 
-.user-status.visible {
-    display: block;
+.sidebar {
+    position:fixed;
+    top:0;
+    left:0;
+    width:255px;
+    height:100vh;
+    background:var(--navy);
+    color:white;
+    padding:27px 17px;
+    display:flex;
+    flex-direction:column;
+    z-index:1000;
 }
 
-.user-status button {
-    display: block;
-    margin-top: 10px;
-    border: none;
-    background: var(--navy);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 5px;
+.sidebar-brand {
+    padding:0 12px 35px;
+    border-bottom:1px solid rgba(255,255,255,.12);
 }
 
-@media(max-width:768px) {
-    .menu-toggle {
-        display: block;
+.sidebar-brand .brand {
+    color:white;
+    font-size:22px;
+}
+
+.sidebar-brand small {
+    display:block;
+    color:#9FB3C8;
+    margin-top:5px;
+    font-size:11px;
+    letter-spacing:1px;
+}
+
+.sidebar-label {
+    color:#829AB1;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:2px;
+    padding:25px 12px 12px;
+}
+
+.sidebar-menu {
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+.sidebar-menu button {
+    text-align:left;
+    padding:13px 14px;
+    border:none;
+    border-radius:7px;
+    color:#D9E2EC;
+    background:transparent;
+    font-size:14px;
+    font-weight:600;
+}
+
+.sidebar-menu button:hover,
+.sidebar-menu button.active {
+    background:rgba(0,184,169,.18);
+    color:#54E0D2;
+}
+
+.sidebar-bottom {
+    margin-top:auto;
+    border-top:1px solid rgba(255,255,255,.12);
+    padding-top:18px;
+}
+
+.sidebar-bottom button {
+    width:100%;
+    padding:13px;
+    background:rgba(255,255,255,.08);
+    border:none;
+    border-radius:7px;
+    color:white;
+    text-align:left;
+}
+
+.main-area {
+    margin-left:255px;
+    min-height:100vh;
+}
+
+.topbar {
+    height:75px;
+    background:white;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 35px;
+}
+
+.topbar h2 {
+    font-size:19px;
+}
+
+.user-profile {
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar {
+    width:39px;
+    height:39px;
+    border-radius:50%;
+    background:#DDF8F5;
+    color:#008F83;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:800;
+}
+
+.user-details strong {
+    display:block;
+    font-size:13px;
+}
+
+.user-details small {
+    color:var(--muted);
+    font-size:11px;
+}
+
+.content {
+    padding:35px;
+    max-width:1500px;
+    margin:auto;
+}
+
+.welcome-banner {
+    background:linear-gradient(120deg,var(--navy),var(--navy2));
+    color:white;
+    padding:32px;
+    border-radius:13px;
+    margin-bottom:30px;
+    position:relative;
+    overflow:hidden;
+}
+
+.welcome-banner:after {
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    border:35px solid rgba(0,184,169,.15);
+    border-radius:50%;
+    right:-45px;
+    top:-100px;
+}
+
+.welcome-banner small {
+    color:#55DFD1;
+    font-weight:800;
+    letter-spacing:2px;
+}
+
+.welcome-banner h1 {
+    font-size:27px;
+    margin:10px 0;
+}
+
+.welcome-banner p {
+    color:#D9E2EC;
+    font-size:14px;
+}
+
+.section-title {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:30px 0 17px;
+}
+
+.section-title h3 {
+    font-size:19px;
+}
+
+.section-title p {
+    color:var(--muted);
+    font-size:12px;
+}
+
+.stats-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-bottom:30px;
+}
+
+.stat-card {
+    background:white;
+    border:1px solid var(--border);
+    border-radius:11px;
+    padding:23px;
+}
+
+.stat-card .stat-icon {
+    width:42px;
+    height:42px;
+    background:#E6FAF8;
+    color:#009B90;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
+    margin-bottom:15px;
+}
+
+.stat-card strong {
+    display:block;
+    font-size:27px;
+}
+
+.stat-card span {
+    color:var(--muted);
+    font-size:13px;
+}
+
+.course-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.course-card {
+    background:white;
+    border:1px solid var(--border);
+    border-radius:11px;
+    padding:23px;
+}
+
+.course-card .course-icon {
+    width:43px;
+    height:43px;
+    background:#E6FAF8;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
+    margin-bottom:15px;
+}
+
+.course-card h4 {
+    margin-bottom:8px;
+}
+
+.course-card p {
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:15px;
+}
+
+.course-card button {
+    background:var(--navy);
+    color:white;
+    border:none;
+    padding:10px 16px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.empty-state {
+    background:white;
+    border:1px dashed #CBD5E1;
+    border-radius:11px;
+    padding:45px 20px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.empty-state .empty-icon {
+    font-size:38px;
+    margin-bottom:12px;
+}
+
+.empty-state h3 {
+    color:var(--navy);
+    margin-bottom:7px;
+}
+
+.panel {
+    background:white;
+    border:1px solid var(--border);
+    border-radius:11px;
+    padding:25px;
+    margin-bottom:20px;
+}
+
+.panel h3 {
+    margin-bottom:10px;
+}
+
+.panel p {
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.7;
+}
+
+/* =================================
+   ADMIN DASHBOARD
+================================= */
+
+.admin-badge {
+    display:inline-block;
+    padding:5px 10px;
+    background:#E6FAF8;
+    color:#008F83;
+    font-size:11px;
+    font-weight:800;
+    border-radius:20px;
+}
+
+/* =================================
+   MOBILE
+================================= */
+
+.mobile-menu {
+    display:none;
+    border:none;
+    background:none;
+    font-size:24px;
+    color:var(--navy);
+}
+
+@media(max-width:850px) {
+
+    .sidebar {
+        transform:translateX(-100%);
+        transition:.25s;
     }
 
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 70px;
-        left: 0;
-        width: 100%;
-        background: white;
-        flex-direction: column;
-        padding: 25px;
-        gap: 22px;
+    .sidebar.open {
+        transform:translateX(0);
     }
 
-    .nav-links.active {
-        display: flex;
+    .main-area {
+        margin-left:0;
     }
 
-    .hero {
-        padding: 75px 22px;
+    .mobile-menu {
+        display:block;
     }
 
-    .hero-content {
-        grid-template-columns: 1fr;
+    .topbar {
+        padding:0 18px;
     }
 
-    .hero-card {
-        padding: 25px;
+    .content {
+        padding:20px;
     }
 
-    .about-content {
-        grid-template-columns: 1fr;
-        gap: 30px;
+    .stats-grid {
+        grid-template-columns:1fr 1fr;
     }
 
-    .subject-grid,.features {
-        grid-template-columns: 1fr;
+    .course-grid {
+        grid-template-columns:1fr;
     }
 
-    .section-heading h2,.cta h2 {
-        font-size: 29px;
+}
+
+@media(max-width:550px) {
+
+    .public-header {
+        padding:0 18px;
+        height:70px;
     }
 
-    .auth-nav {
-        flex-direction: column;
-        width: 100%;
+    .public-header .brand {
+        font-size:18px;
     }
+
+    .public-actions {
+        gap:6px;
+    }
+
+    .public-actions .btn {
+        padding:10px 12px;
+        font-size:12px;
+    }
+
+    .welcome-hero {
+        min-height:calc(100vh - 70px);
+        padding:55px 24px;
+    }
+
+    .welcome-content h1 {
+        font-size:43px;
+    }
+
+    .welcome-content p {
+        font-size:15px;
+    }
+
+    .welcome-footer {
+        display:none;
+    }
+
+    .auth-box {
+        padding:27px 22px;
+    }
+
+    .stats-grid {
+        grid-template-columns:1fr;
+    }
+
+    .welcome-banner {
+        padding:25px;
+    }
+
+    .welcome-banner h1 {
+        font-size:23px;
+    }
+
+    .user-details {
+        display:none;
+    }
+
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<nav>
+<!-- =================================
+     PUBLIC WELCOME PAGE
+================================= -->
 
-<a href="#" class="logo">BRIGHT <span>MINDS.</span></a>
+<div id="welcomePage">
 
-<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <header class="public-header">
 
-<div class="nav-links" id="navLinks">
+        <div class="brand">
+            BRIGHT <span>MINDS.</span>
+        </div>
 
-<a href="#home">Home</a>
-<a href="#about">About Us</a>
-<a href="#subjects">Subjects</a>
-<a href="#why">Why Us</a>
-<a href="#contact">Contact</a>
+        <div class="public-actions">
 
-<div class="auth-nav" id="authButtons">
-<button class="login-nav" onclick="openAuth('login')">Login</button>
-<button class="register-nav" onclick="openAuth('signup')">Register</button>
-</div>
+            <button class="btn btn-secondary"
+                onclick="openAuth('login')">
+                Sign In
+            </button>
 
-</div>
-</nav>
-</header>
+            <button class="btn btn-primary"
+                onclick="openAuth('signup')">
+                Create Account
+            </button>
 
-<main>
+        </div>
 
-<section class="hero" id="home">
+    </header>
 
-<div class="hero-content">
+    <main class="welcome-hero">
 
-<div>
+        <div class="welcome-content">
 
-<div class="hero-tag">BRIGHT MINDS TUTORIALS</div>
+            <div class="welcome-label">
+                BRIGHT MINDS TUTORIALS
+            </div>
 
-<h1>Unlock Your Potential. <span>Shape Your Future.</span></h1>
+            <h1>
+                Learn with purpose.<br>
+                <span>Excel with confidence.</span>
+            </h1>
 
-<p>
-Education is more than memorising facts.
-It's about understanding, discovering and developing
-the knowledge to transform your future.
-</p>
+            <p>
+                Welcome to a learning environment built around
+                understanding, curiosity and academic excellence.
+                Access your learning materials, lessons and
+                assessments in one place.
+            </p>
 
-<div class="hero-buttons">
-<a href="#subjects" class="btn btn-primary">Explore Subjects →</a>
-<a href="#about" class="btn btn-outline">Discover More</a>
-</div>
+            <div class="welcome-buttons">
 
-</div>
+                <button class="btn btn-primary"
+                    onclick="openAuth('signup')">
+                    Get Started →
+                </button>
 
-<div class="hero-card">
+                <button class="btn welcome-outline"
+                    onclick="openAuth('login')">
+                    Sign In to Continue
+                </button>
 
-<h3>Learning Starts Here.</h3>
+            </div>
 
-<div class="hero-card-item">
-<span class="hero-icon">📐</span>
-<span>Mathematics & Problem Solving</span>
-</div>
+        </div>
 
-<div class="hero-card-item">
-<span class="hero-icon">⚛️</span>
-<span>Physics & Scientific Discovery</span>
-</div>
+        <div class="welcome-footer">
+            Learn. Understand. Excel.
+        </div>
 
-<div class="hero-card-item">
-<span class="hero-icon">🧪</span>
-<span>Chemistry & Practical Knowledge</span>
-</div>
-
-<div class="hero-card-item">
-<span class="hero-icon">🧬</span>
-<span>Biology & Life Sciences</span>
-</div>
-
-</div>
-</div>
-</section>
-
-<section class="about" id="about">
-
-<div class="container about-content">
-
-<div>
-
-<div class="hero-tag">WHO WE ARE</div>
-
-<h2>Building Knowledge. Inspiring Excellence.</h2>
-
-<p>
-Bright Minds Tutorials is an educational initiative
-dedicated to making learning meaningful, accessible
-and engaging.
-</p>
-
-<p>
-We believe every student has the potential to excel
-when given the right guidance, resources and learning
-environment.
-</p>
-
-<p>
-Our approach focuses on developing genuine understanding,
-strengthening problem-solving abilities and preparing
-learners for academic success.
-</p>
+    </main>
 
 </div>
 
-<div class="about-highlight">
 
-<h3>Our Philosophy</h3>
+<!-- =================================
+     APPLICATION DASHBOARD
+================================= -->
 
-<p>
-We don't just teach students what to learn.
-We help them understand why it works, how it works
-and how to apply that knowledge.
-</p>
+<div id="appPage" class="hidden">
 
-<br>
-<strong>Learn. Understand. Excel.</strong>
+    <aside class="sidebar" id="sidebar">
 
-</div>
-</div>
-</section>
+        <div class="sidebar-brand">
 
-<section id="subjects">
+            <div class="brand">
+                BRIGHT <span>MINDS.</span>
+            </div>
 
-<div class="container">
+            <small id="sidebarSubtitle">
+                LEARNING PORTAL
+            </small>
 
-<div class="section-heading">
-<small>OUR ACADEMIC PROGRAMMES</small>
-<h2>Explore Our Subjects</h2>
-<p>
-Develop a strong foundation in the sciences
-through structured learning and guided practice.
-</p>
-</div>
+        </div>
 
-<div class="subject-grid">
+        <div class="sidebar-label">WORKSPACE</div>
 
-<div class="subject-card">
-<div class="subject-icon">📐</div>
-<h3>Mathematics</h3>
-<p>Develop logical thinking, mathematical reasoning and problem-solving skills.</p>
-</div>
+        <div class="sidebar-menu" id="sidebarMenu">
 
-<div class="subject-card">
-<div class="subject-icon">⚛️</div>
-<h3>Physics</h3>
-<p>Understand the principles governing matter, energy and the physical world.</p>
-</div>
+            <!-- Menu is created according to account role -->
 
-<div class="subject-card">
-<div class="subject-icon">🧪</div>
-<h3>Chemistry</h3>
-<p>Explore chemical reactions, matter, elements and the fascinating world of chemistry.</p>
-</div>
+        </div>
 
-<div class="subject-card">
-<div class="subject-icon">🧬</div>
-<h3>Biology</h3>
-<p>Discover life processes, living organisms and the complexity of biological systems.</p>
-</div>
+        <div class="sidebar-bottom">
 
-<div class="subject-card">
-<div class="subject-icon">💻</div>
-<h3>Computer Studies</h3>
-<p>Develop digital literacy and understand the technologies shaping our world.</p>
-</div>
+            <button onclick="logout()">
+                ↪ &nbsp; Sign Out
+            </button>
 
-</div>
-</div>
-</section>
+        </div>
 
-<section class="why" id="why">
+    </aside>
 
-<div class="container">
 
-<div class="section-heading">
-<small>THE BRIGHT MINDS DIFFERENCE</small>
-<h2>Why Learn With Us?</h2>
-<p>We believe effective education should build confidence, competence and curiosity.</p>
-</div>
+    <main class="main-area">
 
-<div class="features">
+        <header class="topbar">
 
-<div class="feature">
-<div class="feature-icon">🎯</div>
-<h3>Concept-Based Learning</h3>
-<p>Understand concepts deeply instead of relying on memorisation.</p>
-</div>
+            <div style="display:flex;align-items:center;gap:15px;">
 
-<div class="feature">
-<div class="feature-icon">📚</div>
-<h3>Structured Resources</h3>
-<p>Access organised learning materials designed to support your studies.</p>
-</div>
+                <button class="mobile-menu"
+                    onclick="toggleSidebar()">
+                    ☰
+                </button>
 
-<div class="feature">
-<div class="feature-icon">💡</div>
-<h3>Practical Application</h3>
-<p>Develop the ability to apply knowledge to real academic problems.</p>
-</div>
+                <h2 id="pageHeading">Dashboard</h2>
+
+            </div>
+
+            <div class="user-profile">
+
+                <div class="avatar" id="userAvatar">B</div>
+
+                <div class="user-details">
+
+                    <strong id="topUserName">Student</strong>
+
+                    <small id="topUserRole">Student Account</small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="content" id="dashboardContent">
+
+            <!-- Dashboard content is loaded here -->
+
+        </div>
+
+    </main>
 
 </div>
-</div>
-</section>
-
-<section class="cta">
-
-<div class="container">
-
-<h2>Your Journey to Excellence Starts Here.</h2>
-
-<p>
-Take the next step towards becoming a confident,
-knowledgeable and independent learner.
-</p>
-
-<button class="btn btn-primary" onclick="openAuth('signup')">
-Create Your Account →
-</button>
-
-</div>
-</section>
-
-<section class="contact" id="contact">
-
-<div class="container contact-box">
-
-<div class="section-heading">
-<small>GET IN TOUCH</small>
-<h2>Connect With Us</h2>
-</div>
-
-<p>
-Interested in learning with Bright Minds Tutorials?
-Contact us to find out more about our programmes.
-</p>
-
-<a href="mailto:brightmindstutorials@gmail.com" class="btn btn-primary">
-Contact Us
-</a>
-
-</div>
-</section>
-
-</main>
-
-<footer>
-
-<div class="logo" style="color:white;">
-BRIGHT <span>MINDS.</span>
-</div>
-
-<p>Learn. Understand. Excel.</p>
-
-<p>© <span id="year"></span> Bright Minds Tutorials. All rights reserved.</p>
-
-</footer>
 
 
-<!-- AUTHENTICATION MODAL -->
+<!-- =================================
+     AUTHENTICATION MODAL
+================================= -->
 
 <div class="modal" id="authModal">
 
-<div class="auth-box">
+    <div class="auth-box">
 
-<button class="close-modal" onclick="closeAuth()">×</button>
+        <button class="close-modal"
+            onclick="closeAuth()">×</button>
 
-<h2 id="authTitle">Welcome Back</h2>
+        <div class="auth-logo">
+            BRIGHT <span>MINDS.</span>
+        </div>
 
-<p class="auth-description" id="authDescription">
-Sign in to your Bright Minds account.
-</p>
+        <h2 id="authTitle">Welcome Back</h2>
 
-<div id="authMessage" class="auth-message"></div>
+        <p class="auth-description" id="authDescription">
+            Sign in to your learning account.
+        </p>
 
-<div id="authFormContainer">
+        <div id="authMessage" class="auth-message"></div>
 
-<form id="authForm">
+        <form id="authForm">
 
-<div id="nameField" style="display:none;">
+            <div id="nameField" class="hidden">
 
-<label for="fullName">Full Name</label>
+                <label for="fullName">Full Name</label>
 
-<input
-type="text"
-id="fullName"
-placeholder="Enter your full name"
-autocomplete="name"
->
+                <input
+                    type="text"
+                    id="fullName"
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                >
+
+            </div>
+
+            <label for="email">Email Address</label>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                required
+                autocomplete="email"
+            >
+
+            <label for="password">Password</label>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password"
+            >
+
+            <button type="button"
+                class="forgot-button"
+                id="forgotButton"
+                onclick="resetPassword()">
+                Forgot password?
+            </button>
+
+            <button type="submit"
+                class="auth-submit"
+                id="authSubmit">
+                Sign In
+            </button>
+
+        </form>
+
+        <div class="auth-switch" id="authSwitch">
+
+            Don't have an account?
+
+            <button onclick="openAuth('signup')">
+                Register
+            </button>
+
+        </div>
+
+    </div>
 
 </div>
-
-<label for="email">Email Address</label>
-
-<input
-type="email"
-id="email"
-placeholder="Enter your email"
-required
-autocomplete="email"
->
-
-<label for="password">Password</label>
-
-<input
-type="password"
-id="password"
-placeholder="Enter your password"
-required
-autocomplete="current-password"
->
-
-<button type="button"
-class="forgot-password"
-id="forgotButton"
-onclick="resetPassword()">
-Forgot password?
-</button>
-
-<button type="submit" class="auth-submit" id="authSubmit">
-Sign In
-</button>
-
-</form>
-
-<div class="auth-switch" id="authSwitch">
-
-Don't have an account?
-
-<button onclick="openAuth('signup')">Register</button>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-
-<!-- SUPABASE LIBRARY AND CONFIGURATION -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="./supabase-config.js"></script>
 
 
 <script>
 
-document.getElementById("year").textContent =
-new Date().getFullYear();
-
-
-function toggleMenu() {
-    document.getElementById("navLinks").classList.toggle("active");
-}
-
-document.querySelectorAll(".nav-links a").forEach(link => {
-    link.addEventListener("click", () => {
-        document.getElementById("navLinks").classList.remove("active");
-    });
-});
-
-
-// ===================================
-// SUPABASE CONNECTION
-// ===================================
+/* =================================
+   GENERAL SETUP
+================================= */
 
 let supabaseClient = null;
+let currentUser = null;
+let currentProfile = null;
+let currentMode = "login";
+
+const welcomePage = document.getElementById("welcomePage");
+const appPage = document.getElementById("appPage");
 
 try {
 
-    if (
-        !window.BRIGHT_MINDS_CONFIG ||
-        !window.BRIGHT_MINDS_CONFIG.SUPABASE_URL ||
-        !window.BRIGHT_MINDS_CONFIG.SUPABASE_KEY
-    ) {
+    if (!window.BRIGHT_MINDS_CONFIG) {
         throw new Error("Supabase configuration is missing.");
-    }
-
-    if (!window.supabase || !window.supabase.createClient) {
-        throw new Error("Supabase library failed to load.");
     }
 
     supabaseClient = window.supabase.createClient(
@@ -978,16 +1027,14 @@ try {
 
 } catch (error) {
 
-    console.error("Supabase connection error:", error);
+    console.error("Supabase setup error:", error);
 
 }
 
 
-// ===================================
-// AUTHENTICATION INTERFACE
-// ===================================
-
-let currentMode = "login";
+/* =================================
+   AUTH MODAL
+================================= */
 
 function openAuth(mode) {
 
@@ -996,53 +1043,62 @@ function openAuth(mode) {
     document.getElementById("authModal").classList.add("active");
 
     document.getElementById("authMessage").className = "auth-message";
+
     document.getElementById("authMessage").textContent = "";
 
     const nameField = document.getElementById("nameField");
-    const forgotButton = document.getElementById("forgotButton");
-    const authTitle = document.getElementById("authTitle");
-    const authDescription = document.getElementById("authDescription");
-    const authSubmit = document.getElementById("authSubmit");
-    const authSwitch = document.getElementById("authSwitch");
+    const forgot = document.getElementById("forgotButton");
+
+    const title = document.getElementById("authTitle");
+    const description = document.getElementById("authDescription");
+    const submit = document.getElementById("authSubmit");
+    const switchBox = document.getElementById("authSwitch");
 
     if (mode === "signup") {
 
-        authTitle.textContent = "Create Your Account";
-        authDescription.textContent = "Join the Bright Minds learning community.";
+        title.textContent = "Create Your Account";
 
-        nameField.style.display = "block";
+        description.textContent =
+            "Join the Bright Minds learning community.";
+
+        nameField.classList.remove("hidden");
 
         document.getElementById("fullName").required = true;
 
-        forgotButton.style.display = "none";
+        forgot.classList.add("hidden");
 
-        authSubmit.textContent = "Create Account";
+        submit.textContent = "Create Account";
 
-        authSwitch.innerHTML =
-        'Already have an account? <button type="button" onclick="openAuth(\'login\')">Sign In</button>';
+        switchBox.innerHTML =
+            'Already have an account? <button type="button" onclick="openAuth(\'login\')">Sign In</button>';
 
     } else {
 
-        authTitle.textContent = "Welcome Back";
-        authDescription.textContent = "Sign in to your Bright Minds account.";
+        title.textContent = "Welcome Back";
 
-        nameField.style.display = "none";
+        description.textContent =
+            "Sign in to access your learning portal.";
+
+        nameField.classList.add("hidden");
 
         document.getElementById("fullName").required = false;
 
-        forgotButton.style.display = "block";
+        forgot.classList.remove("hidden");
 
-        authSubmit.textContent = "Sign In";
+        submit.textContent = "Sign In";
 
-        authSwitch.innerHTML =
-        'Don\'t have an account? <button type="button" onclick="openAuth(\'signup\')">Register</button>';
+        switchBox.innerHTML =
+            'Don\'t have an account? <button type="button" onclick="openAuth(\'signup\')">Register</button>';
 
     }
+
 }
 
 
 function closeAuth() {
+
     document.getElementById("authModal").classList.remove("active");
+
 }
 
 
@@ -1055,10 +1111,6 @@ document.getElementById("authModal").addEventListener("click", function(e) {
 });
 
 
-// ===================================
-// DISPLAY MESSAGES
-// ===================================
-
 function showMessage(message, type) {
 
     const box = document.getElementById("authMessage");
@@ -1070,9 +1122,9 @@ function showMessage(message, type) {
 }
 
 
-// ===================================
-// REGISTRATION AND LOGIN
-// ===================================
+/* =================================
+   REGISTRATION AND LOGIN
+================================= */
 
 document.getElementById("authForm").addEventListener("submit", async function(e) {
 
@@ -1081,11 +1133,12 @@ document.getElementById("authForm").addEventListener("submit", async function(e)
     if (!supabaseClient) {
 
         showMessage(
-            "Unable to connect to Supabase. Check your configuration file.",
+            "Unable to connect to the learning platform. Check the Supabase configuration.",
             "error"
         );
 
         return;
+
     }
 
     const email = document.getElementById("email").value.trim();
@@ -1094,10 +1147,10 @@ document.getElementById("authForm").addEventListener("submit", async function(e)
 
     const fullName = document.getElementById("fullName").value.trim();
 
-    const submitButton = document.getElementById("authSubmit");
+    const button = document.getElementById("authSubmit");
 
-    submitButton.disabled = true;
-    submitButton.textContent = "Please wait...";
+    button.disabled = true;
+    button.textContent = "Please wait...";
 
     try {
 
@@ -1113,9 +1166,8 @@ document.getElementById("authForm").addEventListener("submit", async function(e)
 
             const { data, error } = await supabaseClient.auth.signUp({
 
-                email: email,
-
-                password: password,
+                email,
+                password,
 
                 options: {
 
@@ -1124,7 +1176,7 @@ document.getElementById("authForm").addEventListener("submit", async function(e)
                     },
 
                     emailRedirectTo:
-                    "https://somforge.github.io/bright-minds-tutorials/"
+                        "https://somforge.github.io/bright-minds-tutorials/"
 
                 }
 
@@ -1135,16 +1187,16 @@ document.getElementById("authForm").addEventListener("submit", async function(e)
             if (data.session) {
 
                 showMessage(
-                    "Registration successful! You are now signed in.",
+                    "Account created successfully. Opening your dashboard...",
                     "success"
                 );
 
-                await updateAuthInterface(data.session.user);
+                await loadApplication(data.session.user);
 
             } else {
 
                 showMessage(
-                    "Your account has been created. Please check your email to confirm your registration before signing in.",
+                    "Your account has been created. Please check your email and confirm your registration before signing in.",
                     "success"
                 );
 
@@ -1153,19 +1205,21 @@ document.getElementById("authForm").addEventListener("submit", async function(e)
         } else {
 
             const { data, error } =
-            await supabaseClient.auth.signInWithPassword({
+                await supabaseClient.auth.signInWithPassword({
 
-                email: email,
+                    email,
+                    password
 
-                password: password
-
-            });
+                });
 
             if (error) throw error;
 
-            showMessage("Login successful!", "success");
+            showMessage(
+                "Login successful. Opening your dashboard...",
+                "success"
+            );
 
-            await updateAuthInterface(data.user);
+            await loadApplication(data.user);
 
         }
 
@@ -1175,48 +1229,46 @@ document.getElementById("authForm").addEventListener("submit", async function(e)
 
     } finally {
 
-        submitButton.disabled = false;
+        button.disabled = false;
 
-        submitButton.textContent =
-        currentMode === "signup" ? "Create Account" : "Sign In";
+        button.textContent =
+            currentMode === "signup" ? "Create Account" : "Sign In";
 
     }
 
 });
 
 
-// ===================================
-// PASSWORD RECOVERY
-// ===================================
+/* =================================
+   PASSWORD RECOVERY
+================================= */
 
 async function resetPassword() {
 
-    if (!supabaseClient) {
-        showMessage("Supabase is not connected.", "error");
-        return;
-    }
+    if (!supabaseClient) return;
 
     const email = document.getElementById("email").value.trim();
 
     if (!email) {
 
         showMessage(
-            "Please enter your email address first.",
+            "Enter your email address first.",
             "error"
         );
 
         return;
+
     }
 
     try {
 
         const { error } =
-        await supabaseClient.auth.resetPasswordForEmail(email, {
+            await supabaseClient.auth.resetPasswordForEmail(email, {
 
-            redirectTo:
-            "https://somforge.github.io/bright-minds-tutorials/"
+                redirectTo:
+                    "https://somforge.github.io/bright-minds-tutorials/"
 
-        });
+            });
 
         if (error) throw error;
 
@@ -1234,92 +1286,708 @@ async function resetPassword() {
 }
 
 
-// ===================================
-// USER SESSION AND ACCOUNT ROLE
-// ===================================
+/* =================================
+   LOAD ACCOUNT AND DETERMINE ROLE
+================================= */
 
-async function updateAuthInterface(user) {
+async function loadApplication(user) {
 
     if (!user || !supabaseClient) return;
 
-    const { data: profile, error } =
-    await supabaseClient
-        .from("profiles")
-        .select("full_name, role")
-        .eq("id", user.id)
-        .single();
+    try {
 
-    if (error) {
+        const { data: profile, error } =
+            await supabaseClient
+                .from("profiles")
+                .select("full_name, role")
+                .eq("id", user.id)
+                .single();
 
-        console.error("Profile lookup error:", error);
+        if (error) throw error;
 
-        return;
+        currentUser = user;
+        currentProfile = profile;
 
-    }
+        if (profile.role !== "admin" && profile.role !== "student") {
 
-    const role = profile.role;
+            throw new Error("Your account has an unrecognised role.");
 
-    const name = profile.full_name || user.email;
+        }
 
-    document.getElementById("authButtons").innerHTML = `
+        welcomePage.classList.add("hidden");
 
-        <span style="font-size:13px;font-weight:600;">
-            Welcome, ${escapeHTML(name)}
-        </span>
+        appPage.classList.remove("hidden");
 
-        <button class="register-nav" onclick="logout()">
-            Logout
-        </button>
+        closeAuth();
 
-    `;
+        const name = profile.full_name || user.email;
 
-    if (role === "admin") {
+        document.getElementById("topUserName").textContent = name;
+
+        document.getElementById("userAvatar").textContent =
+            name.charAt(0).toUpperCase();
+
+        document.getElementById("topUserRole").textContent =
+            profile.role === "admin" ? "Administrator" : "Student";
+
+        if (profile.role === "admin") {
+
+            setupAdminDashboard();
+
+        } else {
+
+            setupStudentDashboard();
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
 
         showMessage(
-            "Welcome, Administrator! Your administrator account is recognised. We will now build your administration dashboard.",
-            "success"
-        );
-
-    } else {
-
-        showMessage(
-            "Welcome to Bright Minds Tutorials! Your student account is ready.",
-            "success"
+            "We could not load your account profile: " + error.message,
+            "error"
         );
 
     }
-
-    document.getElementById("authModal").classList.add("active");
 
 }
 
 
-function escapeHTML(value) {
+/* =================================
+   SIDEBAR MENU
+================================= */
 
-    return String(value).replace(/[&<>"']/g, function(char) {
+function buildMenu(items) {
 
-        return {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-        }[char];
+    const menu = document.getElementById("sidebarMenu");
+
+    menu.innerHTML = "";
+
+    items.forEach(item => {
+
+        const button = document.createElement("button");
+
+        button.textContent = item.icon + "   " + item.label;
+
+        button.dataset.page = item.page;
+
+        button.onclick = () => navigateDashboard(item.page);
+
+        menu.appendChild(button);
 
     });
 
 }
 
 
-// ===================================
-// LOGOUT
-// ===================================
+function navigateDashboard(page) {
+
+    document.querySelectorAll("#sidebarMenu button").forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.page === page
+        );
+
+    });
+
+    document.getElementById("sidebar").classList.remove("open");
+
+    if (currentProfile.role === "admin") {
+
+        renderAdminPage(page);
+
+    } else {
+
+        renderStudentPage(page);
+
+    }
+
+}
+
+
+function toggleSidebar() {
+
+    document.getElementById("sidebar").classList.toggle("open");
+
+}
+
+
+/* =================================
+   STUDENT DASHBOARD
+================================= */
+
+function setupStudentDashboard() {
+
+    document.getElementById("sidebarSubtitle").textContent =
+        "STUDENT PORTAL";
+
+    buildMenu([
+
+        {label:"Overview",icon:"▦",page:"overview"},
+
+        {label:"My Courses",icon:"▤",page:"courses"},
+
+        {label:"Assessments",icon:"✎",page:"assessments"},
+
+        {label:"My Results",icon:"▥",page:"results"},
+
+        {label:"Announcements",icon:"◉",page:"announcements"},
+
+        {label:"My Profile",icon:"◎",page:"profile"}
+
+    ]);
+
+    navigateDashboard("overview");
+
+}
+
+
+function renderStudentPage(page) {
+
+    const content = document.getElementById("dashboardContent");
+
+    if (page === "overview") {
+
+        document.getElementById("pageHeading").textContent =
+            "Student Overview";
+
+        content.innerHTML = `
+
+            <div class="welcome-banner">
+
+                <small>YOUR LEARNING SPACE</small>
+
+                <h1>Welcome back, ${escapeHTML(currentProfile.full_name || "Student")}!</h1>
+
+                <p>
+                    Continue your learning journey.
+                    Your courses, resources and assessments are all in one place.
+                </p>
+
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">📚</div>
+
+                    <strong id="courseCount">—</strong>
+
+                    <span>My Courses</span>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">📝</div>
+
+                    <strong>—</strong>
+
+                    <span>Assessments</span>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">🏆</div>
+
+                    <strong>—</strong>
+
+                    <span>Results</span>
+
+                </div>
+
+            </div>
+
+            <div class="section-title">
+
+                <div>
+                    <h3>My Learning</h3>
+                    <p>Your enrolled courses</p>
+                </div>
+
+            </div>
+
+            <div id="studentCourses">
+
+                <div class="empty-state">
+                    Loading your courses...
+                </div>
+
+            </div>
+
+        `;
+
+        loadStudentCourses();
+
+    }
+
+    else if (page === "courses") {
+
+        document.getElementById("pageHeading").textContent =
+            "My Courses";
+
+        content.innerHTML = `
+
+            <div class="section-title">
+                <div>
+                    <h3>My Courses</h3>
+                    <p>Courses you are enrolled in.</p>
+                </div>
+            </div>
+
+            <div id="studentCourses">
+                <div class="empty-state">Loading your courses...</div>
+            </div>
+
+        `;
+
+        loadStudentCourses();
+
+    }
+
+    else {
+
+        const titles = {
+            assessments:"Assessments",
+            results:"My Results",
+            announcements:"Announcements",
+            profile:"My Profile"
+        };
+
+        document.getElementById("pageHeading").textContent =
+            titles[page] || "Student Portal";
+
+        if (page === "profile") {
+
+            content.innerHTML = `
+
+                <div class="panel">
+
+                    <h3>My Profile</h3>
+
+                    <p><strong>Full name:</strong> ${escapeHTML(currentProfile.full_name || "Not provided")}</p>
+
+                    <p><strong>Email:</strong> ${escapeHTML(currentUser.email)}</p>
+
+                    <p><strong>Account type:</strong> Student</p>
+
+                </div>
+
+            `;
+
+        } else {
+
+            content.innerHTML = `
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">📘</div>
+
+                    <h3>${titles[page] || "Coming Soon"}</h3>
+
+                    <p>
+                        This section is being prepared.
+                        It will become available as we complete the learning platform.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+}
+
+
+/* =================================
+   STUDENT COURSE RETRIEVAL
+================================= */
+
+async function loadStudentCourses() {
+
+    const container = document.getElementById("studentCourses");
+
+    if (!container || !currentUser) return;
+
+    try {
+
+        /*
+         * RLS should ensure students can only retrieve
+         * their own enrolment records.
+         */
+
+        const { data: enrolments, error } =
+            await supabaseClient
+                .from("enrollments")
+                .select("*");
+
+        if (error) throw error;
+
+        const activeEnrolments = (enrolments || []).filter(enrolment =>
+            enrolment.status === "active"
+        );
+
+        document.getElementById("courseCount").textContent =
+            activeEnrolments.length;
+
+        if (activeEnrolments.length === 0) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">📚</div>
+
+                    <h3>No Courses Yet</h3>
+
+                    <p>
+                        You are not currently enrolled in any courses.
+                        Once your enrolment is approved, your courses will appear here.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+        const courseIds = [
+            ...new Set(activeEnrolments.map(item => item.course_id).filter(Boolean))
+        ];
+
+        if (courseIds.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>Course information unavailable</h3>
+                    <p>Your enrolment records do not contain course references.</p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+        const { data: courses, error: courseError } =
+            await supabaseClient
+                .from("courses")
+                .select("*")
+                .in("id", courseIds);
+
+        if (courseError) throw courseError;
+
+        if (!courses || courses.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>No course information available</h3>
+                    <p>Please contact the administrator.</p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+        container.innerHTML = `
+
+            <div class="course-grid">
+
+                ${courses.map(course => `
+
+                    <div class="course-card">
+
+                        <div class="course-icon">📘</div>
+
+                        <h4>${escapeHTML(course.title || course.name || course.course_name || "Course")}</h4>
+
+                        <p>
+                            ${escapeHTML(course.description || "Your learning materials and lessons will be available here.")}
+                        </p>
+
+                        <button onclick="alert('The lesson area will be activated in the next development stage.')">
+                            Open Course →
+                        </button>
+
+                    </div>
+
+                `).join("")}
+
+            </div>
+
+        `;
+
+    } catch (error) {
+
+        console.error("Course loading error:", error);
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <h3>Unable to load courses</h3>
+
+                <p>
+                    There was a problem retrieving your course information.
+                    Please try again later.
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =================================
+   ADMIN DASHBOARD
+================================= */
+
+function setupAdminDashboard() {
+
+    document.getElementById("sidebarSubtitle").textContent =
+        "ADMINISTRATION PORTAL";
+
+    buildMenu([
+
+        {label:"Overview",icon:"▦",page:"overview"},
+
+        {label:"Students",icon:"♙",page:"students"},
+
+        {label:"Courses",icon:"▤",page:"courses"},
+
+        {label:"Enrolments",icon:"▣",page:"enrolments"},
+
+        {label:"Lessons & Materials",icon:"📚",page:"lessons"},
+
+        {label:"Assessments",icon:"✎",page:"assessments"},
+
+        {label:"Results",icon:"▥",page:"results"},
+
+        {label:"Announcements",icon:"◉",page:"announcements"}
+
+    ]);
+
+    navigateDashboard("overview");
+
+}
+
+
+function renderAdminPage(page) {
+
+    const content = document.getElementById("dashboardContent");
+
+    const headings = {
+        overview:"Administrator Overview",
+        students:"Student Management",
+        courses:"Course Management",
+        enrolments:"Enrolment Management",
+        lessons:"Lessons & Learning Materials",
+        assessments:"Assessments",
+        results:"Results & Performance",
+        announcements:"Announcements"
+    };
+
+    document.getElementById("pageHeading").textContent =
+        headings[page] || "Administration";
+
+    if (page === "overview") {
+
+        content.innerHTML = `
+
+            <div class="welcome-banner">
+
+                <small>ADMINISTRATION PORTAL</small>
+
+                <h1>Welcome, ${escapeHTML(currentProfile.full_name || "Administrator")}.</h1>
+
+                <p>
+                    Manage your learning platform, students,
+                    courses and academic activities.
+                </p>
+
+                <br>
+
+                <span class="admin-badge">FULL ADMINISTRATOR ACCESS</span>
+
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon">♙</div>
+                    <strong id="adminStudentCount">—</strong>
+                    <span>Registered Students</span>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <strong id="adminCourseCount">—</strong>
+                    <span>Total Courses</span>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">▣</div>
+                    <strong id="adminEnrolmentCount">—</strong>
+                    <span>Enrolments</span>
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <h3>Platform Management</h3>
+
+                <p>
+                    Use the navigation menu to manage students,
+                    courses, enrolments and learning activities.
+                    The management tools will be connected in the
+                    next development stages.
+                </p>
+
+            </div>
+
+        `;
+
+        loadAdminStats();
+
+    } else {
+
+        const descriptions = {
+
+            students:"View students, approve registrations and manage student accounts.",
+
+            courses:"Create, edit, publish and organise academic courses.",
+
+            enrolments:"Manage student enrolments and course access.",
+
+            lessons:"Upload and organise lessons, videos and learning materials.",
+
+            assessments:"Create quizzes, tests and examinations.",
+
+            results:"Review student results and academic performance.",
+
+            announcements:"Publish important information for students."
+
+        };
+
+        content.innerHTML = `
+
+            <div class="panel">
+
+                <h3>${headings[page]}</h3>
+
+                <p>${descriptions[page]}</p>
+
+                <br>
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">⚙️</div>
+
+                    <h3>Management tools coming next</h3>
+
+                    <p>
+                        We are building this section to connect
+                        directly to your Bright Minds database.
+                    </p>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =================================
+   ADMIN STATISTICS
+================================= */
+
+async function loadAdminStats() {
+
+    try {
+
+        const [students, courses, enrolments] = await Promise.all([
+
+            supabaseClient
+                .from("profiles")
+                .select("id", {count:"exact",head:true})
+                .eq("role","student"),
+
+            supabaseClient
+                .from("courses")
+                .select("id", {count:"exact",head:true}),
+
+            supabaseClient
+                .from("enrollments")
+                .select("id", {count:"exact",head:true})
+
+        ]);
+
+        if (students.error) throw students.error;
+        if (courses.error) throw courses.error;
+        if (enrolments.error) throw enrolments.error;
+
+        document.getElementById("adminStudentCount").textContent =
+            students.count ?? 0;
+
+        document.getElementById("adminCourseCount").textContent =
+            courses.count ?? 0;
+
+        document.getElementById("adminEnrolmentCount").textContent =
+            enrolments.count ?? 0;
+
+    } catch (error) {
+
+        console.error("Admin statistics error:", error);
+
+    }
+
+}
+
+
+/* =================================
+   SAFE TEXT DISPLAY
+================================= */
+
+function escapeHTML(value) {
+
+    return String(value).replace(/[&<>"']/g, char => ({
+
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+
+    })[char]);
+
+}
+
+
+/* =================================
+   LOGOUT
+================================= */
 
 async function logout() {
 
     if (!supabaseClient) return;
 
-    const { error } = await supabaseClient.auth.signOut();
+    const {error} = await supabaseClient.auth.signOut();
 
     if (error) {
 
@@ -1329,35 +1997,26 @@ async function logout() {
 
     }
 
-    document.getElementById("authButtons").innerHTML = `
+    currentUser = null;
+    currentProfile = null;
 
-        <button class="login-nav" onclick="openAuth('login')">
-            Login
-        </button>
+    appPage.classList.add("hidden");
+    welcomePage.classList.remove("hidden");
 
-        <button class="register-nav" onclick="openAuth('signup')">
-            Register
-        </button>
-
-    `;
-
-    closeAuth();
-
-    alert("You have successfully logged out.");
+    document.getElementById("sidebar").classList.remove("open");
 
 }
 
 
-// ===================================
-// RESTORE EXISTING SESSION
-// ===================================
+/* =================================
+   RESTORE SESSION ON PAGE RELOAD
+================================= */
 
 async function checkExistingSession() {
 
     if (!supabaseClient) return;
 
-    const { data, error } =
-    await supabaseClient.auth.getSession();
+    const {data,error} = await supabaseClient.auth.getSession();
 
     if (error) {
 
@@ -1369,7 +2028,7 @@ async function checkExistingSession() {
 
     if (data.session) {
 
-        await updateAuthInterface(data.session.user);
+        await loadApplication(data.session.user);
 
     }
 
@@ -1380,21 +2039,15 @@ if (supabaseClient) {
 
     checkExistingSession();
 
-    supabaseClient.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((event,session) => {
 
         if (event === "SIGNED_OUT") {
 
-            document.getElementById("authButtons").innerHTML = `
+            currentUser = null;
+            currentProfile = null;
 
-                <button class="login-nav" onclick="openAuth('login')">
-                    Login
-                </button>
-
-                <button class="register-nav" onclick="openAuth('signup')">
-                    Register
-                </button>
-
-            `;
+            appPage.classList.add("hidden");
+            welcomePage.classList.remove("hidden");
 
         }
 
