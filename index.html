@@ -1,0 +1,637 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Bright Minds Tutorials | Learn. Understand. Excel.</title><meta name="description" content="Bright Minds Tutorials provides quality tutorials in Mathematics, Physics, Chemistry, Biology and Computer Studies."><style>
+:root {
+    --navy: #102A43;
+    --turquoise: #00B8A9;
+    --white: #FFFFFF;
+    --light: #F5F7FA;
+    --text: #334E68;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    color: var(--navy);
+    background: var(--white);
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+header {
+    width: 100%;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+}
+
+nav {
+    max-width: 1200px;
+    margin: auto;
+    padding: 18px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.logo span {
+    color: var(--turquoise);
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav-links a {
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--turquoise);
+}
+
+.nav-button {
+    background: var(--navy);
+    color: white !important;
+    padding: 11px 22px;
+    border-radius: 6px;
+}
+
+.menu-toggle {
+    display: none;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.hero {
+    background: linear-gradient(120deg, #102A43, #173F5F);
+    color: white;
+    padding: 110px 25px;
+}
+
+.hero-content {
+    max-width: 1200px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    align-items: center;
+    gap: 50px;
+}
+
+.hero-tag {
+    color: #5CE0D2;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    font-size: clamp(38px, 5vw, 62px);
+    line-height: 1.15;
+    margin: 20px 0;
+}
+
+.hero h1 span {
+    color: #39D5C5;
+}
+
+.hero p {
+    color: #D9E2EC;
+    font-size: 17px;
+    max-width: 550px;
+    margin-bottom: 30px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 14px 25px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+.btn-primary {
+    background: var(--turquoise);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #009B90;
+    transform: translateY(-3px);
+}
+
+.btn-outline {
+    border: 1px solid white;
+    color: white;
+}
+
+.btn-outline:hover {
+    background: white;
+    color: var(--navy);
+}
+
+.hero-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 40px;
+    backdrop-filter: blur(10px);
+}
+
+.hero-card h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.hero-card-item {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.hero-card-item:last-child {
+    border: none;
+}
+
+.hero-icon {
+    font-size: 25px;
+}
+
+section {
+    padding: 85px 25px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-heading small {
+    color: var(--turquoise);
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.section-heading h2 {
+    font-size: 36px;
+    margin: 10px 0;
+}
+
+.section-heading p {
+    color: #627D98;
+    max-width: 600px;
+    margin: auto;
+}
+
+.about {
+    background: var(--light);
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.about-content h2 {
+    font-size: 35px;
+    margin-bottom: 20px;
+}
+
+.about-content p {
+    color: #627D98;
+    margin-bottom: 15px;
+}
+
+.about-highlight {
+    background: white;
+    border-left: 5px solid var(--turquoise);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+}
+
+.subject-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.subject-card {
+    padding: 30px;
+    border: 1px solid #E5EAF0;
+    border-radius: 12px;
+    transition: 0.3s;
+    background: white;
+}
+
+.subject-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 15px 35px rgba(16,42,67,0.09);
+    border-color: var(--turquoise);
+}
+
+.subject-icon {
+    width: 55px;
+    height: 55px;
+    background: #E6FAF8;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 27px;
+    margin-bottom: 20px;
+}
+
+.subject-card h3 {
+    margin-bottom: 10px;
+    font-size: 21px;
+}
+
+.subject-card p {
+    color: #627D98;
+    font-size: 14px;
+}
+
+.why {
+    background: var(--light);
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.feature {
+    text-align: center;
+    padding: 25px;
+}
+
+.feature-icon {
+    font-size: 35px;
+    margin-bottom: 15px;
+}
+
+.feature h3 {
+    margin-bottom: 10px;
+}
+
+.feature p {
+    color: #627D98;
+    font-size: 14px;
+}
+
+.cta {
+    background: var(--navy);
+    color: white;
+    text-align: center;
+}
+
+.cta h2 {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.cta p {
+    color: #D9E2EC;
+    margin-bottom: 25px;
+}
+
+.contact {
+    background: white;
+}
+
+.contact-box {
+    max-width: 650px;
+    margin: auto;
+    text-align: center;
+}
+
+.contact-box p {
+    color: #627D98;
+    margin: 15px 0 25px;
+}
+
+footer {
+    background: #0B1F33;
+    color: white;
+    padding: 35px 25px;
+    text-align: center;
+}
+
+footer p {
+    color: #BCCCDC;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+@media(max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: white;
+        flex-direction: column;
+        padding: 25px;
+        gap: 22px;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.08);
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .hero {
+        padding: 75px 22px;
+    }
+
+    .hero-content {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-card {
+        padding: 25px;
+    }
+
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .subject-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .features {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .section-heading h2 {
+        font-size: 29px;
+    }
+
+    .cta h2 {
+        font-size: 29px;
+    }
+}
+</style></head><body><header>
+<nav>
+    <a href="#" class="logo">BRIGHT <span>MINDS.</span></a><div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<div class="nav-links" id="navLinks">
+    <a href="#home">Home</a>
+    <a href="#about">About Us</a>
+    <a href="#subjects">Subjects</a>
+    <a href="#why">Why Us</a>
+    <a href="#contact">Contact</a>
+    <a href="#enrol" class="nav-button">Get Started</a>
+</div>
+
+</nav>
+</header><main><section class="hero" id="home">
+<div class="hero-content"><div>
+    <div class="hero-tag">BRIGHT MINDS TUTORIALS</div>
+
+    <h1>Unlock Your Potential. <span>Shape Your Future.</span></h1>
+
+    <p>
+        Education is more than memorising facts.
+        It's about understanding, discovering and developing
+        the knowledge to transform your future.
+    </p>
+
+    <div class="hero-buttons">
+        <a href="#subjects" class="btn btn-primary">Explore Subjects →</a>
+        <a href="#about" class="btn btn-outline">Discover More</a>
+    </div>
+</div>
+
+<div class="hero-card">
+    <h3>Learning Starts Here.</h3>
+
+    <div class="hero-card-item">
+        <span class="hero-icon">📐</span>
+        <span>Mathematics & Problem Solving</span>
+    </div>
+
+    <div class="hero-card-item">
+        <span class="hero-icon">⚛️</span>
+        <span>Physics & Scientific Discovery</span>
+    </div>
+
+    <div class="hero-card-item">
+        <span class="hero-icon">🧪</span>
+        <span>Chemistry & Practical Knowledge</span>
+    </div>
+
+    <div class="hero-card-item">
+        <span class="hero-icon">🧬</span>
+        <span>Biology & Life Sciences</span>
+    </div>
+</div>
+
+</div>
+</section><section class="about" id="about">
+<div class="container about-content"><div>
+    <div class="hero-tag">WHO WE ARE</div>
+    <h2>Building Knowledge. Inspiring Excellence.</h2>
+
+    <p>
+        Bright Minds Tutorials is an educational initiative
+        dedicated to making learning meaningful, accessible
+        and engaging.
+    </p>
+
+    <p>
+        We believe every student has the potential to excel
+        when given the right guidance, resources and learning
+        environment.
+    </p>
+
+    <p>
+        Our approach focuses on developing genuine understanding,
+        strengthening problem-solving abilities and preparing
+        learners for academic success.
+    </p>
+</div>
+
+<div class="about-highlight">
+    <h3>Our Philosophy</h3>
+    <p>
+        We don't just teach students what to learn.
+        We help them understand why it works, how it works
+        and how to apply that knowledge.
+    </p>
+    <br>
+    <strong>Learn. Understand. Excel.</strong>
+</div>
+
+</div>
+</section><section id="subjects">
+<div class="container"><div class="section-heading">
+    <small>OUR ACADEMIC PROGRAMMES</small>
+    <h2>Explore Our Subjects</h2>
+    <p>
+        Develop a strong foundation in the sciences
+        through structured learning and guided practice.
+    </p>
+</div>
+
+<div class="subject-grid">
+
+    <div class="subject-card">
+        <div class="subject-icon">📐</div>
+        <h3>Mathematics</h3>
+        <p>Develop logical thinking, mathematical reasoning and problem-solving skills.</p>
+    </div>
+
+    <div class="subject-card">
+        <div class="subject-icon">⚛️</div>
+        <h3>Physics</h3>
+        <p>Understand the principles governing matter, energy and the physical world.</p>
+    </div>
+
+    <div class="subject-card">
+        <div class="subject-icon">🧪</div>
+        <h3>Chemistry</h3>
+        <p>Explore chemical reactions, matter, elements and the fascinating world of chemistry.</p>
+    </div>
+
+    <div class="subject-card">
+        <div class="subject-icon">🧬</div>
+        <h3>Biology</h3>
+        <p>Discover life processes, living organisms and the complexity of biological systems.</p>
+    </div>
+
+    <div class="subject-card">
+        <div class="subject-icon">💻</div>
+        <h3>Computer Studies</h3>
+        <p>Develop digital literacy and understand the technologies shaping our world.</p>
+    </div>
+
+</div>
+
+</div>
+</section><section class="why" id="why">
+<div class="container"><div class="section-heading">
+    <small>THE BRIGHT MINDS DIFFERENCE</small>
+    <h2>Why Learn With Us?</h2>
+    <p>We believe effective education should build confidence, competence and curiosity.</p>
+</div>
+
+<div class="features">
+
+    <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <h3>Concept-Based Learning</h3>
+        <p>Understand concepts deeply instead of relying on memorisation.</p>
+    </div>
+
+    <div class="feature">
+        <div class="feature-icon">📚</div>
+        <h3>Structured Resources</h3>
+        <p>Access organised learning materials designed to support your studies.</p>
+    </div>
+
+    <div class="feature">
+        <div class="feature-icon">💡</div>
+        <h3>Practical Application</h3>
+        <p>Develop the ability to apply knowledge to real academic problems.</p>
+    </div>
+
+</div>
+
+</div>
+</section><section class="cta" id="enrol">
+<div class="container"><h2>Your Journey to Excellence Starts Here.</h2>
+
+<p>
+    Take the next step towards becoming a confident,
+    knowledgeable and independent learner.
+</p>
+
+<a href="#contact" class="btn btn-primary">Get in Touch →</a>
+
+</div>
+</section><section class="contact" id="contact">
+<div class="container contact-box"><div class="section-heading">
+    <small>GET IN TOUCH</small>
+    <h2>Connect With Us</h2>
+</div>
+
+<p>
+    Interested in learning with Bright Minds Tutorials?
+    Contact us to find out more about our programmes.
+</p>
+
+<a href="mailto:brightmindstutorials@gmail.com" class="btn btn-primary">
+    Contact Us
+</a>
+
+</div>
+</section></main><footer>
+    <div class="logo" style="color:white;">BRIGHT <span>MINDS.</span></div><p>Learn. Understand. Excel.</p>
+
+<p>© <span id="year"></span> Bright Minds Tutorials. All rights reserved.</p>
+
+</footer><script>
+function toggleMenu() {
+    document.getElementById("navLinks").classList.toggle("active");
+}
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+    link.addEventListener("click", () => {
+        document.getElementById("navLinks").classList.remove("active");
+    });
+});
+
+document.getElementById("year").textContent = new Date().getFullYear();
+</script></body>
+</html>
