@@ -1645,7 +1645,34 @@
               : payment.status === "verified"
                 ? "Payment verified. Your course access has been activated or your renewal has been queued after any existing access period."
                 : "Your payment details have been received. Make sure your screenshot or receipt has also been sent to an official Bright Minds WhatsApp number. Course access starts after verification.";
-            return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</strong><span class="pill" style="' + statusStyle + '">' + statusLabel + '</span></div><p style="margin:10px 0 4px">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Method: ' + escapeHTML(payment.payment_method) + ' · Reference: ' + escapeHTML(payment.transaction_reference || "—") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p><p style="font-size:13px;line-height:1.5;margin:10px 0 0">' + nextStep + '</p>' + (payment.verification_notes ? '<p style="font-size:13px;margin-bottom:0;padding:10px;background:#F4F7FA;border-radius:8px"><strong>Administrator note:</strong> ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
+            const statusHeading = payment.status === "rejected"
+              ? "Action needed"
+              : payment.status === "verified" ? "Payment confirmed" : "What happens next";
+            const methodLabel = payment.payment_method === "mtn"
+              ? "MTN MoMo"
+              : payment.payment_method === "airtel" ? "Airtel Money" : (payment.payment_method || "Not specified");
+            const statusPanelStyle = payment.status === "rejected"
+              ? "background:#FFF4F2;border:1px solid #F5D0CB"
+              : payment.status === "verified"
+                ? "background:#F0FAF8;border:1px solid #CDEBE5"
+                : "background:#FFF9EC;border:1px solid #F1E2BC";
+            return '<article class="card" style="margin-bottom:14px">' +
+              '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">' +
+                '<div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:700">Payment total</div><strong style="display:block;color:var(--navy);font:800 23px Manrope;margin-top:3px">' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</strong></div>' +
+                '<span class="pill" style="' + statusStyle + '">' + statusLabel + '</span>' +
+              '</div>' +
+              '<div style="margin:14px 0 10px"><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:700">Courses covered</div><p style="margin:5px 0 0;font-weight:700;line-height:1.5">' + (items || "Course payment") + '</p></div>' +
+              '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;padding:12px;background:#F7F9FC;border-radius:10px">' +
+                '<div><div class="muted" style="font-size:11px">Payment method</div><strong style="font-size:13px">' + escapeHTML(methodLabel) + '</strong></div>' +
+                '<div><div class="muted" style="font-size:11px">Transaction reference</div><strong style="font-size:13px;overflow-wrap:anywhere">' + escapeHTML(payment.transaction_reference || "Not provided") + '</strong></div>' +
+                '<div><div class="muted" style="font-size:11px">Submitted</div><strong style="font-size:13px">' + new Date(payment.created_at).toLocaleString() + '</strong></div>' +
+              '</div>' +
+              '<div style="margin-top:13px;padding:12px;border-radius:10px;' + statusPanelStyle + '">' +
+                '<strong style="display:block;font-size:13px;margin-bottom:5px">' + statusHeading + '</strong>' +
+                '<p style="font-size:13px;line-height:1.55;margin:0">' + nextStep + '</p>' +
+              '</div>' +
+              (payment.verification_notes ? '<div style="font-size:13px;line-height:1.5;margin-top:10px;padding:11px;background:#F4F7FA;border-radius:9px"><strong>Administrator note</strong><p style="margin:5px 0 0">' + escapeHTML(payment.verification_notes) + '</p></div>' : '') +
+              '</article>';
           }).join("") + '</div>' : '<div class="empty">You have not submitted any payments yet.</div>'
         ].join("");
 
