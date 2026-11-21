@@ -2190,7 +2190,62 @@
               </div>
             </div>
           </section>
+
+          <section class="card" style="max-width:900px;margin-top:18px">
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div aria-hidden="true" style="width:42px;height:42px;flex:0 0 42px;border-radius:13px;background:#EAF3FA;color:#245477;display:grid;place-items:center;font-size:19px">⌑</div>
+              <div>
+                <h3 style="margin:0;color:var(--navy);font:800 16px Manrope">Account security</h3>
+                <p class="muted" style="font-size:12px;line-height:1.6;margin:5px 0 0">Keep your account secure by using a strong password that you do not share with anyone.</p>
+              </div>
+            </div>
+            <form id="changePasswordForm" style="margin-top:20px;max-width:560px">
+              <div class="form">
+                <label>New password
+                  <input id="newAccountPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required>
+                </label>
+                <label>Confirm new password
+                  <input id="confirmAccountPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Enter the new password again" required>
+                </label>
+              </div>
+              <div class="inline-actions" style="margin-top:16px;align-items:center">
+                <button class="btn" id="saveAccountPassword" type="submit">Update password</button>
+                <span class="muted" style="font-size:11px">Use at least 8 characters.</span>
+              </div>
+            </form>
+          </section>
         `;
+
+        document.getElementById("changePasswordForm")?.addEventListener("submit", async event => {
+          event.preventDefault();
+          clearAlert();
+          const passwordInput = document.getElementById("newAccountPassword");
+          const confirmInput = document.getElementById("confirmAccountPassword");
+          const password = passwordInput.value;
+          if (password.length < 8) {
+            showAlert("Your new password must contain at least 8 characters.");
+            passwordInput.focus();
+            return;
+          }
+          if (password !== confirmInput.value) {
+            showAlert("The passwords do not match. Please check them and try again.");
+            confirmInput.focus();
+            return;
+          }
+          const button = document.getElementById("saveAccountPassword");
+          button.disabled = true;
+          button.textContent = "Updating password…";
+          const { error } = await supabaseClient.auth.updateUser({ password });
+          button.disabled = false;
+          button.textContent = "Update password";
+          if (error) {
+            showAlert(error.message || "We could not update your password. Please try again.");
+            return;
+          }
+          passwordInput.value = "";
+          confirmInput.value = "";
+          showAlert("Your password has been updated successfully.", "success");
+        });
       }
 
       function renderPlaceholder(message) {
