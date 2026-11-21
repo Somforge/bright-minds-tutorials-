@@ -1,3 +1,7 @@
+-- One price per course and subscription duration prevents duplicate checkout options.
+create unique index if not exists course_subscription_prices_course_duration_uidx
+on public.course_subscription_prices (course_id, duration_months);
+
 -- Manual payment workflow for Bright Minds Tutorials.
 -- Apply only after reviewing this migration. It creates private proof storage,
 -- student-owned submission access, and admin-only approval that activates subscriptions.
