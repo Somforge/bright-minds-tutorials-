@@ -2186,9 +2186,9 @@ async function loadStudentCourses() {
                             ${escapeHTML(course.description || "Your learning materials and lessons will be available here.")}
                         </p>
 
-                        <button onclick="openCourse()">
-                            Open Course →
-                        </button>
+                        <button onclick="openCourse('${course.id}')">
+    Open Course →
+</button>
 
                     </div>
 
@@ -2221,10 +2221,120 @@ async function loadStudentCourses() {
 
 }
 
-function openCourse() {
-    alert("The course lesson viewer is the next feature to connect. Your course access remains protected by subscription checks in the database.");
-}
+async function openCourse(courseId) {
 
+    const content = document.getElementById("dashboardContent");
+
+    if (!content  !currentUser  !courseId) return;
+
+    content.innerHTML = 
+        <div class="empty-state">
+            <p>Loading course information...</p>
+        </div>
+    ;
+
+    try {
+
+        // Verify that the student has an active subscription.
+        const now = new Date().toISOString().slice(0, 10);
+
+        const { data: subscription, error: subscriptionError } =
+            await supabaseClient
+                .from("subscriptions")
+                .select("id")
+                .eq("student_id", currentUser.id)
+                .eq("course_id", courseId)
+                .eq("status", "active")
+                .lte("start_date", now)
+                .gt("end_date", now)
+                .maybeSingle();
+
+        if (subscriptionError) throw subscriptionError;
+
+        if (!subscription) {
+            content.innerHTML = 
+                <div class="empty-state">
+                    <h3>Access restricted</h3>
+                    <p>You do not have an active subscription to this course.</p>
+                    <button onclick="navigateDashboard('courses')">
+                        Back to My Courses
+                    </button>
+                </div>
+            ;
+            return;
+        }
+
+        // Retrieve the selected course.
+        const { data: course, error: courseError } =
+            await supabaseClient
+                .from("courses")
+                .select("*")
+                .eq("id", courseId)
+                .single();
+
+        if (courseError) throw courseError;
+
+        content.innerHTML = 
+
+            <div class="section-title">
+                <div>
+                    <h3>${escapeHTML(course.title || course.name || "Course")}</h3>
+                    <p>Your course learning space</p>
+                </div>
+            </div>
+
+            <div class="panel">
+
+                <div style="font-size:42px;">📘</div>
+
+                <h2>${escapeHTML(course.title || course.name || "Course")}</h2>
+
+                <p>
+                    ${escapeHTML(course.description || "No course description is available yet.")}
+                </p>
+
+                <hr style="margin:20px 0; opacity:0.2;">
+
+                <h3>Course Materials</h3>
+
+                <div class="empty-state">
+                    <div style="font-size:35px;">📚</div>
+                    <h3>Learning materials coming soon</h3>
+                    <p>
+                        Your course learning space is ready.
+                        Lessons and downloadable resources will appear here
+                        once they have been added by your administrator.
+                    </p>
+                </div>
+
+                <button onclick="navigateDashboard('courses')">
+                    ← Back to My Courses
+                </button>
+
+            </div>
+
+        ;
+
+        document.getElementById("pageHeading").textContent =
+            "Course Details";
+
+    } catch (error) {
+
+        console.error("Course opening error:", error);
+
+        content.innerHTML = 
+            <div class="empty-state">
+                <h3>Unable to open course</h3>
+                <p>Please try again later.</p>
+                <button onclick="navigateDashboard('courses')">
+                    Back to My Courses
+                </button>
+            </div>
+        ;
+
+    }
+
+}
 /* =====================================
    ADMIN DASHBOARD
 ===================================== */
