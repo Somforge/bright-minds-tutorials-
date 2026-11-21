@@ -1,863 +1,2539 @@
-
 <!DOCTYPE html>
+
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#102B46">
-  <title>Bright Minds Tutorials</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#102A43">
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
 
-  <style>
-    :root {
-      --navy: #102B46;
-      --blue: #1D4E89;
-      --gold: #F2B544;
-      --light: #F4F7FB;
-      --white: #FFFFFF;
-      --text: #263445;
-      --muted: #718096;
-      --border: #E2E8F0;
-      --green: #16845B;
-      --red: #C0392B;
-      --shadow: 0 8px 30px rgba(16,43,70,.08);
-    }
+<title>Bright Minds Tutorials | Learn. Understand. Excel.</title>
+<meta name="description" content="Welcome to Bright Minds Tutorials. A learning environment built around understanding, curiosity and academic excellence.">
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
 
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--light);
-      color: var(--text);
-      line-height: 1.6;
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    button, input, textarea, select {
-      font: inherit;
-    }
 
-    button {
-      cursor: pointer;
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
 
-    .hidden {
-      display: none !important;
-    }
+<script src="./supabase-config.js"></script>
 
-    .btn {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 20px;
-      border: 0;
-      border-radius: 8px;
-      font-weight: 700;
-      transition: .2s;
-    }
 
-    .btn-primary {
-      background: var(--gold);
-      color: var(--navy);
-    }
+<style>
+:root {
+    --navy: #102A43;
+    --navy-light: #173F5F;
+    --navy-soft: #244D6B;
+    --turquoise: #00B8A9;
+    --turquoise-dark: #00998E;
+    --background: #F4F7FA;
+    --white: #FFFFFF;
+    --text: #334E68;
+    --muted: #829AB1;
+    --border: #E5EAF0;
+    --shadow: 0 12px 35px rgba(16,42,67,.07);
+    --shadow-hover: 0 18px 40px rgba(16,42,67,.12);
+}
 
-    .btn-primary:hover {
-      background: #e4a52f;
-      transform: translateY(-1px);
-    }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    .btn-dark {
-      background: var(--navy);
-      color: white;
-    }
+html {
+    scroll-behavior: smooth;
+}
 
-    .btn-dark:hover {
-      background: var(--blue);
-    }
+body {
+    font-family: "DM Sans", sans-serif;
+    background: var(--background);
+    color: var(--navy);
+    min-height: 100vh;
+}
 
-    .btn-outline {
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--navy);
-    }
+button, input {
+    font: inherit;
+}
 
-    .btn-danger {
-      background: #FDECEC;
-      color: var(--red);
-    }
+button {
+    cursor: pointer;
+}
 
-    .btn-success {
-      background: #E6F5EE;
-      color: var(--green);
-    }
+a {
+    text-decoration: none;
+}
 
-    .btn-small {
-      padding: 7px 11px;
-      font-size: 13px;
-    }
+.hidden {
+    display: none !important;
+}
 
-    /* PUBLIC WEBSITE */
+/* =====================================
+   PUBLIC HOMEPAGE
+===================================== */
 
-    .navbar {
-      background: var(--navy);
-      color: white;
-      padding: 17px 7%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-    }
+#welcomePage {
+    background: white;
+    min-height: 100vh;
+}
 
-    .brand {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -.5px;
-    }
+.public-header {
+    height: 82px;
+    padding: 0 8%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 100;
+}
 
-    .brand span {
-      color: var(--gold);
-    }
+.brand {
+    font-family: "Manrope", sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--navy);
+}
 
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
+.brand span {
+    color: var(--turquoise);
+}
 
-    .nav-links a {
-      font-size: 14px;
-      color: #E7EDF5;
-    }
+.public-actions {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
 
-    .nav-links a:hover {
-      color: var(--gold);
+.support-link {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 12px;
+}
+
+.support-link:hover {
+    color: var(--turquoise);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 23px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: .2s ease;
+}
+
+.btn-primary {
+    background: var(--turquoise);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--turquoise-dark);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #EDF2F7;
+    color: var(--navy);
+}
+
+.btn-secondary:hover {
+    background: #DCE6EF;
+}
+
+.mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--navy);
+    font-size: 25px;
+}
+
+/* HERO */
+
+.hero {
+    min-height: 650px;
+    padding: 90px 9%;
+    display: flex;
+    align-items: center;
+    background:
+        radial-gradient(circle at 85% 20%, rgba(0,184,169,.18), transparent 28%),
+        radial-gradient(circle at 70% 100%, rgba(0,184,169,.10), transparent 35%),
+        linear-gradient(120deg, #102A43, #173F5F);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 470px;
+    height: 470px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    right: -160px;
+    bottom: -240px;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    right: -85px;
+    bottom: -165px;
+}
+
+.hero-content {
+    max-width: 780px;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #54DED1;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 26px;
+}
+
+.hero-label::before {
+    content: "";
+    width: 28px;
+    height: 2px;
+    background: var(--turquoise);
+}
+
+.hero h1 {
+    font-family: "Manrope", sans-serif;
+    font-size: clamp(43px, 6.2vw, 75px);
+    line-height: 1.13;
+    letter-spacing: -3px;
+    font-weight: 800;
+    margin-bottom: 27px;
+}
+
+.hero h1 span {
+    color: #42D7C8;
+}
+
+.hero-description {
+    max-width: 600px;
+    font-size: 17px;
+    line-height: 1.9;
+    color: #D9E2EC;
+    margin-bottom: 36px;
+}
+
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.hero-buttons .btn {
+    padding: 16px 26px;
+}
+
+.btn-outline {
+    color: white;
+    border: 1px solid rgba(255,255,255,.45);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background: rgba(255,255,255,.1);
+}
+
+/* INTRODUCTION */
+
+.introduction {
+    padding: 95px 9%;
+    background: white;
+}
+
+.intro-container {
+    max-width: 1150px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 75px;
+    align-items: center;
+}
+
+.section-label {
+    color: var(--turquoise-dark);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 17px;
+}
+
+.intro-text h2 {
+    font-family: "Manrope", sans-serif;
+    font-size: clamp(29px, 4vw, 43px);
+    line-height: 1.25;
+    letter-spacing: -1.5px;
+    margin-bottom: 22px;
+}
+
+.intro-text p {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 15px;
+}
+
+.intro-card {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 35px;
+}
+
+.intro-card h3 {
+    font-size: 21px;
+    margin-bottom: 25px;
+}
+
+.principle {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+.principle:last-child {
+    margin-bottom: 0;
+}
+
+.principle-icon {
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #DDF8F5;
+    color: #008F83;
+    border-radius: 9px;
+    font-size: 20px;
+}
+
+.principle h4 {
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.principle p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+/* CALL TO ACTION */
+
+.cta {
+    padding: 75px 9%;
+    background: #EAF8F6;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 700px;
+    margin: auto;
+}
+
+.cta h2 {
+    font-family: "Manrope", sans-serif;
+    font-size: clamp(27px, 4vw, 39px);
+    margin-bottom: 15px;
+}
+
+.cta p {
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 15px;
+    margin-bottom: 27px;
+}
+
+/* FOOTER */
+
+.public-footer {
+    background: #0B1F33;
+    color: white;
+    padding: 48px 8% 22px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.footer-brand {
+    font-family: "Manrope", sans-serif;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.footer-brand span {
+    color: var(--turquoise);
+}
+
+.footer-tagline {
+    color: #BCCCDC;
+    font-size: 13px;
+    margin-top: 7px;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 23px;
+}
+
+.footer-links a,
+.footer-links button {
+    color: #D9E2EC;
+    font-size: 13px;
+    background: none;
+    border: none;
+}
+
+.footer-links a:hover,
+.footer-links button:hover {
+    color: var(--turquoise);
+}
+
+.footer-bottom {
+    max-width: 1200px;
+    margin: 30px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.12);
+    text-align: center;
+    color: #829AB1;
+    font-size: 12px;
+}
+
+/* =====================================
+   LEGAL MODAL
+===================================== */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    background: rgba(5,20,35,.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.legal-box {
+    background: white;
+    width: 100%;
+    max-width: 650px;
+    padding: 35px;
+    border-radius: 13px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.legal-close {
+    float: right;
+    border: none;
+    background: #EDF2F7;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 21px;
+}
+
+.legal-box h2 {
+    margin-bottom: 18px;
+}
+
+.legal-box h3 {
+    font-size: 16px;
+    margin: 22px 0 8px;
+}
+
+.legal-box p {
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 12px;
+}
+
+/* =====================================
+   APPLICATION DASHBOARD
+===================================== */
+
+#appPage {
+    min-height: 100vh;
+    background: var(--background);
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    position: fixed;    .public-actions .btn {
+        padding: 10px 13px;
+        font-size: 12px;
     }
 
     .hero {
-      min-height: 570px;
-      background:
-        linear-gradient(90deg, rgba(16,43,70,.97), rgba(16,43,70,.83)),
-        linear-gradient(135deg, #1D4E89, #102B46);
-      color: white;
-      padding: 100px 8%;
-      display: flex;
-      align-items: center;
-    }
-
-    .hero-content {
-      max-width: 720px;
-    }
-
-    .hero-label {
-      color: var(--gold);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-size: 13px;
-      margin-bottom: 18px;
+        min-height: 570px;
+        padding: 75px 7%;
     }
 
     .hero h1 {
-      font-size: clamp(38px, 6vw, 64px);
-      line-height: 1.12;
-      margin-bottom: 22px;
+        letter-spacing: -1.8px;
     }
 
-    .hero h1 span {
-      color: var(--gold);
+    .hero-description {
+        font-size: 15px;
     }
 
-    .hero p {
-      color: #DCE6F1;
-      font-size: 18px;
-      max-width: 600px;
-      margin-bottom: 30px;
+    .introduction {
+        padding: 70px 7%;
     }
 
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 13px;
+    .intro-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
     }
 
-    .section {
-      padding: 75px 8%;
-    }
-
-    .section-heading {
-      text-align: center;
-      max-width: 680px;
-      margin: 0 auto 40px;
-    }
-
-    .section-heading h2 {
-      color: var(--navy);
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
-
-    .section-heading p {
-      color: var(--muted);
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-    }
-
-    .feature-card {
-      background: white;
-      padding: 28px;
-      border-radius: 13px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-    }
-
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: #FFF3D9;
-      display: grid;
-      place-items: center;
-      font-size: 23px;
-      margin-bottom: 18px;
-    }
-
-    .feature-card h3 {
-      color: var(--navy);
-      margin-bottom: 9px;
-    }
-
-    .feature-card p {
-      color: var(--muted);
-      font-size: 14px;
+    .intro-card {
+        padding: 25px;
     }
 
     .cta {
-      background: var(--navy);
-      color: white;
-      padding: 65px 8%;
-      text-align: center;
+        padding: 65px 7%;
     }
 
-    .cta h2 {
-      font-size: 32px;
-      margin-bottom: 12px;
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .cta p {
-      color: #DCE6F1;
-      margin-bottom: 23px;
+    .footer-links {
+        gap: 17px;
     }
 
-    footer {
-      background: #0B2035;
-      color: #DCE6F1;
-      padding: 35px 8%;
-      text-align: center;
-      font-size: 13px;
+    .topbar {
+        height: 70px;
+        padding: 0 17px;
     }
 
-    footer p {
-      margin: 5px 0;
+    .topbar h2 {
+        font-size: 16px;
     }
 
-    /* AUTHENTICATION */
-
-    .auth-screen {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 25px;
-      background: linear-gradient(135deg, var(--navy), var(--blue));
+    .user-details {
+        display: none;
     }
 
-    .auth-card {
-      background: white;
-      width: 100%;
-      max-width: 440px;
-      border-radius: 15px;
-      padding: 35px;
-      box-shadow: 0 15px 50px rgba(0,0,0,.2);
+    .content {
+        padding: 20px 15px;
     }
 
-    .auth-card h2 {
-      color: var(--navy);
-      margin-bottom: 7px;
+    .welcome-banner {
+        padding: 27px 22px;
     }
 
-    .auth-card > p {
-      color: var(--muted);
-      margin-bottom: 24px;
-      font-size: 14px;
+    .welcome-banner h1 {
+        font-size: 23px;
     }
 
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 6px;
-      color: var(--navy);
-    }
-
-    .form-control {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      outline: none;
-      background: white;
-    }
-
-    .form-control:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(29,78,137,.1);
-    }
-
-    .auth-card .btn {
-      width: 100%;
-      margin-top: 8px;
-    }
-
-    .auth-switch {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-    }
-
-    .auth-switch a {
-      color: var(--blue);
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .message {
-      padding: 11px;
-      border-radius: 7px;
-      font-size: 13px;
-      margin-bottom: 15px;
-      display: none;
-    }
-
-    .message.error {
-      display: block;
-      color: #9B2626;
-      background: #FDECEC;
-    }
-
-    .message.success {
-      display: block;
-      color: #126B49;
-      background: #E6F5EE;
-    }
-
-    /* RESPONSIVE */
-
-    @media(max-width: 900px) {
-      .features {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media(max-width: 650px) {
-      .navbar {
-        padding: 15px 5%;
-        flex-wrap: wrap;
-      }
-
-      .nav-links {
-        gap: 13px;
-      }
-
-      .nav-links a {
-        font-size: 12px;
-      }
-
-      .hero {
-        padding: 75px 6%;
-        min-height: 500px;
-      }
-
-      .section {
-        padding: 55px 6%;
-      }
-
-      .features {
+    .stats-grid {
         grid-template-columns: 1fr;
-      }
-
-      .auth-card {
-        padding: 25px;
-      }
+        gap: 12px;
     }
-  </style>
+
+    .stat-card {
+        padding: 19px;
+    }
+
+    .course-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:420px) {
+    .brand {
+        font-size: 18px;
+    }
+
+    .public-actions .btn {
+        padding: 9px 10px;
+    }
+
+    .hero {
+        min-height: 520px;
+    }
+
+    .hero h1 {
+        font-size: 41px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+    }
+
+    .legal-box {
+        padding: 25px 20px;
+    }
+}
+
+/* =====================================
+   AUTHENTICATION FORMS
+===================================== */
+
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+    background:
+        radial-gradient(circle at 85% 15%, rgba(0,184,169,.12), transparent 25%),
+        linear-gradient(135deg,#F4F7FA,#EAF1F6);
+}
+
+.auth-card {
+    background: white;
+    width: 100%;
+    max-width: 440px;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 18px 50px rgba(16,42,67,.1);
+    border: 1px solid var(--border);
+}
+
+.auth-brand {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.auth-brand .brand {
+    font-size: 26px;
+}
+
+.auth-brand p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+.auth-card h2 {
+    font-family: "Manrope",sans-serif;
+    font-size: 23px;
+    margin-bottom: 8px;
+}
+
+.auth-subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--navy);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #D9E2EC;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: .2s ease;
+    color: var(--navy);
+    background: white;
+}
+
+.form-group input:focus {
+    border-color: var(--turquoise);
+    box-shadow: 0 0 0 3px rgba(0,184,169,.12);
+}
+
+.form-group input::placeholder {
+    color: #9FB3C8;
+}
+
+.auth-submit {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--turquoise);
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    margin-top: 7px;
+    transition: .2s ease;
+}
+
+.auth-submit:hover {
+    background: var(--turquoise-dark);
+}
+
+.auth-submit:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.auth-switch {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 22px;
+}
+
+.auth-switch a {
+    color: var(--turquoise-dark);
+    font-weight: 800;
+}
+
+.auth-message {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: none;
+}
+
+.auth-message.error {
+    display: block;
+    color: #B42318;
+    background: #FEF3F2;
+    border: 1px solid #FECDCA;
+}
+
+.auth-message.success {
+    display: block;
+    color: #027A48;
+    background: #ECFDF3;
+    border: 1px solid #ABEFC6;
+}
+
+.auth-back {
+    display: block;
+    text-align: center;
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* =====================================
+   ADMIN MANAGEMENT COMPONENTS
+===================================== */
+
+.admin-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.admin-toolbar p {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.admin-action {
+    background: var(--turquoise);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 17px;
+    font-size: 12px;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+.admin-action:hover {
+    background: var(--turquoise-dark);
+    transform: translateY(-1px);
+}
+
+.admin-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+.admin-table th {
+    background: #F4F7FA;
+    color: #627D98;
+    font-size: 10px;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 15px 17px;
+}
+
+.admin-table td {
+    padding: 16px 17px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text);
+    vertical-align: middle;
+}
+
+.admin-table td strong {
+    color: var(--navy);
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 800;
+    background: #DDF8F5;
+    color: #008F83;
+}
+
+.status-pill.off {
+    background: #FEE4E2;
+    color: #B42318;
+}
+
+.table-actions {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.table-actions button {
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--navy);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.table-actions button:hover {
+    border-color: var(--turquoise);
+    color: var(--turquoise-dark);
+}
+
+.admin-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.admin-form .full {
+    grid-column: 1 / -1;
+}
+
+.admin-form label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 7px;
+}
+
+.admin-form input:not([type="checkbox"]),
+.admin-form textarea,
+.admin-form select {
+    width: 100%;
+    border: 1px solid #D9E2EC;
+    border-radius: 7px;
+    padding: 12px;
+    font: inherit;
+    font-size: 13px;
+    color: var(--navy);
+    background: white;
+}
+
+.admin-form textarea {
+    min-height: 105px;
+    resize: vertical;
+}
+
+.admin-form input:focus,
+.admin-form textarea:focus,
+.admin-form select:focus {
+    outline: none;
+    border-color: var(--turquoise);
+    box-shadow: 0 0 0 3px rgba(0,184,169,.1);
+}
+
+.checkline {
+    display: flex !important;
+    align-items: center;
+    gap: 9px;
+}
+
+.checkline input {
+    accent-color: var(--turquoise);
+}
+
+.admin-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.admin-modal-actions button {
+    border: none;
+    border-radius: 7px;
+    padding: 11px 17px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.admin-modal-actions .cancel {
+    background: #EDF2F7;
+    color: var(--navy);
+}
+
+.admin-modal-actions .save {
+    background: var(--turquoise);
+    color: white;
+}
+
+@media(max-width:600px) {
+    .auth-card {
+        padding: 30px 23px;
+    }
+
+    .admin-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-form {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-form .full {
+        grid-column: auto;
+    }
+}
+
+/* =====================================
+   HOMEPAGE REFINEMENTS
+===================================== */
+
+#welcomePage .public-header {
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,.94);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 4px 20px rgba(16,42,67,.04);
+}
+
+#welcomePage .hero {
+    min-height: 680px;
+}
+
+#welcomePage .hero-content {
+    max-width: 850px;
+}
+
+#welcomePage .hero h1 {
+    max-width: 820px;
+}
+
+#welcomePage .hero-description {
+    max-width: 640px;
+}
+
+#welcomePage .introduction {
+    padding-top: 105px;
+    padding-bottom: 105px;
+}
+
+#welcomePage .intro-card {
+    box-shadow: var(--shadow);
+}
+
+#welcomePage .cta {
+    background:
+        radial-gradient(circle at 10% 20%, rgba(0,184,169,.08), transparent 30%),
+        #EAF8F6;
+}
+
+#welcomePage .public-footer {
+    padding-top: 58px;
+}
+
+#welcomePage a:focus-visible,
+#welcomePage button:focus-visible {
+    outline: 3px solid rgba(0,184,169,.55);
+    outline-offset: 3px;
+}
+
+@media(max-width:650px) {
+    #welcomePage .hero {
+        min-height: 590px;
+    }
+
+    #welcomePage .introduction {
+        padding-top: 72px;
+        padding-bottom: 72px;
+    }
+}    .public-actions .btn {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .hero {
+        min-height: 570px;
+        padding: 65px 25px;
+    }
+
+    .hero h1 {
+        font-size: 44px;
+        letter-spacing: -2px;
+    }
+
+    .hero-description {
+        font-size: 15px;
+    }
+
+    .introduction {
+        padding: 65px 24px;
+    }
+
+    .intro-container {
+        grid-template-columns: 1fr;
+    }
+
+    .intro-card {
+        padding: 25px;
+    }
+
+    .cta {
+        padding: 60px 24px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-links {
+        justify-content: center;
+        gap: 17px;
+    }
+
+    .content {
+        padding: 20px 16px 35px;
+    }
+
+    .topbar {
+        height: 68px;
+        padding: 0 16px;
+    }
+
+    .topbar h2 {
+        font-size: 16px;
+    }
+
+    .user-details {
+        display: none;
+    }
+
+    .avatar {
+        width: 37px;
+        height: 37px;
+    }
+
+    .stats-grid,
+    .course-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        gap: 13px;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+
+    .stat-icon {
+        margin-bottom: 12px;
+    }
+
+    .welcome-banner {
+        padding: 26px 22px;
+        border-radius: 13px;
+    }
+
+    .welcome-banner h1 {
+        font-size: 23px;
+    }
+
+    .welcome-banner p {
+        font-size: 13px;
+    }
+
+    .section-title {
+        margin-top: 27px;
+    }
+
+    .course-card,
+    .panel {
+        padding: 21px;
+    }
+
+    .legal-box {
+        padding: 25px 20px;
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* ADMIN MANAGEMENT TOOLS — additive styles; original theme preserved */
+.admin-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin:24px 0 18px}
+.admin-toolbar p{color:var(--muted);font-size:13px}
+.admin-action{border:0;border-radius:8px;padding:11px 16px;background:var(--turquoise);color:#fff;font-weight:700;font-size:13px}
+.admin-action:hover{background:var(--turquoise-dark)}
+.admin-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--border);border-radius:13px;box-shadow:0 3px 12px rgba(16,42,67,.025)}
+.admin-table{width:100%;border-collapse:collapse;min-width:650px}
+.admin-table th,.admin-table td{padding:15px 17px;text-align:left;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.admin-table th{background:#F7FAFC;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px}
+.admin-table tr:last-child td{border-bottom:0}
+.admin-table td strong{color:var(--navy)}
+.status-pill{display:inline-block;padding:5px 9px;border-radius:20px;background:#E6FAF8;color:#008F83;font-size:11px;font-weight:800}
+.status-pill.off{background:#EDF2F7;color:#627D98}
+.table-actions{display:flex;gap:7px;flex-wrap:wrap}
+.table-actions button{border:1px solid var(--border);background:#fff;color:var(--navy);padding:7px 10px;border-radius:6px;font-size:11px;font-weight:700}
+.table-actions button:hover{border-color:var(--turquoise);color:var(--turquoise-dark)}
+.table-actions button.danger{color:#B42318}
+.admin-form{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}
+.admin-form label{display:block;color:var(--text);font-size:12px;font-weight:700;margin-bottom:6px}
+.admin-form input,.admin-form textarea,.admin-form select{width:100%;border:1px solid #CBD5E1;border-radius:7px;padding:11px 12px;color:var(--navy);background:#fff;font:inherit;font-size:13px}
+.admin-form textarea{min-height:95px;resize:vertical}
+.admin-form .full{grid-column:1/-1}
+.admin-form .checkline{display:flex;align-items:center;gap:9px;font-size:13px}
+.admin-form .checkline input{width:auto}
+.admin-modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.admin-modal-actions button{border:0;border-radius:7px;padding:10px 15px;font-weight:700;font-size:13px}
+.admin-modal-actions .cancel{background:#EDF2F7;color:var(--navy)}
+.admin-modal-actions .save{background:var(--turquoise);color:#fff}
+.admin-notice{padding:13px 15px;border-radius:8px;background:#E6FAF8;color:#006B63;font-size:13px;margin:14px 0}
+.admin-notice.error{background:#FEECEB;color:#B42318}
+@media(max-width:650px){.admin-form{grid-template-columns:1fr}.admin-form .full{grid-column:auto}.admin-toolbar{align-items:flex-start}}
+
+
+
+/* =====================================
+   PUBLIC HOMEPAGE REFINEMENT
+   Visual-only additions; dashboard styles and behaviour remain untouched.
+===================================== */
+#welcomePage {
+    --public-width: 1160px;
+    background: #fff;
+}
+#welcomePage .public-header {
+    position: sticky;
+    top: 0;
+    height: 78px;
+    padding-inline: max(5.5%, calc((100% - var(--public-width)) / 2));
+    background: rgba(255,255,255,.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 5px 24px rgba(16,42,67,.035);
+}
+#welcomePage .brand { font-size: 23px; letter-spacing: -1.15px; }
+#welcomePage .public-actions { gap: 10px; }
+#welcomePage .support-link { padding: 11px 12px; margin-right: 5px; }
+#welcomePage .btn { border-radius: 9px; min-height: 44px; }
+#welcomePage .btn-primary { box-shadow: 0 7px 18px rgba(0,184,169,.18); }
+#welcomePage .btn-primary:hover { box-shadow: 0 10px 22px rgba(0,184,169,.25); }
+#welcomePage .hero {
+    min-height: 620px;
+    padding: 96px max(7%, calc((100% - var(--public-width)) / 2));
+    background:
+      radial-gradient(ellipse at 82% 22%, rgba(0,184,169,.22), transparent 30%),
+      radial-gradient(ellipse at 72% 100%, rgba(57,190,183,.13), transparent 36%),
+      linear-gradient(116deg, #0D263D 0%, #143B59 58%, #174B64 100%);
+}
+#welcomePage .hero-content { max-width: 760px; }
+#welcomePage .hero-label {
+    padding: 9px 13px;
+    border: 1px solid rgba(84,222,209,.24);
+    border-radius: 30px;
+    background: rgba(0,184,169,.09);
+    letter-spacing: 2.2px;
+    margin-bottom: 25px;
+}
+#welcomePage .hero-label::before { width: 7px; height: 7px; border-radius: 50%; }
+#welcomePage .hero h1 {
+    font-size: clamp(44px, 6vw, 72px);
+    line-height: 1.12;
+    letter-spacing: -3.3px;
+    max-width: 760px;
+}
+#welcomePage .hero-description { max-width: 590px; font-size: 16px; line-height: 1.85; color: #DCE8F1; }
+#welcomePage .hero-buttons .btn { min-height: 52px; padding-inline: 25px; }
+#welcomePage .btn-outline { border-color: rgba(255,255,255,.32); }
+#welcomePage .introduction { padding: 100px 6%; }
+#welcomePage .intro-container { max-width: var(--public-width); gap: clamp(40px, 7vw, 88px); }
+#welcomePage .section-label { letter-spacing: 1.8px; }
+#welcomePage .intro-text h2 { max-width: 520px; font-size: clamp(30px, 3.6vw, 42px); }
+#welcomePage .intro-text p { font-size: 14.5px; line-height: 1.9; }
+#welcomePage .intro-card {
+    padding: 36px;
+    border-radius: 17px;
+    background: linear-gradient(145deg, #F7FAFC, #F0F8F7);
+    box-shadow: 0 14px 38px rgba(16,42,67,.055);
+}
+#welcomePage .intro-card h3 { font-family: "Manrope", sans-serif; font-size: 20px; margin-bottom: 27px; }
+#welcomePage .principle { gap: 17px; margin-bottom: 26px; }
+#welcomePage .principle-icon { border-radius: 12px; width: 46px; height: 46px; }
+#welcomePage .principle h4 { font-size: 14px; }
+#welcomePage .principle p { color: #627D98; font-size: 12.5px; }
+#welcomePage .cta {
+    padding: 82px 6%;
+    background: linear-gradient(120deg, #E9F8F6, #F3FAFA);
+    border-top: 1px solid #E2F2F0;
+    border-bottom: 1px solid #E2F2F0;
+}
+#welcomePage .cta-content { max-width: 720px; }
+#welcomePage .cta h2 { font-size: clamp(28px, 3.5vw, 39px); letter-spacing: -1.2px; line-height: 1.25; }
+#welcomePage .cta p { max-width: 590px; margin: 0 auto 27px; font-size: 14px; }
+#welcomePage .public-footer { padding: 53px 6% 22px; }
+#welcomePage .footer-content, #welcomePage .footer-bottom { max-width: var(--public-width); }
+#welcomePage .footer-links { gap: 25px; }
+#welcomePage .footer-links a, #welcomePage .footer-links button { transition: color .18s ease; }
+#welcomePage a:focus-visible, #welcomePage button:focus-visible {
+    outline: 3px solid rgba(0,184,169,.55);
+    outline-offset: 3px;
+}
+@media (max-width: 760px) {
+    #welcomePage .public-header { height: 72px; padding-inline: 5%; }
+    #welcomePage .brand { font-size: 20px; }
+    #welcomePage .public-actions { gap: 7px; }
+    #welcomePage .support-link { display: none; }
+    #welcomePage .public-actions .btn { min-height: 40px; padding: 9px 12px; font-size: 12px; }
+    #welcomePage .hero { min-height: 570px; padding: 76px 7%; }
+    #welcomePage .hero h1 { font-size: clamp(39px, 9vw, 58px); letter-spacing: -2.3px; }
+    #welcomePage .hero-description { font-size: 14px; line-height: 1.8; }
+    #welcomePage .introduction { padding: 72px 7%; }
+    #welcomePage .intro-container { gap: 35px; }
+    #welcomePage .intro-card { padding: 27px 23px; }
+    #welcomePage .cta { padding: 65px 7%; }
+    #welcomePage .public-footer { padding: 42px 7% 20px; }
+}
+@media (max-width: 420px) {
+    #welcomePage .public-actions .btn-secondary { display: none; }
+    #welcomePage .hero-buttons { flex-direction: column; align-items: stretch; max-width: 310px; }
+    #welcomePage .hero-buttons .btn { width: 100%; }
+    #welcomePage .footer-links { gap: 15px 20px; }
+}
+
+</style>
 </head>
 
 <body>
 
-  <!-- PUBLIC HOMEPAGE -->
-  <div id="publicPage">
+<!-- =====================================
+     PUBLIC HOMEPAGE
+===================================== -->
 
-    <nav class="navbar">
-      <a href="#" class="brand">BRIGHT <span>MINDS</span></a>
+<div id="welcomePage">
 
-      <div class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#learning">Learning</a>
-        <a href="#" onclick="showLogin()">Login</a>
-        <button class="btn btn-primary" onclick="showRegister()">Get Started</button>
-      </div>
+<header class="public-header">
+
+    <a href="index.html" class="brand">
+        BRIGHT <span>MINDS.</span>
+    </a>
+
+    <nav class="public-actions">
+
+        <a href="mailto:brightmindstutorials@gmail.com"
+           class="support-link">
+            Support
+        </a>
+
+        <a href="login.html" class="btn btn-secondary">
+            Sign In
+        </a>
+
+        <a href="register.html" class="btn btn-primary">
+            Create Account
+        </a>
+
     </nav>
 
-    <section class="hero" id="home">
-      <div class="hero-content">
-        <div class="hero-label">Bright Minds Tutorials</div>
+</header>
 
-        <h1>Learn Better.<br>Think <span>Beyond.</span></h1>
+<main>
 
-        <p>
-          A learning space designed to help students understand concepts,
-          strengthen their foundations and develop the confidence to solve problems.
-        </p>
+    <section class="hero">
 
-        <div class="hero-actions">
-          <button class="btn btn-primary" onclick="showRegister()">Start Learning</button>
-          <a href="#about" class="btn btn-outline">Explore More</a>
+        <div class="hero-content">
+
+            <div class="hero-label">
+                BRIGHT MINDS TUTORIALS
+            </div>
+
+            <h1>
+                Learn with purpose.<br>
+                <span>Excel with confidence.</span>
+            </h1>
+
+            <p class="hero-description">
+                Welcome to a learning environment built around
+                understanding, curiosity and academic excellence.
+                Develop your knowledge, strengthen your skills
+                and take the next step in your educational journey.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="register.html" class="btn btn-primary">
+                    Get Started →
+                </a>
+
+                <a href="login.html" class="btn btn-outline">
+                    Access Learning Portal
+                </a>
+
+            </div>
+
         </div>
-      </div>
+
     </section>
 
-    <section class="section" id="about">
-      <div class="section-heading">
-        <h2>Learning With Understanding</h2>
-        <p>
-          We believe that effective learning goes beyond memorising information.
-          It begins with understanding the principles behind what you study.
-        </p>
-      </div>
+    <section class="introduction">
 
-      <div class="features">
-        <div class="feature-card">
-          <div class="feature-icon">📘</div>
-          <h3>Concept-Based Learning</h3>
-          <p>Build a strong foundation by understanding the ideas behind every topic.</p>
+        <div class="intro-container">
+
+            <div class="intro-text">
+
+                <div class="section-label">
+                    WELCOME TO BRIGHT MINDS
+                </div>
+
+                <h2>
+                    Education is more than memorising facts.
+                </h2>
+
+                <p>
+                    At Bright Minds Tutorials, we believe meaningful
+                    learning begins with understanding. Our aim is
+                    to encourage curiosity, develop strong foundations
+                    and help learners approach their studies with
+                    confidence.
+                </p>
+
+                <p>
+                    Through a structured learning environment,
+                    students can access their learning resources
+                    and continue developing their academic potential.
+                </p>
+
+            </div>
+
+            <div class="intro-card">
+
+                <h3>Our learning philosophy</h3>
+
+                <div class="principle">
+                    <div class="principle-icon">◎</div>
+                    <div>
+                        <h4>Understand</h4>
+                        <p>
+                            Build a strong foundation by understanding
+                            concepts rather than simply memorising them.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="principle">
+                    <div class="principle-icon">✦</div>
+                    <div>
+                        <h4>Develop</h4>
+                        <p>
+                            Strengthen knowledge through practice,
+                            curiosity and consistent learning.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="principle">
+                    <div class="principle-icon">↗</div>
+                    <div>
+                        <h4>Excel</h4>
+                        <p>
+                            Apply what you learn with confidence
+                            and continue striving for excellence.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🧠</div>
-          <h3>Problem Solving</h3>
-          <p>Develop the ability to apply knowledge to questions and real problems.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🎯</div>
-          <h3>Academic Growth</h3>
-          <p>Learn at your pace and work towards becoming a more confident student.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="learning">
-      <div class="section-heading">
-        <h2>Your Learning Space</h2>
-        <p>
-          Access learning materials, tutorials and academic resources
-          through your personal student dashboard.
-        </p>
-      </div>
-
-      <div class="features">
-        <div class="feature-card">
-          <div class="feature-icon">📚</div>
-          <h3>Courses</h3>
-          <p>Explore available courses and access organised learning content.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📝</div>
-          <h3>Past Papers</h3>
-          <p>Practise questions and strengthen your examination preparation.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">💡</div>
-          <h3>Learning Resources</h3>
-          <p>Use additional resources to support your understanding.</p>
-        </div>
-      </div>
     </section>
 
     <section class="cta">
-      <h2>Ready to Begin?</h2>
-      <p>Create your account and access your learning space.</p>
-      <button class="btn btn-primary" onclick="showRegister()">Create Your Account</button>
+
+        <div class="cta-content">
+
+            <div class="section-label">
+                TAKE THE NEXT STEP
+            </div>
+
+            <h2>
+                Your journey towards excellence starts here.
+            </h2>
+
+            <p>
+                Create your account to access the Bright Minds
+                learning portal and begin your learning journey.
+            </p>
+
+            <a href="register.html" class="btn btn-primary">
+                Create Your Account →
+            </a>
+
+        </div>
+
     </section>
 
-    <footer>
-      <p><strong>BRIGHT MINDS TUTORIALS</strong></p>
-      <p>Building understanding. Developing potential.</p>
-      <p>© <span id="year"></span> Bright Minds Tutorials. All rights reserved.</p>
-    </footer>
+</main>
 
-  </div>
+<footer class="public-footer">
 
-  <!-- LOGIN -->
-  <section id="loginScreen" class="auth-screen hidden">
-    <div class="auth-card">
-      <div class="brand" style="color:var(--navy);margin-bottom:20px;">
-        BRIGHT <span>MINDS</span>
-      </div>
+    <div class="footer-content">
 
-      <h2>Welcome Back</h2>
-      <p>Sign in to continue to your learning space.</p>
+        <div>
+            <div class="footer-brand">
+                BRIGHT <span>MINDS.</span>
+            </div>
 
-      <div id="loginMessage" class="message"></div>
-
-      <form id="loginForm">
-        <div class="form-group">
-          <label for="loginEmail">Email Address</label>
-          <input class="form-control" id="loginEmail" type="email" required>
+            <div class="footer-tagline">
+                Learn. Understand. Excel.
+            </div>
         </div>
 
-        <div class="form-group">
-          <label for="loginPassword">Password</label>
-          <input class="form-control" id="loginPassword" type="password" required>
+        <div class="footer-links">
+
+            <a href="mailto:brightmindstutorials@gmail.com">
+                Contact Us
+            </a>
+
+            <a href="mailto:brightmindstutorials@gmail.com">
+                Support
+            </a>
+
+            <button onclick="showLegal('privacy')">
+                Privacy Policy
+            </button>
+
+            <button onclick="showLegal('terms')">
+                Terms of Use
+            </button>
+
         </div>
 
-        <button class="btn btn-primary" type="submit" id="loginButton">Sign In</button>
-      </form>
-
-      <div class="auth-switch">
-        Don't have an account?
-        <a onclick="showRegister()">Create one</a>
-      </div>
-
-      <div class="auth-switch">
-        <a onclick="showHome()">← Back to homepage</a>
-      </div>
     </div>
-  </section>
 
-  <!-- REGISTRATION -->
-  <section id="registerScreen" class="auth-screen hidden">
-    <div class="auth-card">
-      <div class="brand" style="color:var(--navy);margin-bottom:20px;">
-        BRIGHT <span>MINDS</span>
-      </div>
-
-      <h2>Create an Account</h2>
-      <p>Join Bright Minds Tutorials and begin learning.</p>
-
-      <div id="registerMessage" class="message"></div>
-
-      <form id="registerForm">
-        <div class="form-group">
-          <label for="registerName">Full Name</label>
-          <input class="form-control" id="registerName" type="text" required>
-        </div>
-
-        <div class="form-group">
-          <label for="registerEmail">Email Address</label>
-          <input class="form-control" id="registerEmail" type="email" required>
-        </div>
-
-        <div class="form-group">
-          <label for="registerPassword">Password</label>
-          <input class="form-control" id="registerPassword" type="password" minlength="6" required>
-        </div>
-
-        <button class="btn btn-primary" type="submit" id="registerButton">Create Account</button>
-      </form>
-
-      <div class="auth-switch">
-        Already registered?
-        <a onclick="showLogin()">Sign in</a>
-      </div>
-
-      <div class="auth-switch">
-        <a onclick="showHome()">← Back to homepage</a>
-      </div>
+    <div class="footer-bottom">
+        © <span id="publicYear"></span>
+        Bright Minds Tutorials. All rights reserved.
     </div>
-  </section>
 
-  <script>
-    /* --------------------------------------------------
-       SUPABASE INITIALISATION
-    -------------------------------------------------- */
+</footer>
 
-    const SUPABASE_URL =
-      window.BRIGHT_MINDS_CONFIG?.SUPABASE_URL;
+</div>
 
-    const SUPABASE_KEY =
-      window.BRIGHT_MINDS_CONFIG?.SUPABASE_KEY;
+<!-- =====================================
+     DASHBOARD
+===================================== -->
 
-    let supabaseClient = null;
+<div id="appPage" class="hidden">
 
-    if (window.supabase && SUPABASE_URL && SUPABASE_KEY) {
-      supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
+<div class="sidebar-overlay" id="sidebarOverlay"
+     onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-brand">
+
+        <div class="brand">
+            BRIGHT <span>MINDS.</span>
+        </div>
+
+        <small id="sidebarSubtitle">LEARNING PORTAL</small>    </div>
+
+    <div class="sidebar-label">WORKSPACE</div>
+
+    <div class="sidebar-menu" id="sidebarMenu"></div>
+
+    <div class="sidebar-bottom">
+
+        <button onclick="logout()">
+            ↪ &nbsp; Sign Out
+        </button>
+
+    </div>
+
+</aside>
+
+<main class="main-area">
+
+    <header class="topbar">
+
+        <div style="display:flex;align-items:center;gap:15px;">
+
+            <button class="mobile-menu"
+                onclick="toggleSidebar()"
+                aria-label="Open navigation">
+                ☰
+            </button>
+
+            <h2 id="pageHeading">Dashboard</h2>
+
+        </div>
+
+        <div class="user-profile">
+
+            <div class="avatar" id="userAvatar">B</div>
+
+            <div class="user-details">
+
+                <strong id="topUserName">Student</strong>
+
+                <small id="topUserRole">Student Account</small>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <div class="content" id="dashboardContent"></div>
+
+</main>
+
+</div>
+
+<!-- =====================================
+     LEGAL MODAL
+===================================== -->
+
+<div class="modal" id="legalModal">
+
+    <div class="legal-box">
+
+        <button class="legal-close"
+            onclick="closeLegal()"
+            aria-label="Close">
+            ×
+        </button>
+
+        <div id="legalContent"></div>
+
+    </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* =====================================
+   INITIALISATION
+===================================== */
+
+let supabaseClient = null;
+let currentUser = null;
+let currentProfile = null;
+
+const welcomePage = document.getElementById("welcomePage");
+const appPage = document.getElementById("appPage");
+
+document.getElementById("publicYear").textContent =
+    new Date().getFullYear();
+
+if (
+    window.BRIGHT_MINDS_CONFIG &&
+    window.BRIGHT_MINDS_CONFIG.SUPABASE_URL &&
+    window.BRIGHT_MINDS_CONFIG.SUPABASE_KEY &&
+    window.supabase
+) {
+
+    supabaseClient = window.supabase.createClient(
+        window.BRIGHT_MINDS_CONFIG.SUPABASE_URL,
+        window.BRIGHT_MINDS_CONFIG.SUPABASE_KEY
+    );
+
+} else {
+
+    console.error("Bright Minds Supabase configuration is unavailable.");
+
+}
+
+/* =====================================
+   LEGAL INFORMATION
+===================================== */
+
+function showLegal(type) {
+
+    const content = document.getElementById("legalContent");
+
+    if (type === "privacy") {
+
+        content.innerHTML = `
+
+            <h2>Privacy Policy</h2>
+
+            <p><strong>Bright Minds Tutorials</strong></p>
+
+            <p>
+                We value your privacy. This policy explains how
+                information may be handled when you use our platform.
+            </p>
+
+            <h3>1. Information Collected</h3>
+
+            <p>
+                We may collect your name, email address and account
+                information when you register. Enrolment and learning
+                activity information may also be stored.
+            </p>
+
+            <h3>2. How Information Is Used</h3>
+
+            <p>
+                Information is used to manage accounts, provide
+                educational services, manage enrolments and communicate
+                important updates.
+            </p>
+
+            <h3>3. Data Storage</h3>
+
+            <p>
+                The platform uses Supabase for authentication and
+                database services.
+            </p>
+
+            <h3>4. Information Sharing</h3>
+
+            <p>
+                Personal information is not intended to be sold.
+                Authorised administrators may access information
+                when necessary to provide educational services.
+            </p>
+
+            <h3>5. Account Security</h3>
+
+            <p>
+                Users should keep their passwords confidential.
+                Contact us if you suspect unauthorised access.
+            </p>
+
+            <h3>6. Contact</h3>
+
+            <p>
+                Email: brightmindstutorials@gmail.com
+            </p>
+
+        `;
+
+    } else {
+
+        content.innerHTML = `
+
+            <h2>Terms of Use</h2>
+
+            <p><strong>Bright Minds Tutorials</strong></p>
+
+            <p>
+                By using this platform, you agree to use it responsibly
+                and comply with these terms.
+            </p>
+
+            <h3>1. Account Registration</h3>
+
+            <p>
+                Users should provide accurate registration information
+                and keep their login credentials confidential.
+            </p>
+
+            <h3>2. Educational Use</h3>
+
+            <p>
+                Learning materials, lessons and assessments are
+                provided for educational purposes.
+            </p>
+
+            <h3>3. Account Responsibility</h3>
+
+            <p>
+                Users are responsible for activity carried out
+                through their accounts.
+            </p>
+
+            <h3>4. Learning Materials</h3>
+
+            <p>
+                Materials must not be redistributed, republished
+                or sold without appropriate permission.
+            </p>
+
+            <h3>5. Acceptable Use</h3>
+
+            <p>
+                Users must not attempt to access restricted areas
+                without permission or interfere with other users.
+            </p>
+
+            <h3>6. Platform Availability</h3>
+
+            <p>
+                Continuous availability cannot be guaranteed.
+                Features may occasionally be updated or unavailable.
+            </p>
+
+            <h3>7. Contact</h3>
+
+            <p>
+                Email: brightmindstutorials@gmail.com
+            </p>
+
+        `;
+
     }
 
-    document.getElementById("year").textContent =
-      new Date().getFullYear();
+    document.getElementById("legalModal").classList.add("active");
 
+}
 
-    /* --------------------------------------------------
-       GENERAL PAGE NAVIGATION
-    -------------------------------------------------- */
+function closeLegal() {
 
-    function hideAllScreens() {
-      document.getElementById("publicPage").classList.add("hidden");
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("registerScreen").classList.add("hidden");
+    document.getElementById("legalModal").classList.remove("active");
+
+}
+
+document.getElementById("legalModal").addEventListener("click", function(event) {
+
+    if (event.target === this) {
+        closeLegal();
     }
 
-    function showHome() {
-      hideAllScreens();
-      document.getElementById("publicPage").classList.remove("hidden");
-      window.scrollTo(0, 0);
+});
+
+/* =====================================
+   LOAD AUTHENTICATED APPLICATION
+===================================== */
+
+async function loadApplication(user) {
+
+    if (!user || !supabaseClient) return;
+
+    try {
+
+        const { data: profile, error } =
+            await supabaseClient
+                .from("profiles")
+                .select("full_name, role")
+                .eq("id", user.id)
+                .single();
+
+        if (error) throw error;
+
+        if (!profile) {
+            throw new Error("No account profile was found.");
+        }
+
+        if (!["admin", "student"].includes(profile.role)) {
+            throw new Error("Your account has an unrecognised role.");
+        }
+
+        currentUser = user;
+        currentProfile = profile;
+
+        welcomePage.classList.add("hidden");
+        appPage.classList.remove("hidden");
+
+        const name = profile.full_name || user.email;
+
+        document.getElementById("topUserName").textContent = name;
+
+        document.getElementById("userAvatar").textContent =
+            name.charAt(0).toUpperCase();
+
+        document.getElementById("topUserRole").textContent =
+            profile.role === "admin" ? "Administrator" : "Student";
+
+        if (profile.role === "admin") {
+            setupAdminDashboard();
+        } else {
+            setupStudentDashboard();
+        }
+
+    } catch (error) {
+
+        console.error("Application loading error:", error);
+
+        alert("Unable to load your account: " + error.message);
+
+        await supabaseClient.auth.signOut();
+
     }
 
-    function showLogin() {
-      hideAllScreens();
-      document.getElementById("loginScreen").classList.remove("hidden");
-    }
+}
 
-    function showRegister() {
-      hideAllScreens();
-      document.getElementById("registerScreen").classList.remove("hidden");
-    }
+/* =====================================
+   DASHBOARD NAVIGATION
+===================================== */
 
+function buildMenu(items) {
 
-    /* --------------------------------------------------
-       DASHBOARD REDIRECTION
-    -------------------------------------------------- */
+    const menu = document.getElementById("sidebarMenu");
 
-    function redirectToDashboard() {
-      window.location.replace("./dashboard.html");
-    }
+    menu.innerHTML = "";
 
+    items.forEach(item => {
 
-    /* --------------------------------------------------
-       MESSAGES AND HELPERS
-    -------------------------------------------------- */
+        const button = document.createElement("button");
 
-    function showMessage(elementId, message, type = "error") {
-      const element = document.getElementById(elementId);
+        button.textContent = item.icon + "   " + item.label;
 
-      element.textContent = message;
-      element.className = "message " + type;
-    }
+        button.dataset.page = item.page;
 
-    function clearMessage(elementId) {
-      const element = document.getElementById(elementId);
-
-      element.textContent = "";
-      element.className = "message";
-    }
-
-    function setButtonLoading(buttonId, loading, loadingText, normalText) {
-      const button = document.getElementById(buttonId);
-
-      button.disabled = loading;
-      button.textContent = loading ? loadingText : normalText;
-    }
-
-
-    /* --------------------------------------------------
-       REGISTRATION
-    -------------------------------------------------- */
-
-    document.getElementById("registerForm").addEventListener("submit", async function(event) {
-      event.preventDefault();
-      clearMessage("registerMessage");
-
-      if (!supabaseClient) {
-        showMessage(
-          "registerMessage",
-          "Supabase configuration was not found. Please try again later."
-        );
-        return;
-      }
-
-      const fullName = document.getElementById("registerName").value.trim();
-      const email = document.getElementById("registerEmail").value.trim();
-      const password = document.getElementById("registerPassword").value;
-
-      if (!fullName || !email || !password) {
-        showMessage("registerMessage", "Please complete all the fields.");
-        return;
-      }
-
-      setButtonLoading(
-        "registerButton",
-        true,
-        "Creating account...",
-        "Create Account"
-      );
-
-      try {
-        const { data, error } = await supabaseClient.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName
-            }
-          }
+        button.addEventListener("click", () => {
+            navigateDashboard(item.page);
         });
 
-        if (error) throw error;
+        menu.appendChild(button);
 
-        if (data.user && data.session) {
-          showMessage(
-            "registerMessage",
-            "Account created successfully. Redirecting to your dashboard...",
-            "success"
-          );
-
-          redirectToDashboard();
-          return;
-        }
-
-        showMessage(
-          "registerMessage",
-          "Registration successful. Please check your email to confirm your account before signing in.",
-          "success"
-        );
-
-      } catch (error) {
-        showMessage(
-          "registerMessage",
-          error.message || "Registration failed. Please try again."
-        );
-      } finally {
-        setButtonLoading(
-          "registerButton",
-          false,
-          "Creating account...",
-          "Create Account"
-        );
-      }
     });
 
+}
 
-    /* --------------------------------------------------
-       LOGIN
-    -------------------------------------------------- */
+function navigateDashboard(page) {
 
-    document.getElementById("loginForm").addEventListener("submit", async function(event) {
-      event.preventDefault();
-      clearMessage("loginMessage");
+    document.querySelectorAll("#sidebarMenu button").forEach(button => {
 
-      if (!supabaseClient) {
-        showMessage(
-          "loginMessage",
-          "Supabase configuration was not found. Please try again later."
-        );
-        return;
-      }
-
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value;
-
-      setButtonLoading(
-        "loginButton",
-        true,
-        "Signing in...",
-        "Sign In"
-      );
-
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) throw error;
-
-        if (!data.session || !data.user) {
-          throw new Error("Login succeeded, but no active session was returned. Please try again.");
-        }
-
-        redirectToDashboard();
-
-      } catch (error) {
-        showMessage(
-          "loginMessage",
-          error.message || "Unable to sign in. Please check your details."
+        button.classList.toggle(
+            "active",
+            button.dataset.page === page
         );
 
-        setButtonLoading(
-          "loginButton",
-          false,
-          "Signing in...",
-          "Sign In"
-        );
-      }
     });
 
+    closeSidebar();
 
-    /* --------------------------------------------------
-       CHECK EXISTING SESSION
-    -------------------------------------------------- */
+    if (!currentProfile) return;
 
-    async function checkExistingSession() {
-      if (!supabaseClient) {
-        console.error("Supabase configuration is missing.");
-        return;
-      }
+    if (currentProfile.role === "admin") {
+        renderAdminPage(page);
+    } else {
+        renderStudentPage(page);
+    }
 
-      try {
-        const { data, error } = await supabaseClient.auth.getSession();
+}
+
+function toggleSidebar() {
+
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("active");
+
+}
+
+function closeSidebar() {
+
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebarOverlay").classList.remove("active");
+
+}
+
+/* =====================================
+   STUDENT DASHBOARD
+===================================== */
+
+function setupStudentDashboard() {
+
+    document.getElementById("sidebarSubtitle").textContent =
+        "STUDENT PORTAL";
+
+    buildMenu([
+
+        {label:"Overview",icon:"▦",page:"overview"},
+        {label:"My Courses",icon:"▤",page:"courses"},
+        {label:"Assessments",icon:"✎",page:"assessments"},
+        {label:"My Results",icon:"▥",page:"results"},
+        {label:"Announcements",icon:"◉",page:"announcements"},
+        {label:"My Profile",icon:"◎",page:"profile"}
+
+    ]);
+
+    navigateDashboard("overview");
+
+}
+
+function renderStudentPage(page) {
+
+    const content = document.getElementById("dashboardContent");
+
+    if (page === "overview") {
+
+        document.getElementById("pageHeading").textContent =
+            "Student Overview";
+
+        content.innerHTML = `
+
+            <div class="welcome-banner">
+
+                <small>YOUR LEARNING SPACE</small>
+
+                <h1>Welcome back, ${escapeHTML(currentProfile.full_name || "Student")}!</h1>
+
+                <p>
+                    Continue your learning journey.
+                    Your courses, resources and assessments are all in one place.
+                </p>
+
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <strong id="courseCount">—</strong>
+                    <span>My Courses</span>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <strong>—</strong>
+                    <span>Assessments</span>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <strong>—</strong>
+                    <span>Results</span>
+                </div>
+
+            </div>
+
+            <div class="section-title">
+                <div>
+                    <h3>My Learning</h3>
+                    <p>Your enrolled courses</p>
+                </div>
+            </div>
+
+            <div id="studentCourses">
+                <div class="empty-state">Loading your courses...</div>
+            </div>
+
+        `;
+
+        loadStudentCourses();
+
+    }
+
+    else if (page === "courses") {
+
+        document.getElementById("pageHeading").textContent =
+            "My Courses";
+
+        content.innerHTML = `
+
+            <div class="section-title">
+                <div>
+                    <h3>My Courses</h3>
+                    <p>Courses you are enrolled in.</p>
+                </div>
+            </div>
+
+            <div id="studentCourses">
+                <div class="empty-state">Loading your courses...</div>
+            </div>
+
+        `;
+
+        loadStudentCourses();
+
+    }
+
+    else {        const titles = {
+            assessments:"Assessments",
+            results:"My Results",
+            announcements:"Announcements",
+            profile:"My Profile"
+        };
+
+        document.getElementById("pageHeading").textContent =
+            titles[page] || "Student Portal";
+
+        if (page === "profile") {
+
+            content.innerHTML = `
+
+                <div class="panel">
+
+                    <h3>My Profile</h3>
+
+                    <p><strong>Full name:</strong> ${escapeHTML(currentProfile.full_name || "Not provided")}</p>
+
+                    <p><strong>Email:</strong> ${escapeHTML(currentUser.email)}</p>
+
+                    <p><strong>Account type:</strong> Student</p>
+
+                </div>
+
+            `;
+
+        } else {
+
+            content.innerHTML = `
+
+                <div class="empty-state">
+
+                    <div style="font-size:38px;">📘</div>
+
+                    <h3>${titles[page] || "Coming Soon"}</h3>
+
+                    <p>
+                        This section is being prepared.
+                        It will become available as development continues.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+}
+
+/* =====================================
+   STUDENT COURSE RETRIEVAL
+===================================== */
+
+async function loadStudentCourses() {
+
+    const container = document.getElementById("studentCourses");
+
+    if (!container || !currentUser) return;
+
+    try {
+
+        const now = new Date().toISOString().slice(0, 10);
+        const { data: subscriptions, error } =
+            await supabaseClient
+                .from("subscriptions")
+                .select("id,course_id,status,start_date,end_date")
+                .eq("student_id", currentUser.id)
+                .eq("status", "active")
+                .lte("start_date", now)
+                .gt("end_date", now);
 
         if (error) throw error;
 
-        if (data.session?.user) {
-          redirectToDashboard();
+        const activeEnrolments = subscriptions || [];
+
+        const courseCount = document.getElementById("courseCount");
+
+        if (courseCount) {
+            courseCount.textContent = activeEnrolments.length;
         }
 
-      } catch (error) {
-        console.error("Session check failed:", error);
-      }
-    }
+        if (activeEnrolments.length === 0) {
 
+            container.innerHTML = `
 
-    /* --------------------------------------------------
-       AUTHENTICATION STATE CHANGES
-    -------------------------------------------------- */
+                <div class="empty-state">
 
-    if (supabaseClient) {
-      supabaseClient.auth.onAuthStateChange((event) => {
-        if (event === "SIGNED_OUT") {
-          showHome();
+                    <div style="font-size:38px;">📚</div>
+
+                    <h3>No Courses Yet</h3>
+
+                    <p>
+                        You are not currently enrolled in any courses.
+                        Once your enrolment is approved, your courses
+                        will appear here.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
         }
-      });
+
+        const courseIds = [
+            ...new Set(activeEnrolments.map(item => item.course_id).filter(Boolean))
+        ];
+
+        if (courseIds.length === 0) {
+            throw new Error("Your enrolment records do not contain course references.");
+        }
+
+        const { data: courses, error: courseError } =
+            await supabaseClient
+                .from("courses")
+                .select("*")
+                .in("id", courseIds);
+
+        if (courseError) throw courseError;
+
+        if (!courses || courses.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>No course information available</h3>
+                    <p>Please contact the administrator.</p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+        container.innerHTML = `
+
+            <div class="course-grid">
+
+                ${courses.map(course => `
+
+                    <div class="course-card">
+
+                        <div class="course-icon">📘</div>
+
+                        <h4>${escapeHTML(course.title || course.name || course.course_name || "Course")}</h4>
+
+                        <p>
+                            ${escapeHTML(course.description || "Your learning materials and lessons will be available here.")}
+                        </p>
+
+                        <button onclick="openCourse()">
+                            Open Course →
+                        </button>
+
+                    </div>
+
+                `).join("")}
+
+            </div>
+
+        `;
+
+    } catch (error) {
+
+        console.error("Course loading error:", error);
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <h3>Unable to load courses</h3>
+
+                <p>
+                    There was a problem retrieving your course information.
+                    Please try again later.
+                </p>
+
+            </div>
+
+        `;
+
     }
+
+}
+
+function openCourse() {
+    alert("The course lesson viewer is the next feature to connect. Your course access remains protected by subscription checks in the database.");
+}
+
+/* =====================================
+   ADMIN DASHBOARD
+===================================== */
+
+function setupAdminDashboard() {
+
+    document.getElementById("sidebarSubtitle").textContent =
+        "ADMINISTRATION PORTAL";
+
+    buildMenu([
+
+        {label:"Overview",icon:"▦",page:"overview"},
+        {label:"Students",icon:"♙",page:"students"},
+        {label:"Courses",icon:"▤",page:"courses"},
+        {label:"Enrolments",icon:"▣",page:"enrolments"},
+        {label:"Lessons & Materials",icon:"📚",page:"lessons"},
+        {label:"Assessments",icon:"✎",page:"assessments"},
+        {label:"Results",icon:"▥",page:"results"},
+        {label:"Announcements",icon:"◉",page:"announcements"}
+
+    ]);
+
+    navigateDashboard("overview");
+
+}
+
+function renderAdminPage(page) {
+    const content = document.getElementById("dashboardContent");
+    const headings = {
+        overview:"Administrator Overview", students:"Student Management",
+        courses:"Course Management", enrolments:"Enrolment Management",
+        lessons:"Lessons & Learning Materials", assessments:"Assessments",
+        results:"Results & Performance", announcements:"Announcements"
+    };
+    document.getElementById("pageHeading").textContent = headings[page] || "Administration";
+
+    if (page === "overview") {
+        content.innerHTML = `
+            <div class="welcome-banner">
+                <small>ADMINISTRATION PORTAL</small>
+                <h1>Welcome, ${escapeHTML(currentProfile.full_name || "Administrator")}.</h1>
+                <p>Manage your learning platform, students, courses and academic activities.</p><br>
+                <span class="admin-badge">FULL ADMINISTRATOR ACCESS</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon">♙</div><strong id="adminStudentCount">—</strong><span>Registered Students</span></div>
+                <div class="stat-card"><div class="stat-icon">📚</div><strong id="adminCourseCount">—</strong><span>Total Courses</span></div>
+                <div class="stat-card"><div class="stat-icon">▣</div><strong id="adminEnrolmentCount">—</strong><span>Enrolments</span></div>
+            </div>
+            <div class="panel"><h3>Platform Management</h3><p>Use the navigation menu to manage students, courses, enrolments and academic activities.</p></div>`;
+        loadAdminStats();
+        return;
+    }
+    if (page === "courses") { renderAdminCourses(); return; }
+    if (page === "students") { renderAdminStudents(); return; }
+    if (page === "enrolments") { renderAdminEnrolments(); return; }
+
+    const descriptions = {
+        lessons:"Upload and organise lessons, videos and learning materials.",
+        assessments:"Create quizzes, tests and examinations.",
+        results:"Review student results and academic performance.",
+        announcements:"Publish important information for students."
+    };
+    content.innerHTML = `<div class="panel"><h3>${escapeHTML(headings[page] || "Administration")}</h3><p>${escapeHTML(descriptions[page] || "This section is not available yet.")}</p><div class="empty-state"><div style="font-size:38px;">⚙️</div><h3>Not connected yet</h3><p>This section will be implemented next. No placeholder action is presented as functional.</p></div></div>`;
+}
+
+/* ADMIN COURSE MANAGEMENT */
+async function renderAdminCourses() {
+    const content = document.getElementById("dashboardContent");
+    content.innerHTML = `<div class="section-title"><div><h3>Courses</h3><p>Create and manage the courses on your platform.</p></div></div><div class="admin-toolbar"><p id="courseAdminMessage">Loading courses…</p><button class="admin-action" onclick="showCourseForm()">＋ Add Course</button></div><div id="adminCourseList"></div>`;
+    await loadAdminCourses();
+}
+
+async function loadAdminCourses() {
+    const box = document.getElementById("adminCourseList");
+    const message = document.getElementById("courseAdminMessage");
+    if (!box || !supabaseClient) return;
+    try {
+        const {data,error} = await supabaseClient.from("courses")
+            .select("id,title,description,subject,price,is_published,created_at")
+            .order("created_at",{ascending:false});
+        if (error) throw error;
+        message.textContent = `${(data || []).length} course(s)`;
+        if (!data || !data.length) {
+            box.innerHTML = `<div class="empty-state"><div style="font-size:36px">📚</div><h3>No courses created yet</h3><p>Select “Add Course” to create your first course.</p></div>`;
+            return;
+        }
+        box.innerHTML = `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Course</th><th>Subject</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>${data.map(c=>`<tr><td><strong>${escapeHTML(c.title)}</strong><br><span style="color:var(--muted)">${escapeHTML((c.description||"").slice(0,90))}</span></td><td>${escapeHTML(c.subject||"—")}</td><td><span class="status-pill ${c.is_published?"":"off"}">${c.is_published?"Published":"Draft"}</span></td><td><div class="table-actions"><button onclick="editCourse('${c.id}')">Edit</button><button onclick="toggleCoursePublication('${c.id}',${!c.is_published})">${c.is_published?"Unpublish":"Publish"}</button></div></td></tr>`).join("")}</tbody></table></div>`;
+    } catch(error) {
+        console.error("Admin course retrieval error:",error);
+        box.innerHTML = `<div class="empty-state"><h3>Unable to load courses</h3><p>${escapeHTML(error.message || "Please check your administrator permissions and try again.")}</p><button class="admin-action" onclick="loadAdminCourses()">Retry</button></div>`;
+        if(message) message.textContent = "Course retrieval failed";
+    }
+}
+
+function showCourseForm(course=null) {
+    const old=document.getElementById("adminCourseModal"); if(old) old.remove();
+    const editing=!!course;
+    const modal=document.createElement("div"); modal.className="modal active"; modal.id="adminCourseModal";
+    modal.innerHTML=`<div class="legal-box"><button class="legal-close" onclick="closeCourseForm()" aria-label="Close">×</button><h2>${editing?"Edit Course":"Create Course"}</h2><p>Enter the course details below. Subscription prices are managed separately from the course record.</p><form id="adminCourseForm" class="admin-form"><input type="hidden" id="adminCourseId" value="${editing?escapeHTML(course.id):""}"><div class="full"><label for="adminCourseTitle">Course title *</label><input id="adminCourseTitle" maxlength="150" required value="${editing?escapeHTML(course.title||""):""}"></div><div><label for="adminCourseSubject">Subject</label><input id="adminCourseSubject" maxlength="100" value="${editing?escapeHTML(course.subject||""):""}"></div><div><label for="adminCoursePrice">Legacy/default price (ZMW)</label><input id="adminCoursePrice" type="number" min="0" step="0.01" value="${editing?Number(course.price||0):0}"></div><div class="full"><label for="adminCourseDescription">Description</label><textarea id="adminCourseDescription" maxlength="3000">${editing?escapeHTML(course.description||""):""}</textarea></div><label class="checkline full"><input id="adminCoursePublished" type="checkbox" ${editing&&course.is_published?"checked":""}> Publish course (make it visible to students)</label><div class="admin-modal-actions full"><button type="button" class="cancel" onclick="closeCourseForm()">Cancel</button><button type="submit" class="save">${editing?"Save Changes":"Create Course"}</button></div></form></div>`;
+    modal.addEventListener("click",e=>{if(e.target===modal)closeCourseForm();});
+    document.body.appendChild(modal);
+    document.getElementById("adminCourseForm").addEventListener("submit",saveCourse);
+}
+
+function closeCourseForm(){const modal=document.getElementById("adminCourseModal");if(modal)modal.remove();}
+
+async function editCourse(id){
+    try{const {data,error}=await supabaseClient.from("courses").select("id,title,description,subject,price,is_published").eq("id",id).single();if(error)throw error;showCourseForm(data);}
+    catch(error){alert("Could not retrieve this course: "+error.message);}
+}
+
+async function saveCourse(event){
+    event.preventDefault();
+    const button=event.submitter; if(button){button.disabled=true;button.textContent="Saving…";}
+    const id=document.getElementById("adminCourseId").value;
+    const title=document.getElementById("adminCourseTitle").value.trim();
+    const price=Number(document.getElementById("adminCoursePrice").value||0);
+    if(!title||!Number.isFinite(price)||price<0){alert("Enter a valid course title and price.");if(button){button.disabled=false;button.textContent=id?"Save Changes":"Create Course";}return;}
+    const record={title,subject:document.getElementById("adminCourseSubject").value.trim()||null,description:document.getElementById("adminCourseDescription").value.trim()||null,price,is_published:document.getElementById("adminCoursePublished").checked};
+    try{
+        const result=id?await supabaseClient.from("courses").update(record).eq("id",id):await supabaseClient.from("courses").insert(record);
+        if(result.error)throw result.error;
+        closeCourseForm();await renderAdminCourses();
+    }catch(error){console.error("Course save error:",error);alert("Course could not be saved: "+error.message);if(button){button.disabled=false;button.textContent=id?"Save Changes":"Create Course";}}
+}
+
+async function toggleCoursePublication(id,published){
+    const action=published?"publish":"unpublish";
+    if(!confirm(`Are you sure you want to ${action} this course?`))return;
+    try{const {error}=await supabaseClient.from("courses").update({is_published:published}).eq("id",id);if(error)throw error;await loadAdminCourses();}
+    catch(error){alert(`Could not ${action} course: `+error.message);}
+}
+
+/* ADMIN STUDENT DIRECTORY */
+async function renderAdminStudents(){
+    const content=document.getElementById("dashboardContent");
+    content.innerHTML=`<div class="section-title"><div><h3>Registered Students</h3><p>Student profiles registered on Bright Minds.</p></div></div><div class="admin-toolbar"><p id="studentAdminMessage">Loading students…</p></div><div id="adminStudentList"></div>`;
+    const box=document.getElementById("adminStudentList");
+    try{
+        const {data,error}=await supabaseClient.from("profiles").select("id,full_name,role,created_at").eq("role","student").order("created_at",{ascending:false});
+        if(error)throw error;
+        document.getElementById("studentAdminMessage").textContent=`${(data||[]).length} registered student(s)`;
+        box.innerHTML=data&&data.length?`<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Student</th><th>Account created</th><th>Account ID</th></tr></thead><tbody>${data.map(s=>`<tr><td><strong>${escapeHTML(s.full_name||"Unnamed student")}</strong></td><td>${s.created_at?new Date(s.created_at).toLocaleDateString():"—"}</td><td>${escapeHTML(s.id)}</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty-state"><h3>No student profiles found</h3><p>Newly registered students will appear here.</p></div>`;
+    }catch(error){console.error("Student directory error:",error);box.innerHTML=`<div class="empty-state"><h3>Unable to load students</h3><p>${escapeHTML(error.message)}</p></div>`;}
+}
+
+/* ADMIN ENROLMENT VIEW */
+async function renderAdminEnrolments(){
+    const content=document.getElementById("dashboardContent");
+    content.innerHTML=`<div class="section-title"><div><h3>Enrolments</h3><p>Review recorded course enrolments and their status.</p></div></div><div id="adminEnrolmentList"><div class="empty-state">Loading enrolments…</div></div>`;
+    const box=document.getElementById("adminEnrolmentList");
+    try{
+        const {data,error}=await supabaseClient.from("enrollments").select("id,student_id,course_id,status,enrolled_at").order("enrolled_at",{ascending:false});
+        if(error)throw error;
+        if(!data||!data.length){box.innerHTML=`<div class="empty-state"><h3>No enrolments found</h3><p>Course enrolment records will appear here.</p></div>`;return;}
+        const studentIds=[...new Set(data.map(x=>x.student_id).filter(Boolean))];
+        const courseIds=[...new Set(data.map(x=>x.course_id).filter(Boolean))];
+        const [students,courses]=await Promise.all([
+            studentIds.length?supabaseClient.from("profiles").select("id,full_name").in("id",studentIds):Promise.resolve({data:[],error:null}),
+            courseIds.length?supabaseClient.from("courses").select("id,title").in("id",courseIds):Promise.resolve({data:[],error:null})
+        ]);
+        if(students.error)throw students.error;if(courses.error)throw courses.error;
+        const studentMap=Object.fromEntries((students.data||[]).map(x=>[x.id,x.full_name]));
+        const courseMap=Object.fromEntries((courses.data||[]).map(x=>[x.id,x.title]));
+        box.innerHTML=`<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Student</th><th>Course</th><th>Status</th><th>Enrolled</th></tr></thead><tbody>${data.map(e=>`<tr><td>${escapeHTML(studentMap[e.student_id]||e.student_id||"—")}</td><td>${escapeHTML(courseMap[e.course_id]||"Course unavailable")}</td><td><span class="status-pill ${e.status==="active"?"":"off"}">${escapeHTML(e.status||"Unknown")}</span></td><td>${e.enrolled_at?new Date(e.enrolled_at).toLocaleDateString():"—"}</td></tr>`).join("")}</tbody></table></div>`;
+    }catch(error){console.error("Enrolment retrieval error:",error);box.innerHTML=`<div class="empty-state"><h3>Unable to load enrolments</h3><p>${escapeHTML(error.message)}</p></div>`;}
+}
+
+/* =====================================
+   ADMIN STATISTICS
+===================================== */
+
+async function loadAdminStats() {
+
+    try {
+
+        const [students, courses, enrolments] = await Promise.all([
+
+            supabaseClient
+                .from("profiles")
+                .select("id", {count:"exact",head:true})
+                .eq("role","student"),
+
+            supabaseClient
+                .from("courses")
+                .select("id", {count:"exact",head:true}),
+
+            supabaseClient
+                .from("enrollments")
+                .select("id", {count:"exact",head:true})
+
+        ]);
+
+        if (students.error) throw students.error;
+        if (courses.error) throw courses.error;
+        if (enrolments.error) throw enrolments.error;
+
+        document.getElementById("adminStudentCount").textContent =
+            students.count ?? 0;
+
+        document.getElementById("adminCourseCount").textContent =
+            courses.count ?? 0;
+
+        document.getElementById("adminEnrolmentCount").textContent =
+            enrolments.count ?? 0;
+
+    } catch (error) {
+
+        console.error("Admin statistics error:", error);
+
+    }
+
+}
+
+/* =====================================
+   SAFE HTML OUTPUT
+===================================== */
+
+function escapeHTML(value) {
+
+    return String(value).replace(/[&<>"']/g, char => ({
+
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+
+    })[char]);
+
+}
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+async function logout() {
+
+    if (!supabaseClient) return;
+
+    const {error} = await supabaseClient.auth.signOut();
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    currentUser = null;
+    currentProfile = null;
+
+    appPage.classList.add("hidden");
+    welcomePage.classList.remove("hidden");
+
+    closeSidebar();
+
+}
+
+/* =====================================
+   RESTORE EXISTING SESSION
+===================================== */
+
+async function checkExistingSession() {
+
+    if (!supabaseClient) return;
+
+    const {data,error} = await supabaseClient.auth.getSession();
+
+    if (error) {
+
+        console.error("Session retrieval error:", error);
+
+        return;
+
+    }
+
+    if (data.session) {
+
+        await loadApplication(data.session.user);
+
+    }
+
+}
+
+if (supabaseClient) {
 
     checkExistingSession();
 
-  </script>
+    supabaseClient.auth.onAuthStateChange((event,session) => {
+
+        if (event === "SIGNED_OUT") {
+
+            currentUser = null;
+            currentProfile = null;
+
+            appPage.classList.add("hidden");
+            welcomePage.classList.remove("hidden");
+
+        }
+
+    });
+
+}
+
+</script>
 
 </body>
 </html>
+```
