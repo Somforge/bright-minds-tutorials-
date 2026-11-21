@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102A43">
+  <title>Dashboard | Bright Minds Tutorials</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy: #102A43;
+      --teal: #00B8A9;
+      --ink: #243B53;
+      --muted: #627D98;
+      --bg: #F4F7FA;
+      --white: #FFFFFF;
+      --border: #D9E2EC;
+      --danger: #C0392B;
+      --shadow: 0 12px 30px rgba(16,42,67,.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .app { min-height: 100vh; }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: 250px;
+      background: var(--navy);
+      color: white;
+      padding: 26px 18px;
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 8px 28px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: white;
+      color: var(--navy);
+      display: grid;
+      place-items: center;
+      font: 800 24px "Manrope", sans-serif;
+      position: relative;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--teal);
+      right: 5px;
+      top: 5px;
+    }
+
+    .brand-name {
+      font: 800 16px "Manrope", sans-serif;
+      line-height: 1.2;
+    }
+
+    .brand-name span { color: var(--teal); }
+
+    .brand-sub {
+      color: #BCCCDC;
+      font-size: 10px;
+      margin-top: 4px;
+    }
+
+    .nav-label {
+      color: #9FB3C8;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      padding: 18px 12px 9px;
+    }
+
+    .nav { display: grid; gap: 6px; }
+
+    .nav button {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #D9E2EC;
+      text-align: left;
+      border-radius: 10px;
+      padding: 12px 13px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      background: rgba(255,255,255,.12);
+      color: white;
+    }
+
+    .nav button.active {
+      box-shadow: inset 3px 0 var(--teal);
+    }
+
+    .nav-icon {
+      width: 19px;
+      text-align: center;
+      color: #7FE3DA;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,.15);
+      padding: 18px 8px 0;
+      color: #BCCCDC;
+      font-size: 12px;
+    }
+
+    .main {
+      margin-left: 250px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      min-height: 76px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 34px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .page-title {
+      font: 800 20px "Manrope", sans-serif;
+      color: var(--navy);
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #D9F7F4;
+      color: var(--navy);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .user-role {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: capitalize;
+      margin-top: 2px;
+    }
+
+    .content {
+      padding: 30px 34px 50px;
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    .welcome { margin-bottom: 25px; }
+
+    .welcome h1 {
+      margin: 0 0 7px;
+      font: 800 26px "Manrope", sans-serif;
+      color: var(--navy);
+    }
+
+    .welcome p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .grid { display: grid; gap: 18px; }
+
+    .stats {
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 21px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      color: var(--navy);
+      font: 800 28px "Manrope", sans-serif;
+      margin-top: 10px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 26px 0 14px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      color: var(--navy);
+      font: 800 18px "Manrope", sans-serif;
+    }
+
+    .muted { color: var(--muted); }
+
+    .btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 15px;
+      font-weight: 700;
+      background: var(--teal);
+      color: white;
+    }
+
+    .btn:hover { filter: brightness(.95); }
+
+    .btn.secondary {
+      background: #E6FFFB;
+      color: #087F78;
+    }
+
+    .btn.danger {
+      background: #FDECEC;
+      color: var(--danger);
+    }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+    }
+
+    .table th, .table td {
+      padding: 13px 12px;
+      border-bottom: 1px solid #EAF0F5;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .table th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 5px 9px;
+      background: #E6FFFB;
+      color: #087F78;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .empty {
+      padding: 30px 16px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+    }
+
+    .alert {
+      padding: 13px 15px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .alert.error {
+      display: block;
+      background: #FFF1F0;
+      color: #9B2C2C;
+      border: 1px solid #FED7D7;
+    }
+
+    .alert.success {
+      display: block;
+      background: #E6FFFB;
+      color: #087F78;
+      border: 1px solid #B2F5EA;
+    }
+
+    .loading {
+      padding: 25px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .mobile-menu {
+      display: none;
+      border: 0;
+      background: #E6FFFB;
+      color: var(--navy);
+      border-radius: 8px;
+      padding: 9px 12px;
+    }
+
+    .hidden { display: none !important; }
+
+    .form {
+      display: grid;
+      gap: 12px;
+      max-width: 520px;
+    }
+
+    .form label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .form input {
+      width: 100%;
+      margin-top: 6px;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--ink);
+      background: white;
+    }
+
+    .inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    @media(max-width:900px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform .2s ease;
+      }
+
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .mobile-menu { display: inline-block; }
+      .topbar { padding: 13px 18px; }
+      .content { padding: 24px 18px 40px; }
+    }
+
+    @media(max-width:620px) {
+      .stats { grid-template-columns: 1fr; }
+      .user-details { display: none; }
+      .welcome h1 { font-size: 22px; }
+      .content { padding: 20px 14px 35px; }
+      .topbar { padding: 12px 14px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="brand">
+        <div class="brand-mark">B</div>
+        <div>
+          <div class="brand-name">Bright <span>Minds</span></div>
+          <div class="brand-sub">TUTORIALS · LEARN. UNDERSTAND. EXCEL.</div>
+        </div>
+      </div>
+
+      <div class="nav-label">WORKSPACE</div>
+
+      <nav class="nav" id="mainNav">
+        <button class="active" data-page="overview">
+          <span class="nav-icon">⌂</span>Overview
+        </button>
+
+        <button data-page="courses">
+          <span class="nav-icon">▣</span>My courses
+        </button>
+
+        <button data-page="assessments">
+          <span class="nav-icon">✓</span>Assessments
+        </button>
+
+        <button data-page="announcements">
+          <span class="nav-icon">◉</span>Announcements
+        </button>
+
+        <button data-page="profile">
+          <span class="nav-icon">○</span>My profile
+        </button>
+      </nav>
+
+      <div class="nav-label hidden" id="adminLabel">
+        ADMINISTRATION
+      </div>
+
+      <nav class="nav hidden" id="adminNav">
+        <button data-page="manage-courses">
+          <span class="nav-icon">▤</span>Manage courses
+        </button>
+
+        <button data-page="manage-announcements">
+          <span class="nav-icon">✎</span>Manage announcements
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div>Bright Minds Tutorials</div>
+        <div style="margin-top:5px">Learn. Understand. Excel.</div>
+      </div>
+
+    </aside>
+
+    <main class="main">
+
+      <header class="topbar">
+
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="mobile-menu" id="menuToggle">☰</button>
+          <div class="page-title" id="pageTitle">Overview</div>
+        </div>
+
+        <div class="top-right">
+
+          <div class="user">
+            <div class="avatar" id="userAvatar">B</div>
+
+            <div class="user-details">
+              <div class="user-name" id="userName">Loading…</div>
+              <div class="user-role" id="userRole">Student</div>
+            </div>
+          </div>
+
+          <button class="btn secondary" id="signOutBtn">
+            Sign out
+          </button>
+
+        </div>
+
+      </header>
+
+      <section class="content">
+
+        <div id="alertBox" class="alert"></div>
+
+        <div id="pageContent">
+          <div class="loading">Loading your Bright Minds dashboard…</div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-config.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const config = window.BRIGHT_MINDS_CONFIG || {};
+
+      const supabaseUrl = config.SUPABASE_URL;
+      const supabaseKey = config.SUPABASE_KEY;
+
+      const pageContent = document.getElementById("pageContent");
+      const alertBox = document.getElementById("alertBox");
+      const pageTitle = document.getElementById("pageTitle");
+
+      let supabaseClient = null;
+      let currentUser = null;
+      let currentProfile = null;
+      let currentPage = "overview";
+
+      const titles = {
+        overview: "Overview",
+        courses: "My courses",
+        assessments: "Assessments",
+        announcements: "Announcements",
+        profile: "My profile",
+        "manage-courses": "Manage courses",
+        "manage-announcements": "Manage announcements"
+      };
+
+      function showAlert(message, type = "error") {
+        alertBox.textContent = message;
+        alertBox.className = "alert " + type;
+      }
+
+      function clearAlert() {
+        alertBox.textContent = "";
+        alertBox.className = "alert";
+      }
+
+      function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char]));
+      }
+
+      function initials(name) {
+        return String(name || "Bright Minds")
+          .trim()
+          .split(/\s+/)
+          .slice(0, 2)
+          .map(part => part[0] || "")
+          .join("")
+          .toUpperCase();
+      }
+
+      function setLoading(message = "Loading…") {
+        pageContent.innerHTML =
+          `<div class="loading">${escapeHTML(message)}</div>`;
+      }
+
+      function isAdmin() {
+        return currentProfile && currentProfile.role === "admin";
+      }
+
+      async function init() {
+
+        if (!window.supabase || !supabaseUrl || !supabaseKey) {
+          pageContent.innerHTML = `
+            <div class="empty">
+              Supabase configuration could not be loaded.
+              Check that supabase-config.js exists and contains
+              the project URL and publishable/anon key.
+            </div>`;
+          return;
+        }
+
+        supabaseClient = window.supabase.createClient(
+          supabaseUrl,
+          supabaseKey
+        );
+
+        const {
+          data: { session },
+          error: sessionError
+        } = await supabaseClient.auth.getSession();
+
+        if (sessionError) {
+          showAlert(sessionError.message);
+          return;
+        }
+
+        if (!session) {
+          window.location.replace("./index.html");
+          return;
+        }
+
+        currentUser = session.user;
+
+        const { data: profile, error: profileError } =
+          await supabaseClient
+            .from("profiles")
+            .select("full_name, role")
+            .eq("id", currentUser.id)
+            .single();
+
+        if (profileError || !profile) {
+          pageContent.innerHTML = `
+            <div class="empty">
+              We could not load your account profile.
+              Please contact Bright Minds support.
+            </div>`;
+
+          showAlert(
+            profileError
+              ? profileError.message
+              : "Your profile record was not found."
+          );
+
+          return;
+        }
+
+        currentProfile = profile;
+
+        document.getElementById("userName").textContent =
+          profile.full_name || currentUser.email || "Bright Minds user";
+
+        document.getElementById("userRole").textContent =
+          profile.role || "student";
+
+        document.getElementById("userAvatar").textContent =
+          initials(profile.full_name || currentUser.email);
+
+        if (isAdmin()) {
+          document.getElementById("adminLabel")
+            .classList.remove("hidden");
+
+          document.getElementById("adminNav")
+            .classList.remove("hidden");
+        }
+
+        await renderPage("overview");
+      }
+
+      async function renderPage(page) {
+
+        if (!titles[page]) return;
+
+        if (page.startsWith("manage-") && !isAdmin()) {
+          showAlert("You do not have permission to open that page.");
+          return;
+        }
+
+        currentPage = page;
+        pageTitle.textContent = titles[page];
+
+        document.querySelectorAll("#mainNav button, #adminNav button")
+          .forEach(button => {
+            button.classList.toggle(
+              "active",
+              button.dataset.page === page
+            );
+          });
+
+        document.getElementById("sidebar")
+          .classList.remove("open");
+
+        clearAlert();
+        setLoading();
+
+        try {
+
+          if (page === "overview") {
+            await renderOverview();
+          }
+
+          else if (page === "courses") {
+            await renderCourses();
+          }
+
+          else if (page === "assessments") {
+            renderPlaceholder(
+              "Assessments and results will appear here when the assessment module is connected."
+            );
+          }
+
+          else if (page === "announcements") {
+            await renderAnnouncements(false);
+          }
+
+          else if (page === "profile") {
+            renderProfile();
+          }
+
+          else if (page === "manage-courses") {
+            await renderManageCourses();
+          }
+
+          else if (page === "manage-announcements") {
+            await renderAnnouncements(true);
+          }
+
+        } catch (error) {
+          pageContent.innerHTML = `
+            <div class="empty">
+              This section could not be loaded.
+            </div>`;
+
+          showAlert(error.message || "An unexpected error occurred.");
+        }
+      }
+
+      async function getMySubscriptions() {
+
+        const { data, error } = await supabaseClient
+          .from("subscriptions")
+          .select(`
+            id,
+            course_id,
+            status,
+            start_date,
+            end_date,
+            courses (
+              id,
+              title,
+              description,
+              subject
+            )
+          `)
+          .eq("student_id", currentUser.id)
+          .eq("status", "active");
+
+        if (error) throw error;
+
+        const today = new Date().toISOString().slice(0, 10);
+
+        return (data || []).filter(item =>
+          (!item.start_date || item.start_date <= today) &&
+          (!item.end_date || item.end_date >= today)
+        );
+      }
+
+      async function renderOverview() {
+
+        if (isAdmin()) {
+
+          const [
+            coursesResult,
+            studentsResult,
+            paymentsResult
+          ] = await Promise.all([
+
+            supabaseClient
+              .from("courses")
+              .select("id", { count: "exact", head: true }),
+
+            supabaseClient
+              .from("profiles")
+              .select("id", { count: "exact", head: true })
+              .eq("role", "student"),
+
+            supabaseClient
+              .from("payments")
+              .select("id", { count: "exact", head: true })
+              .eq("status", "pending")
+
+          ]);
+
+          if (coursesResult.error) throw coursesResult.error;
+          if (studentsResult.error) throw studentsResult.error;
+          if (paymentsResult.error) throw paymentsResult.error;
+
+          pageContent.innerHTML = `
+            <div class="welcome">
+              <h1>Welcome back, ${escapeHTML(currentProfile.full_name || "Administrator")}.</h1>
+              <p>Here is an overview of your learning platform.</p>
+            </div>
+
+            <div class="grid stats">
+
+              <div class="card">
+                <div class="stat-label">Total courses</div>
+                <div class="stat-value">${coursesResult.count ?? 0}</div>
+              </div>
+
+              <div class="card">
+                <div class="stat-label">Student accounts</div>
+                <div class="stat-value">${studentsResult.count ?? 0}</div>
+              </div>
+
+              <div class="card">
+                <div class="stat-label">Pending payments</div>
+                <div class="stat-value">${paymentsResult.count ?? 0}</div>
+              </div>
+
+            </div>
+
+            <div class="card">
+              <h2 style="margin:0 0 8px;color:var(--navy);font:800 18px Manrope">
+                Administration
+              </h2>
+
+              <p class="muted">
+                Use the navigation to manage courses and publish announcements.
+                Payments must only be verified after confirmation from the payment provider.
+              </p>
+            </div>
+          `;
+
+        } else {
+
+          const subscriptions = await getMySubscriptions();
+
+          pageContent.innerHTML = `
+            <div class="welcome">
+              <h1>Welcome back, ${escapeHTML(currentProfile.full_name || "Student")}.</h1>
+              <p>Continue learning and keep making progress.</p>
+            </div>
+
+            <div class="grid stats">
+
+              <div class="card">
+                <div class="stat-label">Active subscriptions</div>
+                <div class="stat-value">${subscriptions.length}</div>
+              </div>
+
+              <div class="card">
+                <div class="stat-label">Learning platform</div>
+                <div class="stat-value" style="font-size:19px;margin-top:15px">
+                  Bright Minds
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="stat-label">Account status</div>
+                <div class="stat-value" style="font-size:19px;margin-top:15px">
+                  Active
+                </div>
+              </div>
+
+            </div>
+
+            <div class="section-head">
+              <h2>Your courses</h2>
+              <button class="btn secondary" data-go="courses">
+                View courses
+              </button>
+            </div>
+
+            ${
+              subscriptions.length
+                ? `
+                  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
+                    ${subscriptions.slice(0, 3).map(item => `
+                      <div class="card">
+                        <span class="pill">Active</span>
+
+                        <h3 style="color:var(--navy);margin:13px 0 6px">
+                          ${escapeHTML(item.courses?.title || "Course")}
+                        </h3>
+
+                        <p class="muted" style="font-size:13px">
+                          ${escapeHTML(item.courses?.subject || "")}
+                        </p>
+                      </div>
+                    `).join("")}
+                  </div>
+                `
+                : `
+                  <div class="empty">
+                    You do not have any active course subscriptions yet.
+                  </div>
+                `
+            }
+          `;
+
+          pageContent
+            .querySelector('[data-go="courses"]')
+            ?.addEventListener("click", () => renderPage("courses"));
+        }
+      }
+
+      async function renderCourses() {
+
+        if (isAdmin()) {
+          await renderManageCourses();
+          return;
+        }
+
+        const subscriptions = await getMySubscriptions();
+
+        if (!subscriptions.length) {
+          pageContent.innerHTML = `
+            <div class="welcome">
+              <h1>My courses</h1>
+              <p>Your subscribed learning materials will appear here.</p>
+            </div>
+
+            <div class="empty">
+              No active course subscriptions were found on your account.
+            </div>
+          `;
+          return;
+        }
+
+        pageContent.innerHTML = `
+          <div class="welcome">
+            <h1>My courses</h1>
+            <p>Courses currently available to your account.</p>
+          </div>
+
+          <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))">
+
+            ${subscriptions.map(item => `
+              <article class="card">
+
+                <span class="pill">Active subscription</span>
+
+                <h2 style="font:800 18px Manrope;color:var(--navy);margin:15px 0 7px">
+                  ${escapeHTML(item.courses?.title || "Course")}
+                </h2>
+
+                <p class="muted" style="font-size:13px">
+                  ${escapeHTML(item.courses?.description || "Your course materials are available through this subscription.")}
+                </p>
+
+                <p class="muted" style="font-size:12px">
+                  Subject: ${escapeHTML(item.courses?.subject || "Not specified")}
+                </p>
+
+                <button
+                  class="btn"
+                  disabled
+                  title="The lesson viewer has not yet been connected">
+                  Open course
+                </button>
+
+              </article>
+            `).join("")}
+
+          </div>
+        `;
+      }
+
+      async function renderManageCourses() {
+
+        const { data, error } = await supabaseClient
+          .from("courses")
+          .select("id,title,description,subject,is_published,created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        pageContent.innerHTML = `
+          <div class="welcome">
+            <h1>Manage courses</h1>
+            <p>Create courses and control whether they are published.</p>
+          </div>
+
+          <div class="card">
+
+            <div class="section-head" style="margin-top:0">
+              <h2>Course list</h2>
+              <button class="btn" id="addCourseBtn">Add course</button>
+            </div>
+
+            <div id="courseFormHost"></div>
+
+            ${
+              data?.length
+                ? `
+                  <div class="table-wrap">
+                    <table class="table">
+
+                      <thead>
+                        <tr>
+                          <th>Course</th>
+                          <th>Subject</th>
+                          <th>Visibility</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        ${data.map(course => `
+                          <tr>
+
+                            <td>
+                              <strong>${escapeHTML(course.title)}</strong>
+                              <div class="muted">
+                                ${escapeHTML(course.description || "")}
+                              </div>
+                            </td>
+
+                            <td>${escapeHTML(course.subject || "—")}</td>
+
+                            <td>
+                              <span class="pill" style="${
+                                course.is_published
+                                  ? ""
+                                  : "background:#F0F4F8;color:#627D98"
+                              }">
+                                ${course.is_published ? "Published" : "Draft"}
+                              </span>
+                            </td>
+
+                            <td>
+                              <button
+                                class="btn secondary"
+                                data-toggle-course="${course.id}"
+                                data-published="${course.is_published}">
+                                ${course.is_published ? "Unpublish" : "Publish"}
+                              </button>
+                            </td>
+
+                          </tr>
+                        `).join("")}
+                      </tbody>
+
+                    </table>
+                  </div>
+                `
+                : `
+                  <div class="empty">
+                    No courses have been created yet.
+                  </div>
+                `
+            }
+
+          </div>
+        `;
+
+        document
+          .getElementById("addCourseBtn")
+          .addEventListener("click", showCourseForm);
+
+        pageContent.querySelectorAll("[data-toggle-course]")
+          .forEach(button => {
+            button.addEventListener("click", () => {
+              toggleCourse(
+                button.dataset.toggleCourse,
+                button.dataset.published === "true"
+              );
+            });
+          });
+      }
+
+      function showCourseForm() {
+
+        const host = document.getElementById("courseFormHost");
+
+        host.innerHTML = `
+          <form class="form" id="courseForm" style="padding:18px 0 24px">
+
+            <label>
+              Course title
+              <input name="title" required maxlength="150">
+            </label>
+
+            <label>
+              Subject
+              <input name="subject" maxlength="100">
+            </label>
+
+            <label>
+              Description
+              <input name="description" maxlength="1000">
+            </label>
+
+            <div class="inline-actions">
+              <button class="btn" type="submit">Save course</button>
+              <button class="btn secondary" type="button" id="cancelCourse">
+                Cancel
+              </button>
+            </div>
+
+          </form>
+        `;
+
+        document
+          .getElementById("cancelCourse")
+          .addEventListener("click", () => {
+            host.innerHTML = "";
+          });
+
+        document
+          .getElementById("courseForm")
+          .addEventListener("submit", async event => {
+
+            event.preventDefault();
+
+            const form = new FormData(event.currentTarget);
+
+            const payload = {
+              title: String(form.get("title") || "").trim(),
+              subject: String(form.get("subject") || "").trim() || null,
+              description: String(form.get("description") || "").trim() || null,
+              is_published: false
+            };
+
+            try {
+
+              const { error } = await supabaseClient
+                .from("courses")
+                .insert(payload);
+
+              if (error) throw error;
+
+              showAlert(
+                "Course created as a draft. Add its subscription prices before publishing.",
+                "success"
+              );
+
+              await renderManageCourses();
+
+            } catch (error) {
+              showAlert(error.message || "Could not create the course.");
+            }
+          });
+      }
+
+      async function toggleCourse(id, currentlyPublished) {
+
+        const action = currentlyPublished ? "unpublish" : "publish";
+
+        if (!confirm(`Are you sure you want to ${action} this course?`)) {
+          return;
+        }
+
+        try {
+
+          const { error } = await supabaseClient
+            .from("courses")
+            .update({ is_published: !currentlyPublished })
+            .eq("id", id);
+
+          if (error) throw error;
+
+          showAlert(
+            `Course ${currentlyPublished ? "unpublished" : "published"} successfully.`,
+            "success"
+          );
+
+          await renderManageCourses();
+
+        } catch (error) {
+          showAlert(error.message || "Could not update the course.");
+        }
+      }
+
+      async function renderAnnouncements(adminMode) {
+
+        const { data, error } = await supabaseClient
+          .from("announcements")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        pageContent.innerHTML = `
+          <div class="welcome">
+            <h1>${adminMode ? "Manage announcements" : "Announcements"}</h1>
+            <p>
+              ${adminMode
+                ? "Share important updates with students."
+                : "Updates from Bright Minds Tutorials."}
+            </p>
+          </div>
+
+          ${
+            adminMode
+              ? `
+                <div class="card" style="margin-bottom:18px">
+                  <form class="form" id="announcementForm">
+
+                    <label>
+                      Announcement title
+                      <input name="title" required maxlength="180">
+                    </label>
+
+                    <label>
+                      Message
+                      <input name="content" required maxlength="3000">
+                    </label>
+
+                    <button class="btn" type="submit">
+                      Publish announcement
+                    </button>
+
+                  </form>
+                </div>
+              `
+              : ""
+          }
+
+          <div class="grid">
+
+            ${
+              data?.length
+                ? data.map(item => `
+                    <article class="card">
+
+                      <div class="muted" style="font-size:11px">
+                        ${item.created_at
+                          ? new Date(item.created_at).toLocaleDateString()
+                          : ""}
+                      </div>
+
+                      <h2 style="font:800 17px Manrope;color:var(--navy);margin:8px 0">
+                        ${escapeHTML(item.title || "Announcement")}
+                      </h2>
+
+                      <p style="white-space:pre-wrap;line-height:1.6">
+                        ${escapeHTML(item.content || item.message || "")}
+                      </p>
+
+                    </article>
+                  `).join("")
+                : `
+                  <div class="empty">
+                    There are no announcements yet.
+                  </div>
+                `
+            }
+
+          </div>
+        `;
+
+        if (adminMode) {
+
+          document
+            .getElementById("announcementForm")
+            .addEventListener("submit", async event => {
+
+              event.preventDefault();
+
+              const form = new FormData(event.currentTarget);
+
+              try {
+
+                const { error } = await supabaseClient
+                  .from("announcements")
+                  .insert({
+                    title: String(form.get("title")).trim(),
+                    content: String(form.get("content")).trim()
+                  });
+
+                if (error) throw error;
+
+                showAlert("Announcement published.", "success");
+
+                await renderAnnouncements(true);
+
+              } catch (error) {
+                showAlert(
+                  error.message || "Could not publish the announcement."
+                );
+              }
+            });
+        }
+      }
+
+      function renderProfile() {
+
+        pageContent.innerHTML = `
+          <div class="welcome">
+            <h1>My profile</h1>
+            <p>Your Bright Minds account information.</p>
+          </div>
+
+          <div class="card" style="max-width:650px">
+
+            <div class="form">
+
+              <label>
+                Full name
+                <input
+                  value="${escapeHTML(currentProfile.full_name || "")}"
+                  disabled>
+              </label>
+
+              <label>
+                Email address
+                <input
+                  value="${escapeHTML(currentUser.email || "")}"
+                  disabled>
+              </label>
+
+              <label>
+                Account role
+                <input
+                  value="${escapeHTML(currentProfile.role || "student")}"
+                  disabled>
+              </label>
+
+            </div>
+
+            <p class="muted" style="font-size:12px;margin-top:18px">
+              To update your account details, contact
+              brightmindstutorials@gmail.com.
+            </p>
+
+          </div>
+        `;
+      }
+
+      function renderPlaceholder(message) {
+
+        pageContent.innerHTML = `
+          <div class="welcome">
+            <h1>${escapeHTML(titles[currentPage])}</h1>
+          </div>
+
+          <div class="empty">
+            ${escapeHTML(message)}
+          </div>
+        `;
+      }
+
+      document
+        .getElementById("mainNav")
+        .addEventListener("click", event => {
+
+          const button = event.target.closest("button[data-page]");
+
+          if (button) {
+            renderPage(button.dataset.page);
+          }
+        });
+
+      document
+        .getElementById("adminNav")
+        .addEventListener("click", event => {
+
+          const button = event.target.closest("button[data-page]");
+
+          if (button) {
+            renderPage(button.dataset.page);
+          }
+        });
+
+      document
+        .getElementById("menuToggle")
+        .addEventListener("click", () => {
+          document.getElementById("sidebar").classList.toggle("open");
+        });
+
+      document
+        .getElementById("signOutBtn")
+        .addEventListener("click", async () => {
+
+          if (!supabaseClient) return;
+
+          const { error } = await supabaseClient.auth.signOut();
+
+          if (error) {
+            showAlert(error.message);
+            return;
+          }
+
+          window.location.replace("./index.html");
+        });
+
+      init().catch(error => {
+        pageContent.innerHTML = `
+          <div class="empty">
+            The dashboard could not be started.
+          </div>
+        `;
+
+        showAlert(error.message || "An unexpected error occurred.");
+      });
+
+    })();
+  </script>
+
+</body>
+</html>
