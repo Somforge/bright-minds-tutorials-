@@ -1458,7 +1458,7 @@
               ? "Please read the administrator's note, correct the issue and submit a new payment proof."
               : payment.status === "verified"
                 ? "Payment verified. Your selected course subscription(s) should now be active."
-                : "Your proof has been received. Course access will be activated after an administrator verifies it.";
+                : "Your payment details have been received. Make sure your screenshot or receipt has also been sent to an official Bright Minds WhatsApp number. Course access starts after verification.";
             return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</strong><span class="pill" style="' + statusStyle + '">' + statusLabel + '</span></div><p style="margin:10px 0 4px">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Method: ' + escapeHTML(payment.payment_method) + ' · Reference: ' + escapeHTML(payment.transaction_reference || "—") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p><p style="font-size:13px;line-height:1.5;margin:10px 0 0">' + nextStep + '</p>' + (payment.verification_notes ? '<p style="font-size:13px;margin-bottom:0;padding:10px;background:#F4F7FA;border-radius:8px"><strong>Administrator note:</strong> ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
           }).join("") + '</div>' : '<div class="empty">You have not submitted any payments yet.</div>'
         ].join("");
