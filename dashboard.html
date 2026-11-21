@@ -1530,7 +1530,7 @@
 
 
       const resourceTypeLabels = {
-        lecture_note: "Lecture notes",
+        lecture_note: "Additional material",
         tutorial_sheet: "Tutorial sheet",
         past_paper: "Past examination paper",
         solution: "Worked solutions / marking guides",
@@ -1562,21 +1562,21 @@
 
         pageContent.innerHTML = [
           '<div class="welcome"><h1>Course tutorial materials</h1><p>Upload tutorial sheets, past examination papers, worked solutions and practice materials. Files stay private until you publish them to students with an active subscription.</p></div>',
-          '<div class="card"><div class="section-head" style="margin-top:0"><h2>Upload a resource</h2></div>',
+          '<div class="card"><div class="section-head" style="margin-top:0"><h2>Upload tutorial material</h2></div>',
           '<form class="form" id="resourceUploadForm" style="max-width:720px">',
           '<label>Course<select name="course_id" id="resourceCourse" required><option value="">Choose a course</option>' + options + '</select></label>',
-          '<label>Module / topic (optional)<select name="module_id" id="resourceModule"><option value="">General course resource</option>' + moduleOptions + '</select></label>',
-          '<label>Resource title<input name="title" required maxlength="180" placeholder="e.g. Introduction to Calculus — Lecture Notes"></label>',
+          '<label>Module / topic (optional)<select name="module_id" id="resourceModule"><option value="">General course material</option>' + moduleOptions + '</select></label>',
+          '<label>Resource title<input name="title" required maxlength="180" placeholder="e.g. Tutorial Sheet 1 — Introduction to Calculus"></label>',
           '<label>Tutorial material type<select name="resource_type" required><option value="tutorial_sheet">Tutorial sheet</option><option value="past_paper">Past examination paper</option><option value="solution">Worked solutions / marking guides</option><option value="other">Other tutorial material</option></select></label>',
           '<label>Year (optional, useful for past papers)<input name="academic_year" type="number" min="1900" max="2100" placeholder="e.g. 2024"></label>',
           '<label>Description (optional)<textarea name="description" rows="3" maxlength="1000" placeholder="Briefly describe what students will find in this file"></textarea></label>',
           '<label>Choose file (PDF, Word, PowerPoint, JPG or PNG; maximum 20 MB)<input name="resource_file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpeg,image/png" required></label>',
           '<label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="publish_now" style="width:auto;margin:0"> Make available to subscribed students immediately</label>',
-          '<div class="inline-actions"><button class="btn" type="submit" id="resourceUploadBtn">Upload resource</button></div>',
+          '<div class="inline-actions"><button class="btn" type="submit" id="resourceUploadBtn">Upload tutorial material</button></div>',
           '<p class="muted" style="font-size:12px;margin:0">If you leave the publish box unticked, the file is saved as a draft and only administrators can see it.</p>',
           '</form></div>',
           '<div class="section-head"><h2>Uploaded tutorial materials (' + resources.length + ')</h2></div>',
-          resources.length ? '<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>Resource</th><th>Course / topic</th><th>Category</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
+          resources.length ? '<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>Tutorial material</th><th>Course / topic</th><th>Category</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
             resources.map(resource => '<tr><td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
               (resource.academic_year ? '<div class="muted">Year: ' + resource.academic_year + '</div>' : '') + '</td>' +
               '<td>' + escapeHTML(resource.courses?.title || "Course") + '<div class="muted">' + escapeHTML(resource.modules?.title || "General resource") + '</div></td>' +
@@ -1663,7 +1663,7 @@
             }
             showAlert(error.message || "The tutorial material could not be uploaded.");
             button.disabled = false;
-            button.textContent = "Upload resource";
+            button.textContent = "Upload tutorial material";
             return;
           }
           await renderAdminResources();
