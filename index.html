@@ -2616,7 +2616,7 @@ async function checkExistingSession() {
 
     if (data.session) {
 
-        await loadApplication(data.session.user);
+        window.location.replace("./dashboard.html");
 
     }
 
@@ -2627,6 +2627,13 @@ if (supabaseClient) {
     checkExistingSession();
 
     supabaseClient.auth.onAuthStateChange((event,session) => {
+
+        if (event === "SIGNED_IN" && session) {
+
+            window.location.replace("./dashboard.html");
+            return;
+
+        }
 
         if (event === "SIGNED_OUT") {
 
