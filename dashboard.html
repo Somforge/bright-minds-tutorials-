@@ -1053,9 +1053,12 @@
           (data && data.length ? '<div class="table-wrap"><table class="table"><thead><tr><th>Course</th><th>Subject</th><th>Prices</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
             data.map(course => {
               const coursePrices = prices.filter(price => price.course_id === course.id);
-              const availableCount = coursePrices.filter(price => price.is_available).length;
+              const availablePrices = coursePrices.filter(price => price.is_available);
+              const priceSummary = availablePrices.length
+                ? availablePrices.map(price => price.duration_months + ' mo · ' + money(price.price) + ' ' + escapeHTML(price.currency || "ZMW")).join('<br>')
+                : 'No active prices';
               return '<tr><td><strong>' + escapeHTML(course.title) + '</strong><div class="muted">' + escapeHTML(course.description || "") + '</div></td>' +
-                '<td>' + escapeHTML(course.subject || "—") + '</td><td>' + availableCount + ' available</td>' +
+                '<td>' + escapeHTML(course.subject || "—") + '</td><td>' + priceSummary + '</td>' +
                 '<td><span class="pill" style="' + (course.is_published ? "" : "background:#F0F4F8;color:#627D98") + '">' + (course.is_published ? "Published" : "Draft") + '</span></td>' +
                 '<td><div class="inline-actions"><button class="btn secondary" data-manage-prices="' + escapeHTML(course.id) + '" data-course-title="' + escapeHTML(course.title) + '">Set prices</button>' +
                 '<button class="btn secondary" data-toggle-course="' + escapeHTML(course.id) + '" data-published="' + course.is_published + '">' + (course.is_published ? "Unpublish" : "Publish") + '</button></div></td></tr>';
@@ -1612,8 +1615,8 @@
           '<p class="muted" style="font-size:12px;margin:0">If you leave the publish box unticked, the file is saved as a draft and only administrators can see it.</p>',
           '</form></div>',
           '<div class="section-head"><h2>Uploaded tutorial materials (' + resources.length + ')</h2></div>',
-          resources.length ? '<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>Tutorial material</th><th>Course / topic</th><th>Category</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
-            resources.map(resource => '<tr><td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
+          resources.length ? '<div class="card"><div style="padding:16px 16px 0"><label for="resourceSearch" class="muted">Find a tutorial material</label><input id="resourceSearch" type="search" placeholder="Search by title, course, topic or file name" style="width:100%;max-width:460px"></div><div class="table-wrap"><table class="table"><thead><tr><th>Tutorial material</th><th>Course / topic</th><th>Category</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
+            resources.map(resource => '<tr data-resource-row data-search="' + escapeHTML([resource.title, resource.original_file_name, resource.courses?.title, resource.modules?.title, resourceTypeLabels[resource.resource_type] || resource.resource_type].filter(Boolean).join(" ").toLowerCase()) + '"><td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
               (resource.academic_year ? '<div class="muted">Year: ' + resource.academic_year + '</div>' : '') + '</td>' +
               '<td>' + escapeHTML(resource.courses?.title || "Course") + '<div class="muted">' + escapeHTML(resource.modules?.title || "General resource") + '</div></td>' +
               '<td>' + escapeHTML(resourceTypeLabels[resource.resource_type] || resource.resource_type) + '</td>' +
@@ -1623,6 +1626,16 @@
               '<button class="btn danger" type="button" data-resource-delete="' + escapeHTML(resource.id) + '" data-path="' + escapeHTML(resource.resource_path) + '">Delete</button></div></td></tr>'
             ).join("") + '</tbody></table></div></div>' : '<div class="empty">No tutorial materials have been uploaded yet. Add your first tutorial sheet, past paper or worked solution here.</div>'
         ].join("");
+
+        const resourceSearch = document.getElementById("resourceSearch");
+        if (resourceSearch) {
+          resourceSearch.addEventListener("input", () => {
+            const query = resourceSearch.value.trim().toLowerCase();
+            pageContent.querySelectorAll("[data-resource-row]").forEach(row => {
+              row.hidden = !row.dataset.search.includes(query);
+            });
+          });
+        }
 
         const moduleSelect = document.getElementById("resourceModule");
         const courseSelect = document.getElementById("resourceCourse");
