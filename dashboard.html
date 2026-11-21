@@ -1444,9 +1444,6 @@
               showAlert("Your payment proof has been submitted. Your course access will be activated after verification.", "success");
               await renderStudentPayments();
             } catch (error) {
-              if (uploadedPath) {
-                await supabaseClient.storage.from("payment-proofs").remove([uploadedPath]);
-              }
               showAlert(error.message || "Your payment could not be submitted.");
               submitButton.disabled = false;
               submitButton.textContent = "Submit payment for review";
