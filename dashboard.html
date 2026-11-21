@@ -1302,6 +1302,219 @@
         }
       }
 
+
+      function money(value) {
+        return "K" + Number(value || 0).toLocaleString("en-ZM", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      async function renderStudentPayments() {
+        const [coursesResult, historyResult] = await Promise.all([
+          supabaseClient
+            .from("courses")
+            .select("id,title,description,subject")
+            .eq("is_published", true)
+            .order("title"),
+          supabaseClient
+            .from("payments")
+            .select("id,total_amount,currency,payment_method,status,transaction_reference,created_at,verification_notes,payment_items(course_title,duration_months)")
+            .eq("student_id", currentUser.id)
+            .order("created_at", { ascending: false })
+        ]);
+
+        if (coursesResult.error) throw coursesResult.error;
+        if (historyResult.error) throw historyResult.error;
+
+        const courses = coursesResult.data || [];
+        let prices = [];
+        if (courses.length) {
+          const priceResult = await supabaseClient
+            .from("course_subscription_prices")
+            .select("id,course_id,duration_months,price,currency")
+            .in("course_id", courses.map(course => course.id))
+            .eq("is_available", true)
+            .order("duration_months");
+          if (priceResult.error) throw priceResult.error;
+          prices = priceResult.data || [];
+        }
+
+        const availableCourses = courses.filter(course =>
+          prices.some(price => price.course_id === course.id)
+        );
+
+        pageContent.innerHTML = [
+          '<div class="welcome"><h1>Course payments</h1><p>Choose a course option, pay using an approved manual method, and submit your proof for review.</p></div>',
+          '<div class="card" style="margin-bottom:20px">',
+          '<h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Before you pay</h2>',
+          '<p class="muted" style="line-height:1.6">Bright Minds accepts MTN MoMo, Airtel Money and bank transfer. Use only official payment details supplied by Bright Minds Tutorials. If you have not received the official number or bank details, contact the team before sending money. Never pay an unofficial personal number.</p>',
+          '<p class="muted" style="font-size:12px">Your course access is activated only after an administrator verifies your payment.</p>',
+          '</div>',
+          availableCourses.length ? [
+            '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Submit payment</h2>',
+            '<form class="form" id="manualPaymentForm">',
+            '<label>Course<select name="course_id" id="paymentCourse" required><option value="">Choose a course</option>',
+            availableCourses.map(course => '<option value="' + escapeHTML(course.id) + '">' + escapeHTML(course.title) + '</option>').join(""),
+            '</select></label>',
+            '<label>Subscription period and price<select name="price_id" id="paymentPrice" required disabled><option value="">Choose a course first</option></select></label>',
+            '<label>Payment method<select name="payment_method" required><option value="">Choose method</option><option value="mtn">MTN MoMo</option><option value="airtel">Airtel Money</option><option value="bank_transfer">Bank transfer</option></select></label>',
+            '<label>Transaction reference<input name="transaction_reference" required maxlength="160" autocomplete="off" placeholder="Enter the transaction/reference number"></label>',
+            '<label>Proof of payment (JPG, PNG, WebP or PDF; maximum 5 MB)<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required></label>',
+            '<button class="btn" type="submit" id="submitPaymentBtn">Submit payment for review</button>',
+            '</form></div>'
+          ].join("") : '<div class="empty" style="margin-bottom:20px">There are no published courses with available subscription prices yet. Bright Minds will list courses here once an administrator has set the prices and published them.</div>',
+          '<div class="section-head"><h2>My payment submissions</h2></div>',
+          historyResult.data?.length ? '<div class="grid">' + historyResult.data.map(payment => {
+            const statusLabel = payment.status === "verified" ? "Verified" : payment.status === "rejected" ? "Rejected" : "Awaiting review";
+            const items = (payment.payment_items || []).map(item =>
+              escapeHTML(item.course_title) + (item.duration_months ? " · " + item.duration_months + " month(s)" : "")
+            ).join(", ");
+            return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</strong><span class="pill">' + statusLabel + '</span></div><p style="margin:10px 0 4px">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Method: ' + escapeHTML(payment.payment_method) + ' · Reference: ' + escapeHTML(payment.transaction_reference || "—") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p>' + (payment.verification_notes ? '<p style="font-size:13px;margin-bottom:0">Admin note: ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
+          }).join("") + '</div>' : '<div class="empty">You have not submitted any payments yet.</div>'
+        ].join("");
+
+        const courseSelect = document.getElementById("paymentCourse");
+        if (courseSelect) {
+          courseSelect.addEventListener("change", () => {
+            const selected = courseSelect.value;
+            const options = prices.filter(price => price.course_id === selected);
+            const priceSelect = document.getElementById("paymentPrice");
+            priceSelect.innerHTML = options.length
+              ? '<option value="">Choose a subscription</option>' + options.map(price =>
+                  '<option value="' + escapeHTML(price.id) + '">' + price.duration_months + ' month(s) · ' + money(price.price) + ' ' + escapeHTML(price.currency || "ZMW") + '</option>'
+                ).join("")
+              : '<option value="">No prices available</option>';
+            priceSelect.disabled = !options.length;
+          });
+        }
+
+        const form = document.getElementById("manualPaymentForm");
+        if (form) {
+          form.addEventListener("submit", async event => {
+            event.preventDefault();
+            const submitButton = document.getElementById("submitPaymentBtn");
+            const values = new FormData(form);
+            const file = values.get("proof");
+            const allowedTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
+            if (!(file instanceof File) || !file.size || file.size > 5242880 || !allowedTypes.includes(file.type)) {
+              showAlert("Choose a JPG, PNG, WebP or PDF proof file no larger than 5 MB.");
+              return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Uploading proof…";
+            let uploadedPath = null;
+
+            try {
+              const extension = file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "");
+              uploadedPath = currentUser.id + "/" + crypto.randomUUID() + "." + (extension || "file");
+              const upload = await supabaseClient.storage
+                .from("payment-proofs")
+                .upload(uploadedPath, file, { upsert: false, contentType: file.type });
+              if (upload.error) throw upload.error;
+
+              submitButton.textContent = "Submitting payment…";
+              const result = await supabaseClient.rpc("submit_manual_payment", {
+                p_course_id: values.get("course_id"),
+                p_price_id: values.get("price_id"),
+                p_payment_method: values.get("payment_method"),
+                p_transaction_reference: values.get("transaction_reference"),
+                p_proof_path: uploadedPath
+              });
+              if (result.error) throw result.error;
+
+              showAlert("Your payment proof has been submitted. Your course access will be activated after verification.", "success");
+              await renderStudentPayments();
+            } catch (error) {
+              if (uploadedPath) {
+                await supabaseClient.storage.from("payment-proofs").remove([uploadedPath]);
+              }
+              showAlert(error.message || "Your payment could not be submitted.");
+              submitButton.disabled = false;
+              submitButton.textContent = "Submit payment for review";
+            }
+          });
+        }
+      }
+
+      async function openPaymentProof(path) {
+        const result = await supabaseClient.storage
+          .from("payment-proofs")
+          .createSignedUrl(path, 300);
+        if (result.error) {
+          showAlert(result.error.message || "The proof file could not be opened.");
+          return;
+        }
+        window.open(result.data.signedUrl, "_blank", "noopener,noreferrer");
+      }
+
+      async function renderAdminPayments() {
+        const { data, error } = await supabaseClient
+          .from("payments")
+          .select("id,student_id,total_amount,currency,payment_method,status,transaction_reference,proof_of_payment_url,verification_notes,created_at,profiles!payments_student_id_fkey(full_name),payment_items(id,course_title,price_at_purchase,duration_months)")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        const pending = (data || []).filter(payment => payment.status === "pending");
+        const reviewed = (data || []).filter(payment => payment.status !== "pending");
+
+        function paymentCard(payment, allowReview) {
+          const name = payment.profiles?.full_name || "Student";
+          const items = (payment.payment_items || []).map(item =>
+            escapeHTML(item.course_title) + " · " + money(item.price_at_purchase) +
+            (item.duration_months ? " · " + item.duration_months + " month(s)" : "")
+          ).join("<br>");
+          return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + escapeHTML(name) + '</strong><span class="pill">' + escapeHTML(payment.status) + '</span></div><h3 style="color:var(--navy);margin:12px 0 6px">' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</h3><p style="line-height:1.6">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px">Method: ' + escapeHTML(payment.payment_method) + '<br>Reference: ' + escapeHTML(payment.transaction_reference || "—") + '<br>Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p><div class="inline-actions"><button class="btn secondary" type="button" data-open-proof="' + escapeHTML(payment.proof_of_payment_url || "") + '">View proof</button>' + (allowReview ? '<button class="btn" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="verified">Approve and activate</button><button class="btn danger" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="rejected">Reject</button>' : '') + '</div>' + (payment.verification_notes ? '<p class="muted" style="font-size:12px">Review note: ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
+        }
+
+        pageContent.innerHTML = [
+          '<div class="welcome"><h1>Payment review</h1><p>Check the transaction reference and proof before approving. Approval activates the course subscription automatically.</p></div>',
+          '<div class="section-head"><h2>Awaiting review (' + pending.length + ')</h2></div>',
+          pending.length ? '<div class="grid">' + pending.map(payment => paymentCard(payment, true)).join("") + '</div>' : '<div class="empty">There are no pending payments.</div>',
+          '<div class="section-head"><h2>Previously reviewed</h2></div>',
+          reviewed.length ? '<div class="grid">' + reviewed.map(payment => paymentCard(payment, false)).join("") + '</div>' : '<div class="empty">No payments have been reviewed yet.</div>'
+        ].join("");
+
+        pageContent.querySelectorAll("[data-open-proof]").forEach(button => {
+          button.addEventListener("click", () => {
+            if (button.dataset.openProof) openPaymentProof(button.dataset.openProof);
+            else showAlert("No proof file was attached to this payment.");
+          });
+        });
+
+        pageContent.querySelectorAll("[data-review-payment]").forEach(button => {
+          button.addEventListener("click", async () => {
+            const decision = button.dataset.decision;
+            const paymentId = button.dataset.reviewPayment;
+            const confirmed = confirm(decision === "verified"
+              ? "Confirm that you checked the payment and want to approve it? This will activate course access."
+              : "Are you sure you want to reject this payment?");
+            if (!confirmed) return;
+
+            const notes = prompt("Optional note for the student:", "") || "";
+            button.disabled = true;
+            try {
+              const result = await supabaseClient.rpc("admin_review_manual_payment", {
+                p_payment_id: paymentId,
+                p_decision: decision,
+                p_notes: notes
+              });
+              if (result.error) throw result.error;
+              showAlert(decision === "verified"
+                ? "Payment verified. The course subscription is now active."
+                : "Payment rejected.", "success");
+              await renderAdminPayments();
+            } catch (error) {
+              showAlert(error.message || "The payment could not be reviewed.");
+              button.disabled = false;
+            }
+          });
+        });
+      }
+
       function renderProfile() {
 
         pageContent.innerHTML = `
