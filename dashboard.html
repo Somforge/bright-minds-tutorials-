@@ -1610,38 +1610,78 @@
       async function renderAdminPayments() {
         const { data, error } = await supabaseClient
           .from("payments")
-          .select("id,student_id,total_amount,currency,payment_method,status,transaction_reference,proof_of_payment_url,verification_notes,created_at,profiles!payments_student_id_fkey(full_name),payment_items(id,course_title,price_at_purchase,duration_months)")
+          .select("id,student_id,total_amount,currency,payment_method,status,transaction_reference,proof_of_payment_url,verification_notes,created_at,verified_at,profiles!payments_student_id_fkey(full_name),payment_items(id,course_title,price_at_purchase,duration_months)")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
 
-        const pending = (data || []).filter(payment => payment.status === "pending");
-        const reviewed = (data || []).filter(payment => payment.status !== "pending");
+        const payments = data || [];
+        const pending = payments.filter(payment => payment.status === "pending");
+        const verified = payments.filter(payment => payment.status === "verified");
+        const rejected = payments.filter(payment => payment.status === "rejected");
+
+        const methodLabel = method => method === "mtn"
+          ? "MTN MoMo"
+          : method === "airtel" ? "Airtel Money" : (method || "Not specified");
 
         function paymentCard(payment, allowReview) {
           const name = payment.profiles?.full_name || "Student";
           const items = (payment.payment_items || []).map(item =>
-            escapeHTML(item.course_title) + " · " + money(item.price_at_purchase) +
-            (item.duration_months ? " · " + item.duration_months + " month(s)" : "")
-          ).join("<br>");
+            '<li style="padding:5px 0">' + escapeHTML(item.course_title) +
+            ' <span class="muted">· ' + money(item.price_at_purchase) +
+            ' · ' + (Number(item.duration_months) || 1) + ' month(s)</span></li>'
+          ).join("");
+          const reference = payment.transaction_reference || "";
           const proofAction = payment.proof_of_payment_url
             ? '<button class="btn secondary" type="button" data-open-proof="' + escapeHTML(payment.proof_of_payment_url) + '">View uploaded proof</button>'
-            : '<p class="muted" style="font-size:12px;margin:8px 0">Student was instructed to send the payment screenshot/receipt to the official Bright Minds WhatsApp lines. Confirm receipt on WhatsApp before approving.</p>';
-          return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + escapeHTML(name) + '</strong><span class="pill">' + escapeHTML(payment.status) + '</span></div><h3 style="color:var(--navy);margin:12px 0 6px">' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</h3><p style="line-height:1.6">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px">Method: ' + escapeHTML(payment.payment_method) + '<br>Reference: ' + escapeHTML(payment.transaction_reference || "—") + '<br>Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p><div class="inline-actions">' + proofAction + (allowReview ? '<button class="btn" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="verified">Approve and activate</button><button class="btn danger" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="rejected">Reject</button>' : '') + '</div>' + (payment.verification_notes ? '<p class="muted" style="font-size:12px">Review note: ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
+            : '<p class="muted" style="font-size:12px;margin:8px 0">No file was uploaded. Confirm the student's receipt directly on the official Bright Minds WhatsApp account before approving.</p>';
+          const reviewActions = allowReview
+            ? '<div class="inline-actions" style="margin-top:14px"><button class="btn" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="verified">Approve and activate</button><button class="btn danger" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="rejected">Reject payment</button></div>'
+            : '<p class="muted" style="font-size:12px;margin-top:12px">Reviewed ' + (payment.verified_at ? new Date(payment.verified_at).toLocaleString() : "date not recorded") + '</p>';
+          return '<article class="card" style="margin-bottom:14px">' +
+            '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><strong>' + escapeHTML(name) + '</strong><span class="pill">' + escapeHTML(payment.status) + '</span></div>' +
+            '<h3 style="color:var(--navy);font:800 22px Manrope;margin:12px 0 8px">' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</h3>' +
+            '<div style="font-size:13px;margin:0 0 10px"><strong>Courses selected</strong><ul style="margin:6px 0 0;padding-left:20px">' + (items || '<li>Course details unavailable</li>') + '</ul></div>' +
+            '<div style="background:var(--surface, #F5F7FA);border-radius:10px;padding:12px;margin:12px 0">' +
+              '<div style="font-size:12px;color:var(--muted);margin-bottom:4px">Transaction reference</div>' +
+              '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><strong style="font-size:14px;overflow-wrap:anywhere">' + escapeHTML(reference || "Not provided") + '</strong>' +
+              (reference ? '<button class="btn secondary" type="button" data-copy-reference="' + escapeHTML(reference) + '" style="padding:7px 11px">Copy reference</button>' : '') + '</div>' +
+            '</div>' +
+            '<p class="muted" style="font-size:12px;line-height:1.7;margin:8px 0">Payment method: ' + escapeHTML(methodLabel(payment.payment_method)) +
+            '<br>Submitted: ' + new Date(payment.created_at).toLocaleString() +
+            '<br>Payment ID: ' + escapeHTML(payment.id) + '</p>' +
+            proofAction + reviewActions +
+            (payment.verification_notes ? '<p class="muted" style="font-size:12px;margin-top:10px">Review note: ' + escapeHTML(payment.verification_notes) + '</p>' : '') +
+            '</article>';
         }
 
         pageContent.innerHTML = [
-          '<div class="welcome"><h1>Payment review</h1><p>Match the transaction reference and amount with the receipt received through WhatsApp before approving. Approval activates or extends the course subscription automatically.</p></div>',
+          '<div class="welcome"><h1>Payment review</h1><p>Check the exact amount, payment method and transaction reference. Match them with the receipt received through WhatsApp or the uploaded proof before approving. Approval activates or extends the selected course subscriptions.</p></div>',
+          '<div class="grid stats" style="margin-bottom:20px">' +
+            '<div class="card"><div class="stat-label">Awaiting review</div><div class="stat-value">' + pending.length + '</div></div>' +
+            '<div class="card"><div class="stat-label">Verified</div><div class="stat-value">' + verified.length + '</div></div>' +
+            '<div class="card"><div class="stat-label">Rejected</div><div class="stat-value">' + rejected.length + '</div></div>' +
+          '</div>',
           '<div class="section-head"><h2>Awaiting review (' + pending.length + ')</h2></div>',
-          pending.length ? '<div class="grid">' + pending.map(payment => paymentCard(payment, true)).join("") + '</div>' : '<div class="empty">There are no pending payments.</div>',
-          '<div class="section-head"><h2>Previously reviewed</h2></div>',
-          reviewed.length ? '<div class="grid">' + reviewed.map(payment => paymentCard(payment, false)).join("") + '</div>' : '<div class="empty">No payments have been reviewed yet.</div>'
+          pending.length ? pending.map(payment => paymentCard(payment, true)).join("") : '<div class="empty">There are no pending payments. New student submissions will appear here.</div>',
+          '<div class="section-head"><h2>Previously reviewed (' + (verified.length + rejected.length) + ')</h2></div>',
+          verified.length ? '<h3 style="color:var(--navy);margin:12px 0">Verified payments (' + verified.length + ')</h3>' + verified.map(payment => paymentCard(payment, false)).join("") : '',
+          rejected.length ? '<h3 style="color:var(--navy);margin:18px 0 12px">Rejected payments (' + rejected.length + ')</h3>' + rejected.map(payment => paymentCard(payment, false)).join("") : '',
+          (!verified.length && !rejected.length) ? '<div class="empty">No payments have been reviewed yet.</div>' : ''
         ].join("");
 
         pageContent.querySelectorAll("[data-open-proof]").forEach(button => {
-          button.addEventListener("click", () => {
-            if (button.dataset.openProof) openPaymentProof(button.dataset.openProof);
-            else showAlert("No proof file was attached to this payment.");
+          button.addEventListener("click", () => openPaymentProof(button.dataset.openProof));
+        });
+
+        pageContent.querySelectorAll("[data-copy-reference]").forEach(button => {
+          button.addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(button.dataset.copyReference);
+              showAlert("Transaction reference copied.", "success");
+            } catch (error) {
+              showAlert("Copy was unavailable in this browser. Please select and copy the reference manually.");
+            }
           });
         });
 
@@ -1650,13 +1690,13 @@
             const decision = button.dataset.decision;
             const paymentId = button.dataset.reviewPayment;
             const confirmed = confirm(decision === "verified"
-              ? "Confirm that you matched the transaction reference and amount with the receipt received through WhatsApp. Approval will activate or extend the student's course access."
+              ? "Only approve after you have independently matched the student's transaction reference and exact amount with the money received. This will activate or extend course access."
               : "Are you sure you want to reject this payment?");
             if (!confirmed) return;
 
             const notes = prompt(
               decision === "rejected"
-                ? "Please give the student a reason for rejection:"
+                ? "Enter the reason for rejection. The student will be able to see this note:"
                 : "Optional note for the student:",
               ""
             );
@@ -1682,8 +1722,8 @@
               });
               if (result.error) throw result.error;
               showAlert(decision === "verified"
-                ? "Payment verified. The course subscription is now active."
-                : "Payment rejected and the student has been given a reason.", "success");
+                ? "Payment verified. The student's course subscription is now active or extended."
+                : "Payment rejected. The student can see the reason in payment history.", "success");
               await renderAdminPayments();
             } catch (error) {
               showAlert(error.message || "The payment could not be reviewed.");
@@ -1695,7 +1735,6 @@
           });
         });
       }
-
 
       const resourceTypeLabels = {
         lecture_note: "Additional material",
