@@ -1387,11 +1387,18 @@
 
                     </article>
                   `).join("")
-                : `
-                  <div class="empty">
-                    There are no announcements yet.
-                  </div>
-                `
+                : adminMode
+                  ? `
+                    <div class="empty">No announcements have been published yet. Use the form above to share the first update with students.</div>
+                  `
+                  : `
+                    <section class="card" style="max-width:680px;margin:0 auto;text-align:center;padding:34px 24px">
+                      <div aria-hidden="true" style="width:56px;height:56px;margin:0 auto 15px;border-radius:16px;background:#E6FFFB;color:#087F78;display:grid;place-items:center;font-size:26px">✦</div>
+                      <h2 style="font:800 19px Manrope;color:var(--navy);margin:0 0 8px">All caught up</h2>
+                      <p class="muted" style="font-size:14px;line-height:1.7;max-width:480px;margin:0 auto 18px">There are no new announcements at the moment. Important course updates, material releases and programme notices will appear here.</p>
+                      <button class="btn secondary" type="button" id="backToDashboard">Back to dashboard</button>
+                    </section>
+                  `
             }
 
           </div>
