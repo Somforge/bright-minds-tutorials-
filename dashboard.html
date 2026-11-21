@@ -1432,7 +1432,7 @@
           '<div style="padding:14px;background:#F4F7FA;border-radius:10px"><strong>MTN MoMo</strong><div style="font-size:20px;font-weight:800;color:var(--navy);margin:5px 0">0768744352</div><div class="muted">Account name: Ethan Makasa</div></div>',
           '<div style="padding:14px;background:#F4F7FA;border-radius:10px"><strong>Airtel Money</strong><div style="font-size:20px;font-weight:800;color:var(--navy);margin:5px 0">0978764356</div><div class="muted">Account name: Francis Nyendwa</div></div>',
           '</div>',
-          '<div style="margin-top:14px;padding:14px;background:#F4F7FA;border-radius:10px"><strong style="color:var(--navy)">How to complete your payment</strong><ol style="padding-left:20px;margin:8px 0 0;line-height:1.7;font-size:13px;color:var(--ink)"><li>Select the course(s) you want.</li><li>Send the exact total to one of the official numbers above.</li><li>Keep your transaction reference and payment receipt.</li><li>Complete the form below and submit your proof.</li></ol><p style="margin:10px 0 0;font-size:12px;color:var(--muted)">Your course access is activated only after Bright Minds verifies the payment. Do not send money to numbers that are not listed here.</p></div><p style="margin:12px 0 0;font-size:13px;color:var(--muted)">Course fee: K75 per course for one month. You may combine up to four courses in one payment.</p>',
+          '<div style="margin-top:14px;padding:14px;background:#F4F7FA;border-radius:10px"><strong style="color:var(--navy)">How to complete your payment</strong><ol style="padding-left:20px;margin:8px 0 0;line-height:1.7;font-size:13px;color:var(--ink)"><li>Select the course(s) you want and note the total.</li><li>Send the exact amount to the MTN or Airtel number shown above.</li><li>Take a screenshot of the successful transaction or receipt and send it on WhatsApp to either official number below.</li><li>In your WhatsApp message, include your full name and the course(s) you are paying for.</li><li>Return here and submit the payment method and transaction reference. You do not need to upload the screenshot on this website.</li></ol><div style="display:grid;gap:8px;margin-top:12px;font-size:13px"><a href="https://wa.me/260768744352" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:700">WhatsApp MTN line: 0768744352 · Ethan Makasa</a><a href="https://wa.me/260978763456" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:700">WhatsApp Airtel line: 0978764356 · Francis Nyendwa</a></div><p style="margin:10px 0 0;font-size:12px;color:var(--muted)">Your course access is activated only after Bright Minds verifies your payment. Send proof only to these official WhatsApp contacts.</p></div><p style="margin:12px 0 0;font-size:13px;color:var(--muted)">Course fee: K75 per course for one month. You may combine up to four courses in one payment.</p>',
           '</div>',
           courses.length ? [
             '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Submit one combined payment</h2>',
@@ -1443,7 +1443,7 @@
             '<div style="padding:15px;background:#E6FFFB;border-radius:10px"><div class="muted" style="font-size:12px">Selected courses</div><strong id="selectedCourseCount" style="font-size:18px">0 courses</strong><div class="muted" style="font-size:12px;margin-top:8px">Total to pay</div><strong id="paymentTotal" style="font-size:28px;color:var(--navy)">K0.00</strong><div class="muted" style="font-size:12px">K75 × number of selected courses × 1 month</div></div>',
             '<label>Payment method<select name="payment_method" id="paymentMethod" required><option value="">Choose method</option><option value="mtn">MTN MoMo</option><option value="airtel">Airtel Money</option></select></label><div id="paymentDestination" class="muted" style="font-size:12px;margin-top:-6px">Choose a payment method to see the matching number and account name.</div>',
             '<label>Transaction reference<input name="transaction_reference" required maxlength="160" autocomplete="off" placeholder="Enter the transaction/reference number"><span class="muted" style="display:block;font-size:11px;margin-top:5px;font-weight:400">Enter the reference exactly as shown in your MoMo confirmation message.</span></label>',
-            '<label>Proof of payment (JPG, PNG, WebP or PDF; maximum 5 MB)<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required><span class="muted" style="display:block;font-size:11px;margin-top:5px;font-weight:400">Upload a clear screenshot or receipt showing the amount, recipient and transaction reference.</span></label>',
+            '<div class="muted" style="font-size:12px;padding:12px;background:#F4F7FA;border-radius:8px">After paying, send your screenshot or receipt through WhatsApp to either official Bright Minds number listed above. No file upload is needed here.</div>',
             '<button class="btn" type="submit" id="submitPaymentBtn" disabled>Submit payment for review</button>',
             '</form></div>'
           ].join("") : '<div class="empty" style="margin-bottom:20px">The four payment courses are ready, but they are not published yet. An administrator must publish Mathematics, Physics, Chemistry and Biology before students can select and pay for them.</div>',
@@ -1492,9 +1492,6 @@
             event.preventDefault();
             const values = new FormData(form);
             const selectedCourseIds = values.getAll("course_ids");
-            const file = values.get("proof");
-            const allowedTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-
             if (!selectedCourseIds.length || selectedCourseIds.length > 4) {
               showAlert("Select between one and four courses.");
               return;
@@ -1507,31 +1504,18 @@
               showAlert("Choose the mobile money method you used.");
               return;
             }
-            if (!(file instanceof File) || !file.size || file.size > 5242880 || !allowedTypes.includes(file.type)) {
-              showAlert("Choose a JPG, PNG, WebP or PDF proof file no larger than 5 MB.");
-              return;
-            }
-
             submitButton.disabled = true;
-            submitButton.textContent = "Uploading proof…";
+            submitButton.textContent = "Submitting payment…";
             try {
-              const extension = file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "");
-              const uploadedPath = currentUser.id + "/" + crypto.randomUUID() + "." + (extension || "file");
-              const upload = await supabaseClient.storage
-                .from("payment-proofs")
-                .upload(uploadedPath, file, { upsert: false, contentType: file.type });
-              if (upload.error) throw upload.error;
-
-              submitButton.textContent = "Submitting payment…";
               const result = await supabaseClient.rpc("submit_manual_payment", {
                 p_course_ids: selectedCourseIds,
                 p_payment_method: values.get("payment_method"),
                 p_transaction_reference: values.get("transaction_reference"),
-                p_proof_path: uploadedPath
+                p_proof_path: null
               });
               if (result.error) throw result.error;
 
-              showAlert("Your combined payment proof has been submitted. All selected course subscriptions will be activated after verification.", "success");
+              showAlert("Your payment details have been submitted. Please make sure you have sent your screenshot or receipt to either official Bright Minds WhatsApp number. Course access starts after verification.", "success");
               await renderStudentPayments();
             } catch (error) {
               showAlert(error.message || "Your payment could not be submitted.");
@@ -1570,7 +1554,10 @@
             escapeHTML(item.course_title) + " · " + money(item.price_at_purchase) +
             (item.duration_months ? " · " + item.duration_months + " month(s)" : "")
           ).join("<br>");
-          return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + escapeHTML(name) + '</strong><span class="pill">' + escapeHTML(payment.status) + '</span></div><h3 style="color:var(--navy);margin:12px 0 6px">' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</h3><p style="line-height:1.6">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px">Method: ' + escapeHTML(payment.payment_method) + '<br>Reference: ' + escapeHTML(payment.transaction_reference || "—") + '<br>Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p><div class="inline-actions"><button class="btn secondary" type="button" data-open-proof="' + escapeHTML(payment.proof_of_payment_url || "") + '">View proof</button>' + (allowReview ? '<button class="btn" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="verified">Approve and activate</button><button class="btn danger" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="rejected">Reject</button>' : '') + '</div>' + (payment.verification_notes ? '<p class="muted" style="font-size:12px">Review note: ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
+          const proofAction = payment.proof_of_payment_url
+            ? '<button class="btn secondary" type="button" data-open-proof="' + escapeHTML(payment.proof_of_payment_url) + '">View uploaded proof</button>'
+            : '<p class="muted" style="font-size:12px;margin:8px 0">Student was instructed to send the payment screenshot/receipt to the official Bright Minds WhatsApp lines. Confirm receipt on WhatsApp before approving.</p>';
+          return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + escapeHTML(name) + '</strong><span class="pill">' + escapeHTML(payment.status) + '</span></div><h3 style="color:var(--navy);margin:12px 0 6px">' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</h3><p style="line-height:1.6">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px">Method: ' + escapeHTML(payment.payment_method) + '<br>Reference: ' + escapeHTML(payment.transaction_reference || "—") + '<br>Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p><div class="inline-actions">' + proofAction + (allowReview ? '<button class="btn" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="verified">Approve and activate</button><button class="btn danger" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="rejected">Reject</button>' : '') + '</div>' + (payment.verification_notes ? '<p class="muted" style="font-size:12px">Review note: ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
         }
 
         pageContent.innerHTML = [
