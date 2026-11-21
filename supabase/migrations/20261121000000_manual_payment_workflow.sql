@@ -69,7 +69,7 @@ begin
     raise exception 'You must be signed in to submit a payment.';
   end if;
 
-  if p_payment_method not in ('mtn', 'airtel', 'bank_transfer') then
+  if p_payment_method is null or p_payment_method not in ('mtn', 'airtel', 'bank_transfer') then
     raise exception 'Choose a valid payment method.';
   end if;
 
@@ -79,7 +79,7 @@ begin
   end if;
 
   if p_proof_path is null
-     or (storage.foldername(p_proof_path))[1] <> v_user_id::text then
+     or coalesce((storage.foldername(p_proof_path))[1], '') <> v_user_id::text then
     raise exception 'A valid proof-of-payment upload is required.';
   end if;
 
@@ -148,7 +148,7 @@ begin
     raise exception 'Only an administrator can review payments.';
   end if;
 
-  if p_decision not in ('verified', 'rejected') then
+  if p_decision is null or p_decision not in ('verified', 'rejected') then
     raise exception 'Choose verified or rejected.';
   end if;
 
@@ -175,7 +175,7 @@ begin
     where id = p_payment_id;
 
     for v_item in
-      select course_id, duration_months
+      select id, course_id, duration_months
       from public.payment_items
       where payment_id = p_payment_id
     loop
@@ -190,9 +190,7 @@ begin
         now(),
         now() + make_interval(months => coalesce(v_item.duration_months, 1)),
         p_payment_id,
-        (select pi.id from public.payment_items pi
-         where pi.payment_id = p_payment_id and pi.course_id = v_item.course_id
-         limit 1)
+        v_item.id
       );
     end loop;
   else
