@@ -473,6 +473,10 @@
           <span class="nav-icon">▤</span>Manage courses
         </button>
 
+        <button data-page="manage-resources">
+          <span class="nav-icon">⇧</span>Resource library
+        </button>
+
         <button data-page="manage-announcements">
           <span class="nav-icon">✎</span>Manage announcements
         </button>
@@ -559,6 +563,7 @@
         announcements: "Announcements",
         profile: "My profile",
         "manage-courses": "Manage courses",
+        "manage-resources": "Resource library",
         "manage-announcements": "Manage announcements",
         payments: "Payments"
       };
@@ -733,6 +738,10 @@
 
           else if (page === "manage-courses") {
             await renderManageCourses();
+          }
+
+          else if (page === "manage-resources") {
+            await renderAdminResources();
           }
 
           else if (page === "manage-announcements") {
@@ -972,18 +981,19 @@
                   Subject: ${escapeHTML(item.courses?.subject || "Not specified")}
                 </p>
 
-                <button
-                  class="btn"
-                  disabled
-                  title="The lesson viewer has not yet been connected">
-                  Open course
-                </button>
+                <button class="btn" type="button" data-open-course="${escapeHTML(item.course_id)}" data-course-title="${escapeHTML(item.courses?.title || "Course")}">View course resources</button>
 
               </article>
             `).join("")}
 
           </div>
         `;
+        pageContent.querySelectorAll("[data-open-course]").forEach(button => {
+          button.addEventListener("click", () =>
+            renderStudentCourseResources(button.dataset.openCourse, button.dataset.courseTitle)
+          );
+        });
+
       }
 
       async function renderManageCourses() {
@@ -1515,6 +1525,222 @@
               button.disabled = false;
             }
           });
+        });
+      }
+
+
+      const resourceTypeLabels = {
+        lecture_note: "Lecture notes",
+        tutorial_sheet: "Tutorial sheet",
+        past_paper: "Past examination paper",
+        solution: "Solutions / marking guide",
+        other: "Other resource"
+      };
+
+      async function renderAdminResources() {
+        const [courseResult, moduleResult, resourceResult] = await Promise.all([
+          supabaseClient.from("courses").select("id,title").order("title"),
+          supabaseClient.from("modules").select("id,course_id,title,position").order("position"),
+          supabaseClient.from("course_resources")
+            .select("id,course_id,module_id,title,resource_type,description,academic_year,resource_path,original_file_name,file_size_bytes,is_published,created_at,courses(title),modules(title)")
+            .order("created_at", { ascending: false })
+        ]);
+        if (courseResult.error) throw courseResult.error;
+        if (moduleResult.error) throw moduleResult.error;
+        if (resourceResult.error) throw resourceResult.error;
+
+        const courses = courseResult.data || [];
+        const modules = moduleResult.data || [];
+        const resources = resourceResult.data || [];
+        const options = courses.map(course =>
+          '<option value="' + escapeHTML(course.id) + '">' + escapeHTML(course.title) + '</option>'
+        ).join("");
+        const moduleOptions = modules.map(module =>
+          '<option value="' + escapeHTML(module.id) + '" data-course="' + escapeHTML(module.course_id) + '">' +
+          escapeHTML(module.title) + '</option>'
+        ).join("");
+
+        pageContent.innerHTML = [
+          '<div class="welcome"><h1>Course resource library</h1><p>Upload lecture notes, tutorial sheets, past papers and solutions. Files stay private until you publish them to students with an active subscription.</p></div>',
+          '<div class="card"><div class="section-head" style="margin-top:0"><h2>Upload a resource</h2></div>',
+          '<form class="form" id="resourceUploadForm" style="max-width:720px">',
+          '<label>Course<select name="course_id" id="resourceCourse" required><option value="">Choose a course</option>' + options + '</select></label>',
+          '<label>Module / topic (optional)<select name="module_id" id="resourceModule"><option value="">General course resource</option>' + moduleOptions + '</select></label>',
+          '<label>Resource title<input name="title" required maxlength="180" placeholder="e.g. Introduction to Calculus — Lecture Notes"></label>',
+          '<label>Resource category<select name="resource_type" required><option value="lecture_note">Lecture notes</option><option value="tutorial_sheet">Tutorial sheet</option><option value="past_paper">Past examination paper</option><option value="solution">Solutions / marking guide</option><option value="other">Other resource</option></select></label>',
+          '<label>Year (optional, useful for past papers)<input name="academic_year" type="number" min="1900" max="2100" placeholder="e.g. 2024"></label>',
+          '<label>Description (optional)<textarea name="description" rows="3" maxlength="1000" placeholder="Briefly describe what students will find in this file"></textarea></label>',
+          '<label>Choose file (PDF, Word, PowerPoint, JPG or PNG; maximum 20 MB)<input name="resource_file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpeg,image/png" required></label>',
+          '<label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="publish_now" style="width:auto;margin:0"> Make available to subscribed students immediately</label>',
+          '<div class="inline-actions"><button class="btn" type="submit" id="resourceUploadBtn">Upload resource</button></div>',
+          '<p class="muted" style="font-size:12px;margin:0">If you leave the publish box unticked, the file is saved as a draft and only administrators can see it.</p>',
+          '</form></div>',
+          '<div class="section-head"><h2>Uploaded resources (' + resources.length + ')</h2></div>',
+          resources.length ? '<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>Resource</th><th>Course / topic</th><th>Category</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
+            resources.map(resource => '<tr><td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
+              (resource.academic_year ? '<div class="muted">Year: ' + resource.academic_year + '</div>' : '') + '</td>' +
+              '<td>' + escapeHTML(resource.courses?.title || "Course") + '<div class="muted">' + escapeHTML(resource.modules?.title || "General resource") + '</div></td>' +
+              '<td>' + escapeHTML(resourceTypeLabels[resource.resource_type] || resource.resource_type) + '</td>' +
+              '<td><span class="pill" style="' + (resource.is_published ? '' : 'background:#F0F4F8;color:#627D98') + '">' + (resource.is_published ? 'Published' : 'Draft') + '</span></td>' +
+              '<td><div class="inline-actions"><button class="btn secondary" type="button" data-resource-open="' + escapeHTML(resource.resource_path) + '">View file</button>' +
+              '<button class="btn secondary" type="button" data-resource-toggle="' + escapeHTML(resource.id) + '" data-published="' + resource.is_published + '">' + (resource.is_published ? 'Unpublish' : 'Publish') + '</button>' +
+              '<button class="btn danger" type="button" data-resource-delete="' + escapeHTML(resource.id) + '" data-path="' + escapeHTML(resource.resource_path) + '">Delete</button></div></td></tr>'
+            ).join("") + '</tbody></table></div></div>' : '<div class="empty">No resources have been uploaded yet. Your first Mathematics notes can be added here.</div>'
+        ].join("");
+
+        const moduleSelect = document.getElementById("resourceModule");
+        const courseSelect = document.getElementById("resourceCourse");
+        courseSelect.addEventListener("change", () => {
+          Array.from(moduleSelect.options).forEach(option => {
+            if (!option.value) return;
+            option.hidden = option.dataset.course !== courseSelect.value;
+            if (option.hidden && option.selected) moduleSelect.value = "";
+          });
+        });
+
+        document.getElementById("resourceUploadForm").addEventListener("submit", async event => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const values = new FormData(form);
+          const file = values.get("resource_file");
+          const allowed = [
+            "application/pdf", "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "image/jpeg", "image/png"
+          ];
+          if (!(file instanceof File) || !file.size || file.size > 20971520 || !allowed.includes(file.type)) {
+            showAlert("Choose a supported PDF, Word, PowerPoint, JPG or PNG file no larger than 20 MB.");
+            return;
+          }
+          const courseId = values.get("course_id");
+          const selectedModule = values.get("module_id") || null;
+          const moduleRecord = modules.find(item => item.id === selectedModule);
+          if (moduleRecord && moduleRecord.course_id !== courseId) {
+            showAlert("Choose a topic belonging to the selected course.");
+            return;
+          }
+          const yearText = String(values.get("academic_year") || "").trim();
+          const year = yearText ? Number(yearText) : null;
+          if (year !== null && (!Number.isInteger(year) || year < 1900 || year > 2100)) {
+            showAlert("Enter a valid year.");
+            return;
+          }
+
+          const button = document.getElementById("resourceUploadBtn");
+          button.disabled = true;
+          button.textContent = "Uploading file…";
+          let uploadedPath = null;
+          try {
+            const extension = (file.name.split(".").pop() || "file").toLowerCase().replace(/[^a-z0-9]/g, "");
+            uploadedPath = courseId + "/" + crypto.randomUUID() + "." + (extension || "file");
+            const upload = await supabaseClient.storage.from("course-resources")
+              .upload(uploadedPath, file, { upsert: false, contentType: file.type });
+            if (upload.error) throw upload.error;
+
+            button.textContent = "Saving resource details…";
+            const insert = await supabaseClient.from("course_resources").insert({
+              course_id: courseId,
+              module_id: selectedModule,
+              title: String(values.get("title") || "").trim(),
+              resource_type: values.get("resource_type"),
+              description: String(values.get("description") || "").trim() || null,
+              academic_year: year,
+              resource_path: uploadedPath,
+              original_file_name: file.name,
+              mime_type: file.type,
+              file_size_bytes: file.size,
+              is_published: values.get("publish_now") === "on",
+              uploaded_by: currentUser.id
+            });
+            if (insert.error) throw insert.error;
+            showAlert("Resource uploaded successfully.", "success");
+            await renderAdminResources();
+          } catch (error) {
+            if (uploadedPath) {
+              await supabaseClient.storage.from("course-resources").remove([uploadedPath]);
+            }
+            showAlert(error.message || "The resource could not be uploaded.");
+            button.disabled = false;
+            button.textContent = "Upload resource";
+          }
+        });
+
+        pageContent.querySelectorAll("[data-resource-open]").forEach(button => {
+          button.addEventListener("click", () => openCourseResource(button.dataset.resourceOpen));
+        });
+        pageContent.querySelectorAll("[data-resource-toggle]").forEach(button => {
+          button.addEventListener("click", async () => {
+            const publish = button.dataset.published !== "true";
+            button.disabled = true;
+            const result = await supabaseClient.from("course_resources")
+              .update({ is_published: publish }).eq("id", button.dataset.resourceToggle);
+            if (result.error) {
+              showAlert(result.error.message || "Could not update resource visibility.");
+              button.disabled = false;
+              return;
+            }
+            showAlert(publish ? "Resource published for subscribed students." : "Resource unpublished.", "success");
+            await renderAdminResources();
+          });
+        });
+        pageContent.querySelectorAll("[data-resource-delete]").forEach(button => {
+          button.addEventListener("click", async () => {
+            if (!confirm("Delete this resource and its uploaded file? This cannot be undone.")) return;
+            button.disabled = true;
+            const removeRow = await supabaseClient.from("course_resources")
+              .delete().eq("id", button.dataset.resourceDelete);
+            if (removeRow.error) {
+              showAlert(removeRow.error.message || "Could not delete the resource.");
+              button.disabled = false;
+              return;
+            }
+            const removeFile = await supabaseClient.storage.from("course-resources")
+              .remove([button.dataset.path]);
+            if (removeFile.error) showAlert("Resource record deleted, but its stored file could not be removed: " + removeFile.error.message);
+            else showAlert("Resource and file deleted.", "success");
+            await renderAdminResources();
+          });
+        });
+      }
+
+      async function openCourseResource(path) {
+        const result = await supabaseClient.storage.from("course-resources")
+          .createSignedUrl(path, 300);
+        if (result.error) {
+          showAlert(result.error.message || "The resource file could not be opened.");
+          return;
+        }
+        window.open(result.data.signedUrl, "_blank", "noopener,noreferrer");
+      }
+
+      async function renderStudentCourseResources(courseId, courseTitle) {
+        setLoading("Loading course resources…");
+        const result = await supabaseClient.from("course_resources")
+          .select("id,title,resource_type,description,academic_year,resource_path,original_file_name,created_at,modules(title)")
+          .eq("course_id", courseId)
+          .eq("is_published", true)
+          .order("created_at", { ascending: false });
+        if (result.error) throw result.error;
+        const resources = result.data || [];
+        pageTitle.textContent = courseTitle || "Course resources";
+        pageContent.innerHTML = [
+          '<div class="welcome"><h1>' + escapeHTML(courseTitle || "Course resources") + '</h1><p>Learning materials available with your active subscription.</p></div>',
+          '<div class="inline-actions" style="margin-bottom:16px"><button class="btn secondary" type="button" id="backToCourses">← Back to my courses</button></div>',
+          resources.length ? '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">' +
+            resources.map(resource => '<article class="card"><span class="pill">' + escapeHTML(resourceTypeLabels[resource.resource_type] || resource.resource_type) + '</span>' +
+              '<h3 style="color:var(--navy);margin:12px 0 6px">' + escapeHTML(resource.title) + '</h3>' +
+              '<p class="muted" style="font-size:12px">' + escapeHTML(resource.modules?.title || "General course resource") +
+              (resource.academic_year ? ' · ' + resource.academic_year : '') + '</p>' +
+              (resource.description ? '<p style="font-size:13px">' + escapeHTML(resource.description) + '</p>' : '') +
+              '<p class="muted" style="font-size:11px;overflow-wrap:anywhere">' + escapeHTML(resource.original_file_name) + '</p>' +
+              '<button class="btn" type="button" data-student-resource="' + escapeHTML(resource.resource_path) + '">Open / download</button></article>'
+            ).join("") + '</div>' : '<div class="empty">No learning materials have been published for this course yet. Please check again later.</div>'
+        ].join("");
+        document.getElementById("backToCourses").addEventListener("click", () => renderPage("courses"));
+        pageContent.querySelectorAll("[data-student-resource]").forEach(button => {
+          button.addEventListener("click", () => openCourseResource(button.dataset.studentResource));
         });
       }
 
