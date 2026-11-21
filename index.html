@@ -1350,6 +1350,90 @@ a {
     }
 }
 
+
+/* Password recovery */
+.recovery-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(9, 28, 45, .72);
+    backdrop-filter: blur(5px);
+}
+.recovery-overlay.is-open { display: flex; }
+.recovery-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 34px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(0,0,0,.22);
+}
+.recovery-mark {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 20px;
+    border-radius: 13px;
+    background: var(--navy);
+    color: #fff;
+    font: 800 25px "Manrope", sans-serif;
+}
+.recovery-card h2 {
+    margin-bottom: 9px;
+    color: var(--navy);
+    font: 800 24px "Manrope", sans-serif;
+}
+.recovery-card p {
+    margin-bottom: 22px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+.recovery-card label {
+    display: block;
+    margin: 14px 0 7px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+}
+.recovery-card input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    outline: none;
+}
+.recovery-card input:focus { border-color: var(--turquoise); }
+.recovery-card button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--turquoise);
+    color: #fff;
+    font-weight: 700;
+}
+.recovery-card button:disabled { opacity: .6; cursor: wait; }
+.recovery-feedback {
+    display: none;
+    margin-top: 14px;
+    padding: 11px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.recovery-feedback.error { display: block; background: #FDECEC; color: #B42318; }
+.recovery-feedback.success { display: block; background: #E7F8F5; color: #087F70; }
+@media (max-width: 480px) {
+    .recovery-card { padding: 26px 21px; }
+}
+
 </style>
 </head>
 
@@ -1646,6 +1730,23 @@ a {
      LEGAL MODAL
 ===================================== -->
 
+
+<div class="recovery-overlay" id="passwordRecoveryOverlay" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
+    <div class="recovery-card">
+        <div class="recovery-mark" aria-hidden="true">B</div>
+        <h2 id="recoveryTitle">Create a new password</h2>
+        <p>Choose a new password for your Bright Minds account. Use at least 8 characters and keep it somewhere safe.</p>
+        <form id="passwordRecoveryForm">
+            <label for="recoveryPassword">New password</label>
+            <input id="recoveryPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
+            <label for="recoveryPasswordConfirm">Confirm new password</label>
+            <input id="recoveryPasswordConfirm" type="password" autocomplete="new-password" minlength="8" required placeholder="Enter the password again">
+            <div class="recovery-feedback" id="recoveryFeedback" role="status" aria-live="polite"></div>
+            <button type="submit" id="recoverySubmit">Update password</button>
+        </form>
+    </div>
+</div>
+
 <div class="modal" id="legalModal">
 
     <div class="legal-box">
@@ -1696,6 +1797,70 @@ if (
     console.error("Bright Minds Supabase configuration is unavailable.");
 
 }
+
+
+/* =====================================
+   PASSWORD RECOVERY
+===================================== */
+
+const recoveryOverlay = document.getElementById("passwordRecoveryOverlay");
+const recoveryForm = document.getElementById("passwordRecoveryForm");
+const recoveryFeedback = document.getElementById("recoveryFeedback");
+const recoverySubmit = document.getElementById("recoverySubmit");
+
+function showRecoveryFeedback(message, type) {
+    recoveryFeedback.textContent = message;
+    recoveryFeedback.className = "recovery-feedback " + type;
+}
+
+function openPasswordRecovery() {
+    recoveryOverlay.classList.add("is-open");
+    document.getElementById("recoveryPassword").focus();
+}
+
+recoveryForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+    if (!supabaseClient) return;
+
+    const password = document.getElementById("recoveryPassword").value;
+    const confirmation = document.getElementById("recoveryPasswordConfirm").value;
+
+    if (password.length < 8) {
+        showRecoveryFeedback("Your password must contain at least 8 characters.", "error");
+        return;
+    }
+
+    if (password !== confirmation) {
+        showRecoveryFeedback("The passwords do not match. Please check them and try again.", "error");
+        return;
+    }
+
+    recoverySubmit.disabled = true;
+    recoverySubmit.textContent = "Updating password...";
+    recoveryFeedback.className = "recovery-feedback";
+
+    try {
+        const { error } = await supabaseClient.auth.updateUser({ password });
+
+        if (error) throw error;
+
+        showRecoveryFeedback("Your password has been updated successfully. You can now sign in with your new password.", "success");
+        recoveryForm.reset();
+        recoverySubmit.textContent = "Return to sign in";
+        recoverySubmit.disabled = false;
+        recoverySubmit.type = "button";
+        recoverySubmit.addEventListener("click", async function returnToSignIn() {
+            await supabaseClient.auth.signOut();
+            window.location.replace("./login.html");
+        }, { once: true });
+
+    } catch (error) {
+        console.error("Password recovery update error:", error);
+        showRecoveryFeedback(error.message || "We could not update your password. Please request a new reset link and try again.", "error");
+        recoverySubmit.disabled = false;
+        recoverySubmit.textContent = "Update password";
+    }
+});
 
 /* =====================================
    LEGAL INFORMATION
@@ -2630,7 +2795,9 @@ async function checkExistingSession() {
 
     }
 
-    if (data.session) {
+    const isPasswordRecovery = window.location.hash.includes("type=recovery");
+
+    if (data.session && !isPasswordRecovery) {
 
         window.location.replace("./dashboard.html");
 
@@ -2644,7 +2811,12 @@ if (supabaseClient) {
 
     supabaseClient.auth.onAuthStateChange((event,session) => {
 
-        if (event === "SIGNED_IN" && session) {
+        if (event === "PASSWORD_RECOVERY" && session) {
+            openPasswordRecovery();
+            return;
+        }
+
+        if (event === "SIGNED_IN" && session && !window.location.hash.includes("type=recovery")) {
 
             window.location.replace("./dashboard.html");
             return;
