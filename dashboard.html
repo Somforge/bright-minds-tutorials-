@@ -474,7 +474,7 @@
         </button>
 
         <button data-page="manage-resources">
-          <span class="nav-icon">⇧</span>Resource library
+          <span class="nav-icon">⇧</span>Tutorial materials
         </button>
 
         <button data-page="manage-announcements">
@@ -563,7 +563,7 @@
         announcements: "Announcements",
         profile: "My profile",
         "manage-courses": "Manage courses",
-        "manage-resources": "Resource library",
+        "manage-resources": "Tutorial materials",
         "manage-announcements": "Manage announcements",
         payments: "Payments"
       };
@@ -981,7 +981,7 @@
                   Subject: ${escapeHTML(item.courses?.subject || "Not specified")}
                 </p>
 
-                <button class="btn" type="button" data-open-course="${escapeHTML(item.course_id)}" data-course-title="${escapeHTML(item.courses?.title || "Course")}">View course resources</button>
+                <button class="btn" type="button" data-open-course="${escapeHTML(item.course_id)}" data-course-title="${escapeHTML(item.courses?.title || "Course")}">View tutorial materials</button>
 
               </article>
             `).join("")}
@@ -1533,8 +1533,8 @@
         lecture_note: "Lecture notes",
         tutorial_sheet: "Tutorial sheet",
         past_paper: "Past examination paper",
-        solution: "Solutions / marking guide",
-        other: "Other resource"
+        solution: "Worked solutions / marking guides",
+        other: "Other tutorial material"
       };
 
       async function renderAdminResources() {
@@ -1561,13 +1561,13 @@
         ).join("");
 
         pageContent.innerHTML = [
-          '<div class="welcome"><h1>Course resource library</h1><p>Upload lecture notes, tutorial sheets, past papers and solutions. Files stay private until you publish them to students with an active subscription.</p></div>',
+          '<div class="welcome"><h1>Course tutorial materials</h1><p>Upload tutorial sheets, past examination papers, worked solutions and practice materials. Files stay private until you publish them to students with an active subscription.</p></div>',
           '<div class="card"><div class="section-head" style="margin-top:0"><h2>Upload a resource</h2></div>',
           '<form class="form" id="resourceUploadForm" style="max-width:720px">',
           '<label>Course<select name="course_id" id="resourceCourse" required><option value="">Choose a course</option>' + options + '</select></label>',
           '<label>Module / topic (optional)<select name="module_id" id="resourceModule"><option value="">General course resource</option>' + moduleOptions + '</select></label>',
           '<label>Resource title<input name="title" required maxlength="180" placeholder="e.g. Introduction to Calculus — Lecture Notes"></label>',
-          '<label>Resource category<select name="resource_type" required><option value="lecture_note">Lecture notes</option><option value="tutorial_sheet">Tutorial sheet</option><option value="past_paper">Past examination paper</option><option value="solution">Solutions / marking guide</option><option value="other">Other resource</option></select></label>',
+          '<label>Tutorial material type<select name="resource_type" required><option value="tutorial_sheet">Tutorial sheet</option><option value="past_paper">Past examination paper</option><option value="solution">Worked solutions / marking guides</option><option value="other">Other tutorial material</option></select></label>',
           '<label>Year (optional, useful for past papers)<input name="academic_year" type="number" min="1900" max="2100" placeholder="e.g. 2024"></label>',
           '<label>Description (optional)<textarea name="description" rows="3" maxlength="1000" placeholder="Briefly describe what students will find in this file"></textarea></label>',
           '<label>Choose file (PDF, Word, PowerPoint, JPG or PNG; maximum 20 MB)<input name="resource_file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpeg,image/png" required></label>',
@@ -1575,7 +1575,7 @@
           '<div class="inline-actions"><button class="btn" type="submit" id="resourceUploadBtn">Upload resource</button></div>',
           '<p class="muted" style="font-size:12px;margin:0">If you leave the publish box unticked, the file is saved as a draft and only administrators can see it.</p>',
           '</form></div>',
-          '<div class="section-head"><h2>Uploaded resources (' + resources.length + ')</h2></div>',
+          '<div class="section-head"><h2>Uploaded tutorial materials (' + resources.length + ')</h2></div>',
           resources.length ? '<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>Resource</th><th>Course / topic</th><th>Category</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
             resources.map(resource => '<tr><td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
               (resource.academic_year ? '<div class="muted">Year: ' + resource.academic_year + '</div>' : '') + '</td>' +
@@ -1585,7 +1585,7 @@
               '<td><div class="inline-actions"><button class="btn secondary" type="button" data-resource-open="' + escapeHTML(resource.resource_path) + '">View file</button>' +
               '<button class="btn secondary" type="button" data-resource-toggle="' + escapeHTML(resource.id) + '" data-published="' + resource.is_published + '">' + (resource.is_published ? 'Unpublish' : 'Publish') + '</button>' +
               '<button class="btn danger" type="button" data-resource-delete="' + escapeHTML(resource.id) + '" data-path="' + escapeHTML(resource.resource_path) + '">Delete</button></div></td></tr>'
-            ).join("") + '</tbody></table></div></div>' : '<div class="empty">No resources have been uploaded yet. Your first Mathematics notes can be added here.</div>'
+            ).join("") + '</tbody></table></div></div>' : '<div class="empty">No tutorial materials have been uploaded yet. Add your first tutorial sheet, past paper or worked solution here.</div>'
         ].join("");
 
         const moduleSelect = document.getElementById("resourceModule");
@@ -1655,13 +1655,13 @@
               uploaded_by: currentUser.id
             });
             if (insert.error) throw insert.error;
-            showAlert("Resource uploaded successfully.", "success");
+            showAlert("Tutorial material uploaded successfully.", "success");
             form.reset();
           } catch (error) {
             if (uploadedPath) {
               await supabaseClient.storage.from("course-resources").remove([uploadedPath]);
             }
-            showAlert(error.message || "The resource could not be uploaded.");
+            showAlert(error.message || "The tutorial material could not be uploaded.");
             button.disabled = false;
             button.textContent = "Upload resource";
             return;
@@ -1683,13 +1683,13 @@
               button.disabled = false;
               return;
             }
-            showAlert(publish ? "Resource published for subscribed students." : "Resource unpublished.", "success");
+            showAlert(publish ? "Tutorial material published for subscribed students." : "Tutorial material unpublished.", "success");
             await renderAdminResources();
           });
         });
         pageContent.querySelectorAll("[data-resource-delete]").forEach(button => {
           button.addEventListener("click", async () => {
-            if (!confirm("Delete this resource and its uploaded file? This cannot be undone.")) return;
+            if (!confirm("Delete this tutorial material and its uploaded file? This cannot be undone.")) return;
             button.disabled = true;
             const removeRow = await supabaseClient.from("course_resources")
               .delete().eq("id", button.dataset.resourceDelete);
@@ -1700,8 +1700,8 @@
             }
             const removeFile = await supabaseClient.storage.from("course-resources")
               .remove([button.dataset.path]);
-            if (removeFile.error) showAlert("Resource record deleted, but its stored file could not be removed: " + removeFile.error.message);
-            else showAlert("Resource and file deleted.", "success");
+            if (removeFile.error) showAlert("Tutorial material record deleted, but its stored file could not be removed: " + removeFile.error.message);
+            else showAlert("Tutorial material and file deleted.", "success");
             await renderAdminResources();
           });
         });
@@ -1718,7 +1718,7 @@
       }
 
       async function renderStudentCourseResources(courseId, courseTitle) {
-        setLoading("Loading course resources…");
+        setLoading("Loading tutorial materials…");
         const result = await supabaseClient.from("course_resources")
           .select("id,title,resource_type,description,academic_year,resource_path,original_file_name,created_at,modules(title)")
           .eq("course_id", courseId)
@@ -1726,9 +1726,9 @@
           .order("created_at", { ascending: false });
         if (result.error) throw result.error;
         const resources = result.data || [];
-        pageTitle.textContent = courseTitle || "Course resources";
+        pageTitle.textContent = courseTitle || "Tutorial materials";
         pageContent.innerHTML = [
-          '<div class="welcome"><h1>' + escapeHTML(courseTitle || "Course resources") + '</h1><p>Learning materials available with your active subscription.</p></div>',
+          '<div class="welcome"><h1>' + escapeHTML(courseTitle || "Tutorial materials") + '</h1><p>Tutorial materials available with your active subscription.</p></div>',
           '<div class="inline-actions" style="margin-bottom:16px"><button class="btn secondary" type="button" id="backToCourses">← Back to my courses</button></div>',
           resources.length ? '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">' +
             resources.map(resource => '<article class="card"><span class="pill">' + escapeHTML(resourceTypeLabels[resource.resource_type] || resource.resource_type) + '</span>' +
@@ -1738,7 +1738,7 @@
               (resource.description ? '<p style="font-size:13px">' + escapeHTML(resource.description) + '</p>' : '') +
               '<p class="muted" style="font-size:11px;overflow-wrap:anywhere">' + escapeHTML(resource.original_file_name) + '</p>' +
               '<button class="btn" type="button" data-student-resource="' + escapeHTML(resource.resource_path) + '">Open / download</button></article>'
-            ).join("") + '</div>' : '<div class="empty">No learning materials have been published for this course yet. Please check again later.</div>'
+            ).join("") + '</div>' : '<div class="empty">No tutorial materials have been published for this course yet. Please check again later.</div>'
         ].join("");
         document.getElementById("backToCourses").addEventListener("click", () => renderPage("courses"));
         pageContent.querySelectorAll("[data-student-resource]").forEach(button => {
