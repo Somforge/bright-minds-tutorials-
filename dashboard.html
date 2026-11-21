@@ -1331,6 +1331,7 @@
           supabaseClient
             .from("courses")
             .select("id,title,description,subject")
+            .in("title", ["Mathematics", "Physics", "Chemistry", "Biology"])
             .eq("is_published", true)
             .order("title"),
           supabaseClient
@@ -1344,42 +1345,32 @@
         if (historyResult.error) throw historyResult.error;
 
         const courses = coursesResult.data || [];
-        let prices = [];
-        if (courses.length) {
-          const priceResult = await supabaseClient
-            .from("course_subscription_prices")
-            .select("id,course_id,duration_months,price,currency")
-            .in("course_id", courses.map(course => course.id))
-            .eq("is_available", true)
-            .order("duration_months");
-          if (priceResult.error) throw priceResult.error;
-          prices = priceResult.data || [];
-        }
-
-        const availableCourses = courses.filter(course =>
-          prices.some(price => price.course_id === course.id)
-        );
+        const allowedOrder = ["Mathematics", "Physics", "Chemistry", "Biology"];
+        courses.sort((a, b) => allowedOrder.indexOf(a.title) - allowedOrder.indexOf(b.title));
 
         pageContent.innerHTML = [
-          '<div class="welcome"><h1>Course payments</h1><p>Choose a course option, pay using an approved manual method, and submit your proof for review.</p></div>',
+          '<div class="welcome"><h1>Course payments</h1><p>Select one or more courses. You can pay for all four together or choose any combination.</p></div>',
           '<div class="card" style="margin-bottom:20px">',
-          '<h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Before you pay</h2>',
-          '<p class="muted" style="line-height:1.6">Bright Minds accepts MTN MoMo, Airtel Money and bank transfer. Use only official payment details supplied by Bright Minds Tutorials. If you have not received the official number or bank details, contact the team before sending money. Never pay an unofficial personal number.</p>',
-          '<p class="muted" style="font-size:12px">Your course access is activated only after an administrator verifies your payment.</p>',
+          '<h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Official payment details</h2>',
+          '<div style="display:grid;gap:12px">',
+          '<div style="padding:14px;background:#F4F7FA;border-radius:10px"><strong>MTN MoMo</strong><div style="font-size:20px;font-weight:800;color:var(--navy);margin:5px 0">0768744352</div><div class="muted">Account name: Ethan Makasa</div></div>',
+          '<div style="padding:14px;background:#F4F7FA;border-radius:10px"><strong>Airtel Money</strong><div style="font-size:20px;font-weight:800;color:var(--navy);margin:5px 0">0978764356</div><div class="muted">Account name: Francis Nyendwa</div></div>',
           '</div>',
-          availableCourses.length ? [
-            '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Submit payment</h2>',
+          '<p style="margin:14px 0 0;font-size:13px;color:var(--muted)">Course fee: K75 per course per month. Send the exact total shown below, then upload your proof. Bright Minds activates access after an administrator verifies your payment.</p>',
+          '</div>',
+          courses.length ? [
+            '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Submit one combined payment</h2>',
             '<form class="form" id="manualPaymentForm">',
-            '<label>Course<select name="course_id" id="paymentCourse" required><option value="">Choose a course</option>',
-            availableCourses.map(course => '<option value="' + escapeHTML(course.id) + '">' + escapeHTML(course.title) + '</option>').join(""),
-            '</select></label>',
-            '<label>Subscription period and price<select name="price_id" id="paymentPrice" required disabled><option value="">Choose a course first</option></select></label>',
-            '<label>Payment method<select name="payment_method" required><option value="">Choose method</option><option value="mtn">MTN MoMo</option><option value="airtel">Airtel Money</option><option value="bank_transfer">Bank transfer</option></select></label>',
+            '<fieldset style="border:0;padding:0;margin:0;display:grid;gap:12px"><legend style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">Choose your courses (K75 each)</legend>',
+            courses.map(course => '<label style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--border);border-radius:9px;color:var(--ink)"><input type="checkbox" name="course_ids" value="' + escapeHTML(course.id) + '" style="width:18px;height:18px;margin:0" data-course-choice> <span>' + escapeHTML(course.title) + '</span></label>').join(""),
+            '</fieldset>',
+            '<div style="padding:15px;background:#E6FFFB;border-radius:10px"><div class="muted" style="font-size:12px">Selected courses</div><strong id="selectedCourseCount" style="font-size:18px">0 courses</strong><div class="muted" style="font-size:12px;margin-top:8px">Total to pay</div><strong id="paymentTotal" style="font-size:28px;color:var(--navy)">K0.00</strong><div class="muted" style="font-size:12px">K75 × number of selected courses × 1 month</div></div>',
+            '<label>Payment method<select name="payment_method" required><option value="">Choose method</option><option value="mtn">MTN MoMo</option><option value="airtel">Airtel Money</option></select></label>',
             '<label>Transaction reference<input name="transaction_reference" required maxlength="160" autocomplete="off" placeholder="Enter the transaction/reference number"></label>',
             '<label>Proof of payment (JPG, PNG, WebP or PDF; maximum 5 MB)<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required></label>',
-            '<button class="btn" type="submit" id="submitPaymentBtn">Submit payment for review</button>',
+            '<button class="btn" type="submit" id="submitPaymentBtn" disabled>Submit payment for review</button>',
             '</form></div>'
-          ].join("") : '<div class="empty" style="margin-bottom:20px">There are no published courses with available subscription prices yet. Bright Minds will list courses here once an administrator has set the prices and published them.</div>',
+          ].join("") : '<div class="empty" style="margin-bottom:20px">The four payment courses are ready, but they are not published yet. An administrator must publish Mathematics, Physics, Chemistry and Biology before students can select and pay for them.</div>',
           '<div class="section-head"><h2>My payment submissions</h2></div>',
           historyResult.data?.length ? '<div class="grid">' + historyResult.data.map(payment => {
             const statusLabel = payment.status === "verified" ? "Verified" : payment.status === "rejected" ? "Rejected" : "Awaiting review";
@@ -1390,30 +1381,32 @@
           }).join("") + '</div>' : '<div class="empty">You have not submitted any payments yet.</div>'
         ].join("");
 
-        const courseSelect = document.getElementById("paymentCourse");
-        if (courseSelect) {
-          courseSelect.addEventListener("change", () => {
-            const selected = courseSelect.value;
-            const options = prices.filter(price => price.course_id === selected);
-            const priceSelect = document.getElementById("paymentPrice");
-            priceSelect.innerHTML = options.length
-              ? '<option value="">Choose a subscription</option>' + options.map(price =>
-                  '<option value="' + escapeHTML(price.id) + '">' + price.duration_months + ' month(s) · ' + money(price.price) + ' ' + escapeHTML(price.currency || "ZMW") + '</option>'
-                ).join("")
-              : '<option value="">No prices available</option>';
-            priceSelect.disabled = !options.length;
-          });
-        }
-
         const form = document.getElementById("manualPaymentForm");
         if (form) {
+          const choices = Array.from(form.querySelectorAll("[data-course-choice]"));
+          const countLabel = document.getElementById("selectedCourseCount");
+          const totalLabel = document.getElementById("paymentTotal");
+          const submitButton = document.getElementById("submitPaymentBtn");
+          const updateTotal = () => {
+            const count = choices.filter(choice => choice.checked).length;
+            countLabel.textContent = count + (count === 1 ? " course" : " courses");
+            totalLabel.textContent = money(count * 75);
+            submitButton.disabled = count === 0;
+          };
+          choices.forEach(choice => choice.addEventListener("change", updateTotal));
+          updateTotal();
+
           form.addEventListener("submit", async event => {
             event.preventDefault();
-            const submitButton = document.getElementById("submitPaymentBtn");
             const values = new FormData(form);
+            const selectedCourseIds = values.getAll("course_ids");
             const file = values.get("proof");
             const allowedTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
+            if (!selectedCourseIds.length || selectedCourseIds.length > 4) {
+              showAlert("Select between one and four courses.");
+              return;
+            }
             if (!(file instanceof File) || !file.size || file.size > 5242880 || !allowedTypes.includes(file.type)) {
               showAlert("Choose a JPG, PNG, WebP or PDF proof file no larger than 5 MB.");
               return;
@@ -1421,11 +1414,9 @@
 
             submitButton.disabled = true;
             submitButton.textContent = "Uploading proof…";
-            let uploadedPath = null;
-
             try {
               const extension = file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "");
-              uploadedPath = currentUser.id + "/" + crypto.randomUUID() + "." + (extension || "file");
+              const uploadedPath = currentUser.id + "/" + crypto.randomUUID() + "." + (extension || "file");
               const upload = await supabaseClient.storage
                 .from("payment-proofs")
                 .upload(uploadedPath, file, { upsert: false, contentType: file.type });
@@ -1433,15 +1424,14 @@
 
               submitButton.textContent = "Submitting payment…";
               const result = await supabaseClient.rpc("submit_manual_payment", {
-                p_course_id: values.get("course_id"),
-                p_price_id: values.get("price_id"),
+                p_course_ids: selectedCourseIds,
                 p_payment_method: values.get("payment_method"),
                 p_transaction_reference: values.get("transaction_reference"),
                 p_proof_path: uploadedPath
               });
               if (result.error) throw result.error;
 
-              showAlert("Your payment proof has been submitted. Your course access will be activated after verification.", "success");
+              showAlert("Your combined payment proof has been submitted. All selected course subscriptions will be activated after verification.", "success");
               await renderStudentPayments();
             } catch (error) {
               showAlert(error.message || "Your payment could not be submitted.");
