@@ -1634,7 +1634,7 @@
           const reference = payment.transaction_reference || "";
           const proofAction = payment.proof_of_payment_url
             ? '<button class="btn secondary" type="button" data-open-proof="' + escapeHTML(payment.proof_of_payment_url) + '">View uploaded proof</button>'
-            : '<p class="muted" style="font-size:12px;margin:8px 0">No file was uploaded. Confirm the student's receipt directly on the official Bright Minds WhatsApp account before approving.</p>';
+            : '<p class="muted" style="font-size:12px;margin:8px 0">No file was uploaded. Confirm the student&#39;s receipt directly on the official Bright Minds WhatsApp account before approving.</p>';
           const reviewActions = allowReview
             ? '<div class="inline-actions" style="margin-top:14px"><button class="btn" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="verified">Approve and activate</button><button class="btn danger" type="button" data-review-payment="' + escapeHTML(payment.id) + '" data-decision="rejected">Reject payment</button></div>'
             : '<p class="muted" style="font-size:12px;margin-top:12px">Reviewed ' + (payment.verified_at ? new Date(payment.verified_at).toLocaleString() : "date not recorded") + '</p>';
