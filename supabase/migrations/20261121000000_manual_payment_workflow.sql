@@ -1,7 +1,3 @@
--- One price per course and subscription duration prevents duplicate checkout options.
-create unique index if not exists course_subscription_prices_course_duration_uidx
-on public.course_subscription_prices (course_id, duration_months);
-
 -- Manual payment workflow for Bright Minds Tutorials.
 -- Apply only after reviewing this migration. It creates private proof storage,
 -- student-owned submission access, and admin-only approval that activates subscriptions.
@@ -38,15 +34,11 @@ using (
   )
 );
 
-drop policy if exists "Students delete their own payment proofs" on storage.objects;
-create policy "Students delete their own payment proofs"
-on storage.objects for delete to authenticated
-using (
-  bucket_id = 'payment-proofs'
-  and (storage.foldername(name))[1] = auth.uid()::text
-);
+create schema if not exists private;
+revoke all on schema private from public;
+grant usage on schema private to authenticated;
 
-create or replace function public.submit_manual_payment(
+create or replace function private.submit_manual_payment(
   p_course_id uuid,
   p_price_id uuid,
   p_payment_method text,
@@ -56,8 +48,8 @@ create or replace function public.submit_manual_payment(
 returns uuid
 language plpgsql
 security definer
-set search_path = public, pg_temp
-as $$
+set search_path = public, storage, pg_temp
+as $
 declare
   v_user_id uuid := auth.uid();
   v_course_title text;
@@ -127,10 +119,26 @@ begin
 end;
 $$;
 
+revoke all on function private.submit_manual_payment(uuid, uuid, text, text, text) from public, anon;
+grant execute on function private.submit_manual_payment(uuid, uuid, text, text, text) to authenticated;
+
+create or replace function public.submit_manual_payment(
+  p_course_id uuid, p_price_id uuid, p_payment_method text,
+  p_transaction_reference text, p_proof_path text
+)
+returns uuid
+language sql
+security invoker
+set search_path = public, private, pg_temp
+as $
+  select private.submit_manual_payment(
+    p_course_id, p_price_id, p_payment_method, p_transaction_reference, p_proof_path
+  );
+$;
 revoke all on function public.submit_manual_payment(uuid, uuid, text, text, text) from public, anon;
 grant execute on function public.submit_manual_payment(uuid, uuid, text, text, text) to authenticated;
 
-create or replace function public.admin_review_manual_payment(
+create or replace function private.admin_review_manual_payment(
   p_payment_id uuid,
   p_decision text,
   p_notes text default null
@@ -205,5 +213,18 @@ begin
 end;
 $$;
 
+revoke all on function private.admin_review_manual_payment(uuid, text, text) from public, anon;
+grant execute on function private.admin_review_manual_payment(uuid, text, text) to authenticated;
+
+create or replace function public.admin_review_manual_payment(
+  p_payment_id uuid, p_decision text, p_notes text default null
+)
+returns void
+language sql
+security invoker
+set search_path = public, private, pg_temp
+as $
+  select private.admin_review_manual_payment(p_payment_id, p_decision, p_notes);
+$;
 revoke all on function public.admin_review_manual_payment(uuid, text, text) from public, anon;
 grant execute on function public.admin_review_manual_payment(uuid, text, text) to authenticated;
