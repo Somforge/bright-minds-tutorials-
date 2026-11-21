@@ -445,6 +445,10 @@
           <span class="nav-icon">▣</span>My courses
         </button>
 
+        <button data-page="payments">
+          <span class="nav-icon">₵</span>Payments
+        </button>
+
         <button data-page="assessments">
           <span class="nav-icon">✓</span>Assessments
         </button>
@@ -469,6 +473,10 @@
 
         <button data-page="manage-announcements">
           <span class="nav-icon">✎</span>Manage announcements
+        </button>
+
+        <button data-page="payments">
+          <span class="nav-icon">₵</span>Review payments
         </button>
       </nav>
 
@@ -549,7 +557,8 @@
         announcements: "Announcements",
         profile: "My profile",
         "manage-courses": "Manage courses",
-        "manage-announcements": "Manage announcements"
+        "manage-announcements": "Manage announcements",
+        payments: "Payments"
       };
 
       function showAlert(message, type = "error") {
@@ -726,6 +735,11 @@
 
           else if (page === "manage-announcements") {
             await renderAnnouncements(true);
+          }
+
+          else if (page === "payments") {
+            if (isAdmin()) await renderAdminPayments();
+            else await renderStudentPayments();
           }
 
         } catch (error) {
