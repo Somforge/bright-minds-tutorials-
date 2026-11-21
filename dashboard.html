@@ -1573,22 +1573,43 @@
               : "Are you sure you want to reject this payment?");
             if (!confirmed) return;
 
-            const notes = prompt("Optional note for the student:", "") || "";
-            button.disabled = true;
+            const notes = prompt(
+              decision === "rejected"
+                ? "Please give the student a reason for rejection:"
+                : "Optional note for the student:",
+              ""
+            );
+            if (notes === null) return;
+            if (decision === "rejected" && !notes.trim()) {
+              showAlert("Please enter a short reason before rejecting this payment.");
+              return;
+            }
+
+            const card = button.closest(".card");
+            const reviewButtons = card ? Array.from(card.querySelectorAll("[data-review-payment]")) : [button];
+            reviewButtons.forEach(action => {
+              action.disabled = true;
+              action.dataset.originalLabel = action.textContent;
+            });
+            button.textContent = decision === "verified" ? "Approving…" : "Rejecting…";
+
             try {
               const result = await supabaseClient.rpc("admin_review_manual_payment", {
                 p_payment_id: paymentId,
                 p_decision: decision,
-                p_notes: notes
+                p_notes: notes.trim()
               });
               if (result.error) throw result.error;
               showAlert(decision === "verified"
                 ? "Payment verified. The course subscription is now active."
-                : "Payment rejected.", "success");
+                : "Payment rejected and the student has been given a reason.", "success");
               await renderAdminPayments();
             } catch (error) {
               showAlert(error.message || "The payment could not be reviewed.");
-              button.disabled = false;
+              reviewButtons.forEach(action => {
+                action.disabled = false;
+                action.textContent = action.dataset.originalLabel || action.textContent;
+              });
             }
           });
         });
