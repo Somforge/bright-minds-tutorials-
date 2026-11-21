@@ -57,12 +57,39 @@
       position: fixed;
       inset: 0 auto 0 0;
       width: 250px;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
       background: var(--navy);
       color: white;
       padding: 26px 18px;
       display: flex;
       flex-direction: column;
       z-index: 20;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(188,204,220,.42) transparent;
+      scroll-behavior: smooth;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(188,204,220,.35);
+      border-radius: 99px;
+    }
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: rgba(188,204,220,.6);
+    }
+
+    .sidebar .brand,
+    .sidebar .nav-label,
+    .sidebar .nav,
+    .sidebar .sidebar-bottom {
+      flex-shrink: 0;
     }
 
     .brand {
