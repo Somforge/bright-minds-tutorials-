@@ -1432,7 +1432,7 @@
           '<div style="padding:14px;background:#F4F7FA;border-radius:10px"><strong>MTN MoMo</strong><div style="font-size:20px;font-weight:800;color:var(--navy);margin:5px 0">0768744352</div><div class="muted">Account name: Ethan Makasa</div></div>',
           '<div style="padding:14px;background:#F4F7FA;border-radius:10px"><strong>Airtel Money</strong><div style="font-size:20px;font-weight:800;color:var(--navy);margin:5px 0">0978764356</div><div class="muted">Account name: Francis Nyendwa</div></div>',
           '</div>',
-          '<p style="margin:14px 0 0;font-size:13px;color:var(--muted)">Course fee: K75 per course per month. Send the exact total shown below, then upload your proof. Bright Minds activates access after an administrator verifies your payment.</p>',
+          '<div style="margin-top:14px;padding:14px;background:#F4F7FA;border-radius:10px"><strong style="color:var(--navy)">How to complete your payment</strong><ol style="padding-left:20px;margin:8px 0 0;line-height:1.7;font-size:13px;color:var(--ink)"><li>Select the course(s) you want.</li><li>Send the exact total to one of the official numbers above.</li><li>Keep your transaction reference and payment receipt.</li><li>Complete the form below and submit your proof.</li></ol><p style="margin:10px 0 0;font-size:12px;color:var(--muted)">Your course access is activated only after Bright Minds verifies the payment. Do not send money to numbers that are not listed here.</p></div><p style="margin:12px 0 0;font-size:13px;color:var(--muted)">Course fee: K75 per course for one month. You may combine up to four courses in one payment.</p>',
           '</div>',
           courses.length ? [
             '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Submit one combined payment</h2>',
@@ -1441,9 +1441,9 @@
             courses.map(course => '<label style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--border);border-radius:9px;color:var(--ink)"><input type="checkbox" name="course_ids" value="' + escapeHTML(course.id) + '" style="width:18px;height:18px;margin:0" data-course-choice> <span>' + escapeHTML(course.title) + '</span></label>').join(""),
             '</fieldset>',
             '<div style="padding:15px;background:#E6FFFB;border-radius:10px"><div class="muted" style="font-size:12px">Selected courses</div><strong id="selectedCourseCount" style="font-size:18px">0 courses</strong><div class="muted" style="font-size:12px;margin-top:8px">Total to pay</div><strong id="paymentTotal" style="font-size:28px;color:var(--navy)">K0.00</strong><div class="muted" style="font-size:12px">K75 × number of selected courses × 1 month</div></div>',
-            '<label>Payment method<select name="payment_method" required><option value="">Choose method</option><option value="mtn">MTN MoMo</option><option value="airtel">Airtel Money</option></select></label>',
-            '<label>Transaction reference<input name="transaction_reference" required maxlength="160" autocomplete="off" placeholder="Enter the transaction/reference number"></label>',
-            '<label>Proof of payment (JPG, PNG, WebP or PDF; maximum 5 MB)<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required></label>',
+            '<label>Payment method<select name="payment_method" id="paymentMethod" required><option value="">Choose method</option><option value="mtn">MTN MoMo</option><option value="airtel">Airtel Money</option></select></label><div id="paymentDestination" class="muted" style="font-size:12px;margin-top:-6px">Choose a payment method to see the matching number and account name.</div>',
+            '<label>Transaction reference<input name="transaction_reference" required maxlength="160" autocomplete="off" placeholder="Enter the transaction/reference number"><span class="muted" style="display:block;font-size:11px;margin-top:5px;font-weight:400">Enter the reference exactly as shown in your MoMo confirmation message.</span></label>',
+            '<label>Proof of payment (JPG, PNG, WebP or PDF; maximum 5 MB)<input name="proof" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required><span class="muted" style="display:block;font-size:11px;margin-top:5px;font-weight:400">Upload a clear screenshot or receipt showing the amount, recipient and transaction reference.</span></label>',
             '<button class="btn" type="submit" id="submitPaymentBtn" disabled>Submit payment for review</button>',
             '</form></div>'
           ].join("") : '<div class="empty" style="margin-bottom:20px">The four payment courses are ready, but they are not published yet. An administrator must publish Mathematics, Physics, Chemistry and Biology before students can select and pay for them.</div>',
@@ -1453,7 +1453,13 @@
             const items = (payment.payment_items || []).map(item =>
               escapeHTML(item.course_title) + (item.duration_months ? " · " + item.duration_months + " month(s)" : "")
             ).join(", ");
-            return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</strong><span class="pill">' + statusLabel + '</span></div><p style="margin:10px 0 4px">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Method: ' + escapeHTML(payment.payment_method) + ' · Reference: ' + escapeHTML(payment.transaction_reference || "—") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p>' + (payment.verification_notes ? '<p style="font-size:13px;margin-bottom:0">Admin note: ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
+            const statusStyle = payment.status === "rejected" ? "background:#FDECEC;color:#9B2C2C" : payment.status === "verified" ? "background:#E6FFFB;color:#087F78" : "background:#FFF7E6;color:#946200";
+            const nextStep = payment.status === "rejected"
+              ? "Please read the administrator's note, correct the issue and submit a new payment proof."
+              : payment.status === "verified"
+                ? "Payment verified. Your selected course subscription(s) should now be active."
+                : "Your proof has been received. Course access will be activated after an administrator verifies it.";
+            return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</strong><span class="pill" style="' + statusStyle + '">' + statusLabel + '</span></div><p style="margin:10px 0 4px">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Method: ' + escapeHTML(payment.payment_method) + ' · Reference: ' + escapeHTML(payment.transaction_reference || "—") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p><p style="font-size:13px;line-height:1.5;margin:10px 0 0">' + nextStep + '</p>' + (payment.verification_notes ? '<p style="font-size:13px;margin-bottom:0;padding:10px;background:#F4F7FA;border-radius:8px"><strong>Administrator note:</strong> ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
           }).join("") + '</div>' : '<div class="empty">You have not submitted any payments yet.</div>'
         ].join("");
 
@@ -1463,12 +1469,22 @@
           const countLabel = document.getElementById("selectedCourseCount");
           const totalLabel = document.getElementById("paymentTotal");
           const submitButton = document.getElementById("submitPaymentBtn");
+          const paymentMethod = document.getElementById("paymentMethod");
+          const paymentDestination = document.getElementById("paymentDestination");
           const updateTotal = () => {
-            const count = choices.filter(choice => choice.checked).length;
+            const selected = choices.filter(choice => choice.checked);
+            const count = selected.length;
             countLabel.textContent = count + (count === 1 ? " course" : " courses");
             totalLabel.textContent = money(count * 75);
             submitButton.disabled = count === 0;
           };
+          paymentMethod.addEventListener("change", () => {
+            paymentDestination.textContent = paymentMethod.value === "mtn"
+              ? "Send to MTN MoMo: 0768744352 · Ethan Makasa"
+              : paymentMethod.value === "airtel"
+                ? "Send to Airtel Money: 0978764356 · Francis Nyendwa"
+                : "Choose a payment method to see the matching number and account name.";
+          });
           choices.forEach(choice => choice.addEventListener("change", updateTotal));
           updateTotal();
 
@@ -1481,6 +1497,14 @@
 
             if (!selectedCourseIds.length || selectedCourseIds.length > 4) {
               showAlert("Select between one and four courses.");
+              return;
+            }
+            if (!String(values.get("transaction_reference") || "").trim()) {
+              showAlert("Enter the transaction reference from your payment confirmation.");
+              return;
+            }
+            if (!values.get("payment_method")) {
+              showAlert("Choose the mobile money method you used.");
               return;
             }
             if (!(file instanceof File) || !file.size || file.size > 5242880 || !allowedTypes.includes(file.type)) {
