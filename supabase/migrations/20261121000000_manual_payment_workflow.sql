@@ -49,7 +49,7 @@ returns uuid
 language plpgsql
 security definer
 set search_path = public, storage, pg_temp
-as $
+as $$
 declare
   v_user_id uuid := auth.uid();
   v_course_title text;
@@ -130,11 +130,11 @@ returns uuid
 language sql
 security invoker
 set search_path = public, private, pg_temp
-as $
+as $$
   select private.submit_manual_payment(
     p_course_id, p_price_id, p_payment_method, p_transaction_reference, p_proof_path
   );
-$;
+$$;
 revoke all on function public.submit_manual_payment(uuid, uuid, text, text, text) from public, anon;
 grant execute on function public.submit_manual_payment(uuid, uuid, text, text, text) to authenticated;
 
@@ -223,8 +223,8 @@ returns void
 language sql
 security invoker
 set search_path = public, private, pg_temp
-as $
+as $$
   select private.admin_review_manual_payment(p_payment_id, p_decision, p_notes);
-$;
+$$;
 revoke all on function public.admin_review_manual_payment(uuid, text, text) from public, anon;
 grant execute on function public.admin_review_manual_payment(uuid, text, text) to authenticated;
