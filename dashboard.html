@@ -442,6 +442,103 @@
       gap: 8px;
     }
 
+    .payment-method-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .payment-method-card {
+      min-width: 0;
+      padding: 15px;
+      background: #F4F7FA;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .payment-number {
+      display: block;
+      margin: 6px 0 3px;
+      color: var(--navy);
+      font: 800 21px "Manrope", sans-serif;
+      letter-spacing: .2px;
+    }
+
+    .payment-steps {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .payment-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      padding: 11px;
+      background: #F8FAFC;
+      border: 1px solid #EAF0F5;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .payment-step-number {
+      flex: 0 0 25px;
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #D9F7F4;
+      color: #087F78;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .payment-whatsapp-links {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .payment-whatsapp-links a {
+      display: block;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--navy);
+      background: white;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .payment-whatsapp-links a:hover {
+      border-color: var(--teal);
+      background: #F2FFFD;
+    }
+
+    #manualPaymentForm { max-width: 100%; }
+    #manualPaymentForm select,
+    #manualPaymentForm input:not([type="checkbox"]) { min-height: 46px; }
+    #manualPaymentForm [data-course-choice] { flex: 0 0 18px; }
+    #manualPaymentForm label:has([data-course-choice]) {
+      cursor: pointer;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    #manualPaymentForm label:has([data-course-choice]):hover {
+      border-color: #9ADFD8 !important;
+      background: #F8FFFE;
+    }
+
+    @media(max-width:620px) {
+      .payment-method-grid { grid-template-columns: 1fr; }
+      .payment-number { font-size: 20px; }
+      .payment-step { padding: 10px; }
+      #manualPaymentForm .btn { width: 100%; min-height: 48px; }
+    }
+
     @media(max-width:900px) {
       .sidebar {
         transform: translateX(-100%);
@@ -1494,12 +1591,20 @@
         pageContent.innerHTML = [
           '<div class="welcome"><h1>Subscribe to tutorial courses</h1><p>Choose one or more subjects. The current monthly price is shown beside each course, and you can combine up to four courses in one payment.</p></div>',
           '<div class="card" style="margin-bottom:20px">',
-          '<h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Official payment details</h2>',
-          '<div style="display:grid;gap:12px">',
-          '<div style="padding:14px;background:#F4F7FA;border-radius:10px"><strong>MTN MoMo</strong><div style="font-size:20px;font-weight:800;color:var(--navy);margin:5px 0">0768744352</div><div class="muted">Account name: Ethan Makasa</div></div>',
-          '<div style="padding:14px;background:#F4F7FA;border-radius:10px"><strong>Airtel Money</strong><div style="font-size:20px;font-weight:800;color:var(--navy);margin:5px 0">0978764356</div><div class="muted">Account name: Francis Nyendwa</div></div>',
+          '<h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">1. Payment details</h2>',
+          '<p class="muted" style="font-size:13px;margin:-4px 0 13px">Pay using either of these official Bright Minds mobile money lines.</p>',
+          '<div class="payment-method-grid">',
+          '<div class="payment-method-card"><strong>MTN MoMo</strong><span class="payment-number">0768744352</span><div class="muted" style="font-size:12px">Account name: Ethan Makasa</div></div>',
+          '<div class="payment-method-card"><strong>Airtel Money</strong><span class="payment-number">0978764356</span><div class="muted" style="font-size:12px">Account name: Francis Nyendwa</div></div>',
           '</div>',
-          '<div style="margin-top:14px;padding:14px;background:#F4F7FA;border-radius:10px"><strong style="color:var(--navy)">How to complete your payment</strong><ol style="padding-left:20px;margin:8px 0 0;line-height:1.7;font-size:13px;color:var(--ink)"><li>Select the course(s) you want and note the total.</li><li>Send the exact amount to the MTN or Airtel number shown above.</li><li>Take a screenshot of the successful transaction or receipt and send it on WhatsApp to either official number below.</li><li>In your WhatsApp message, include your full name and the course(s) you are paying for.</li><li>Return here and submit the payment method and transaction reference. You do not need to upload the screenshot on this website.</li></ol><div style="display:grid;gap:8px;margin-top:12px;font-size:13px"><a href="https://wa.me/260768744352" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:700">WhatsApp MTN line: 0768744352 · Ethan Makasa</a><a href="https://wa.me/260978763456" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:700">WhatsApp Airtel line: 0978764356 · Francis Nyendwa</a></div><p style="margin:10px 0 0;font-size:12px;color:var(--muted)">Your course access is activated only after Bright Minds verifies your payment. Send proof only to these official WhatsApp contacts.</p></div><p style="margin:12px 0 0;font-size:13px;color:var(--muted)">Course fee: K75 per course for one month. You may combine up to four courses in one payment.</p>',
+          '<div style="margin-top:16px"><strong style="color:var(--navy)">2. Follow these steps</strong><div class="payment-steps">',
+          '<div class="payment-step"><span class="payment-step-number">1</span><span><strong>Choose your courses.</strong> Select the subjects below. Your total updates automatically using the current prices.</span></div>',
+          '<div class="payment-step"><span class="payment-step-number">2</span><span><strong>Send the exact amount.</strong> Pay to either the MTN or Airtel number above, using the matching account name.</span></div>',
+          '<div class="payment-step"><span class="payment-step-number">3</span><span><strong>Send your payment proof on WhatsApp.</strong> Take a screenshot of the successful transaction or receipt. Include your full name and the course(s) you selected.</span></div>',
+          '<div class="payment-step"><span class="payment-step-number">4</span><span><strong>Submit your reference below.</strong> Return here, choose the method you paid with and enter the transaction reference. Do not upload the screenshot on this website.</span></div>',
+          '</div></div>',
+          '<div class="payment-whatsapp-links"><a href="https://wa.me/260768744352" target="_blank" rel="noopener noreferrer">WhatsApp MTN line · 0768744352 · Ethan Makasa</a><a href="https://wa.me/260978763456" target="_blank" rel="noopener noreferrer">WhatsApp Airtel line · 0978764356 · Francis Nyendwa</a></div>',
+          '<p style="margin:12px 0 0;font-size:12px;color:var(--muted)">Your course access is activated only after Bright Minds verifies your payment. Send proof only to these official WhatsApp contacts. Course prices are displayed beside each subject and may be updated by the programme.</p>',
           '</div>',
           courses.length ? [
             '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Choose courses and submit payment</h2>',
