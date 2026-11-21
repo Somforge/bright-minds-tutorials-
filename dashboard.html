@@ -1412,29 +1412,50 @@
       }
 
       async function renderStudentPayments() {
-        const [coursesResult, historyResult] = await Promise.all([
+        const [coursesResult, pricesResult, subscriptionsResult, historyResult] = await Promise.all([
           supabaseClient
             .from("courses")
             .select("id,title,description,subject")
             .in("title", ["Mathematics", "Physics", "Chemistry", "Biology"])
-            .eq("is_published", true)
-            .order("title"),
+            .eq("is_published", true),
+          supabaseClient
+            .from("course_subscription_prices")
+            .select("course_id,price,currency,duration_months")
+            .eq("duration_months", 1)
+            .eq("is_available", true),
+          supabaseClient
+            .from("subscriptions")
+            .select("course_id,status,start_date,end_date")
+            .eq("student_id", currentUser.id)
+            .eq("status", "active"),
           supabaseClient
             .from("payments")
-            .select("id,total_amount,currency,payment_method,status,transaction_reference,created_at,verification_notes,payment_items(course_title,duration_months)")
+            .select("id,total_amount,currency,payment_method,status,transaction_reference,created_at,verification_notes,payment_items(course_id,course_title,duration_months)")
             .eq("student_id", currentUser.id)
             .order("created_at", { ascending: false })
         ]);
 
         if (coursesResult.error) throw coursesResult.error;
+        if (pricesResult.error) throw pricesResult.error;
+        if (subscriptionsResult.error) throw subscriptionsResult.error;
         if (historyResult.error) throw historyResult.error;
 
-        const courses = coursesResult.data || [];
         const allowedOrder = ["Mathematics", "Physics", "Chemistry", "Biology"];
-        courses.sort((a, b) => allowedOrder.indexOf(a.title) - allowedOrder.indexOf(b.title));
+        const priceByCourse = new Map((pricesResult.data || []).map(price => [price.course_id, price]));
+        const subscriptions = subscriptionsResult.data || [];
+        const pendingCourseIds = new Set();
+        (historyResult.data || []).filter(payment => payment.status === "pending")
+          .forEach(payment => (payment.payment_items || []).forEach(item => pendingCourseIds.add(item.course_id)));
+        const now = Date.now();
+        const courses = (coursesResult.data || [])
+          .filter(course => priceByCourse.has(course.id))
+          .sort((a, b) => allowedOrder.indexOf(a.title) - allowedOrder.indexOf(b.title));
+        const subscriptionFor = courseId => subscriptions
+          .filter(item => item.course_id === courseId && item.end_date && new Date(item.end_date).getTime() >= now)
+          .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime())[0];
 
         pageContent.innerHTML = [
-          '<div class="welcome"><h1>Course payments</h1><p>Select one or more courses. You can pay for all four together or choose any combination.</p></div>',
+          '<div class="welcome"><h1>Subscribe to tutorial courses</h1><p>Choose one or more subjects. Each course is K75 for one month, and you can combine up to four courses in one payment.</p></div>',
           '<div class="card" style="margin-bottom:20px">',
           '<h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Official payment details</h2>',
           '<div style="display:grid;gap:12px">',
