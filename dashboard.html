@@ -1656,7 +1656,7 @@
             });
             if (insert.error) throw insert.error;
             showAlert("Resource uploaded successfully.", "success");
-            await renderAdminResources();
+            form.reset();
           } catch (error) {
             if (uploadedPath) {
               await supabaseClient.storage.from("course-resources").remove([uploadedPath]);
@@ -1664,7 +1664,9 @@
             showAlert(error.message || "The resource could not be uploaded.");
             button.disabled = false;
             button.textContent = "Upload resource";
+            return;
           }
+          await renderAdminResources();
         });
 
         pageContent.querySelectorAll("[data-resource-open]").forEach(button => {
