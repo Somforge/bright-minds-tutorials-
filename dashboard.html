@@ -925,7 +925,16 @@
 
         } else {
 
-          const subscriptions = await getMySubscriptions();
+          const [subscriptions, pendingPaymentsResult] = await Promise.all([
+            getMySubscriptions(),
+            supabaseClient.from("payments")
+              .select("id,created_at,payment_items(course_title)")
+              .eq("student_id", currentUser.id)
+              .eq("status", "pending")
+              .order("created_at", { ascending: false })
+          ]);
+          if (pendingPaymentsResult.error) throw pendingPaymentsResult.error;
+          const pendingPayments = pendingPaymentsResult.data || [];
 
           pageContent.innerHTML = `
             <div class="welcome">
@@ -993,6 +1002,18 @@
                   </div>
                 `
             }
+            ${pendingPayments.length ? `
+              <div class="card" style="margin-top:18px;border-left:4px solid #D69E36">
+                <h3 style="margin:0 0 6px;color:var(--navy);font:800 16px Manrope">Payment awaiting verification</h3>
+                <p class="muted" style="font-size:13px;margin:0 0 10px">We have received your submission. Your selected course access will be activated after the payment is checked.</p>
+                ${pendingPayments.map(payment => `
+                  <div style="font-size:12px;padding:8px 0;border-top:1px solid var(--border)">
+                    ${escapeHTML((payment.payment_items || []).map(item => item.course_title).filter(Boolean).join(", ") || "Course subscription")} · Submitted ${new Date(payment.created_at).toLocaleDateString()}
+                  </div>
+                `).join("")}
+                <button class="btn secondary" type="button" data-go="payments" style="margin-top:8px">View payment details</button>
+              </div>
+            ` : ""}
           `;
 
           pageContent
