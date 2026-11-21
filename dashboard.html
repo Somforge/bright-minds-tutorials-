@@ -1465,12 +1465,23 @@
           '<div style="margin-top:14px;padding:14px;background:#F4F7FA;border-radius:10px"><strong style="color:var(--navy)">How to complete your payment</strong><ol style="padding-left:20px;margin:8px 0 0;line-height:1.7;font-size:13px;color:var(--ink)"><li>Select the course(s) you want and note the total.</li><li>Send the exact amount to the MTN or Airtel number shown above.</li><li>Take a screenshot of the successful transaction or receipt and send it on WhatsApp to either official number below.</li><li>In your WhatsApp message, include your full name and the course(s) you are paying for.</li><li>Return here and submit the payment method and transaction reference. You do not need to upload the screenshot on this website.</li></ol><div style="display:grid;gap:8px;margin-top:12px;font-size:13px"><a href="https://wa.me/260768744352" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:700">WhatsApp MTN line: 0768744352 · Ethan Makasa</a><a href="https://wa.me/260978763456" target="_blank" rel="noopener noreferrer" style="color:var(--navy);font-weight:700">WhatsApp Airtel line: 0978764356 · Francis Nyendwa</a></div><p style="margin:10px 0 0;font-size:12px;color:var(--muted)">Your course access is activated only after Bright Minds verifies your payment. Send proof only to these official WhatsApp contacts.</p></div><p style="margin:12px 0 0;font-size:13px;color:var(--muted)">Course fee: K75 per course for one month. You may combine up to four courses in one payment.</p>',
           '</div>',
           courses.length ? [
-            '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Submit one combined payment</h2>',
+            '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Choose courses and submit payment</h2>',
+            '<p class="muted" style="font-size:13px">If you already have an active subscription, you can renew early. The new month will begin after your current access ends.</p>',
             '<form class="form" id="manualPaymentForm">',
             '<fieldset style="border:0;padding:0;margin:0;display:grid;gap:12px"><legend style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">Choose your courses (K75 each)</legend>',
-            courses.map(course => '<label style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--border);border-radius:9px;color:var(--ink)"><input type="checkbox" name="course_ids" value="' + escapeHTML(course.id) + '" style="width:18px;height:18px;margin:0" data-course-choice> <span>' + escapeHTML(course.title) + '</span></label>').join(""),
+            courses.map(course => {
+              const price = priceByCourse.get(course.id);
+              const current = subscriptionFor(course.id);
+              const pending = pendingCourseIds.has(course.id);
+              const stateText = pending
+                ? "Payment awaiting review — another payment for this course is paused."
+                : current
+                  ? "Subscribed until " + new Date(current.end_date).toLocaleDateString() + ". Renewing adds time after this date."
+                  : "Available to subscribe";
+              return '<label style="display:flex;align-items:flex-start;gap:10px;padding:13px;border:1px solid var(--border);border-radius:10px;color:var(--ink);' + (pending ? 'opacity:.68;background:#F4F7FA' : '') + '"><input type="checkbox" name="course_ids" value="' + escapeHTML(course.id) + '" style="width:18px;height:18px;margin:2px 0 0" data-course-choice data-price="' + Number(price.price) + '"' + (pending ? ' disabled' : '') + '> <span style="flex:1"><strong>' + escapeHTML(course.title) + '</strong><span class="muted" style="display:block;font-size:12px;margin-top:3px">' + stateText + '</span></span><strong style="white-space:nowrap">' + money(price.price) + ' / month</strong></label>';
+            }).join(""),
             '</fieldset>',
-            '<div style="padding:15px;background:#E6FFFB;border-radius:10px"><div class="muted" style="font-size:12px">Selected courses</div><strong id="selectedCourseCount" style="font-size:18px">0 courses</strong><div class="muted" style="font-size:12px;margin-top:8px">Total to pay</div><strong id="paymentTotal" style="font-size:28px;color:var(--navy)">K0.00</strong><div class="muted" style="font-size:12px">K75 × number of selected courses × 1 month</div></div>',
+            '<div style="padding:15px;background:#E6FFFB;border-radius:10px"><div class="muted" style="font-size:12px">Selected courses</div><strong id="selectedCourseCount" style="font-size:18px">0 courses</strong><div class="muted" style="font-size:12px;margin-top:8px">Total to pay</div><strong id="paymentTotal" style="font-size:28px;color:var(--navy)">K0.00</strong><div class="muted" style="font-size:12px">Total is calculated using the current monthly price of each selected course.</div></div>',
             '<label>Payment method<select name="payment_method" id="paymentMethod" required><option value="">Choose method</option><option value="mtn">MTN MoMo</option><option value="airtel">Airtel Money</option></select></label><div id="paymentDestination" class="muted" style="font-size:12px;margin-top:-6px">Choose a payment method to see the matching number and account name.</div>',
             '<label>Transaction reference<input name="transaction_reference" required maxlength="160" autocomplete="off" placeholder="Enter the transaction/reference number"><span class="muted" style="display:block;font-size:11px;margin-top:5px;font-weight:400">Enter the reference exactly as shown in your MoMo confirmation message.</span></label>',
             '<div class="muted" style="font-size:12px;padding:12px;background:#F4F7FA;border-radius:8px">After paying, send your screenshot or receipt through WhatsApp to either official Bright Minds number listed above. No file upload is needed here.</div>',
@@ -1485,9 +1496,9 @@
             ).join(", ");
             const statusStyle = payment.status === "rejected" ? "background:#FDECEC;color:#9B2C2C" : payment.status === "verified" ? "background:#E6FFFB;color:#087F78" : "background:#FFF7E6;color:#946200";
             const nextStep = payment.status === "rejected"
-              ? "Please read the administrator's note, correct the issue and submit a new payment proof."
+              ? "Please read the administrator's note. If asked to try again, correct the details, resend your receipt through WhatsApp and submit a new payment reference."
               : payment.status === "verified"
-                ? "Payment verified. Your selected course subscription(s) should now be active."
+                ? "Payment verified. Your course access has been activated or your renewal has been queued after any existing access period."
                 : "Your payment details have been received. Make sure your screenshot or receipt has also been sent to an official Bright Minds WhatsApp number. Course access starts after verification.";
             return '<article class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><strong>' + money(payment.total_amount) + ' ' + escapeHTML(payment.currency || "ZMW") + '</strong><span class="pill" style="' + statusStyle + '">' + statusLabel + '</span></div><p style="margin:10px 0 4px">' + (items || "Course payment") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Method: ' + escapeHTML(payment.payment_method) + ' · Reference: ' + escapeHTML(payment.transaction_reference || "—") + '</p><p class="muted" style="font-size:12px;margin:4px 0">Submitted: ' + new Date(payment.created_at).toLocaleString() + '</p><p style="font-size:13px;line-height:1.5;margin:10px 0 0">' + nextStep + '</p>' + (payment.verification_notes ? '<p style="font-size:13px;margin-bottom:0;padding:10px;background:#F4F7FA;border-radius:8px"><strong>Administrator note:</strong> ' + escapeHTML(payment.verification_notes) + '</p>' : '') + '</article>';
           }).join("") + '</div>' : '<div class="empty">You have not submitted any payments yet.</div>'
@@ -1505,7 +1516,8 @@
             const selected = choices.filter(choice => choice.checked);
             const count = selected.length;
             countLabel.textContent = count + (count === 1 ? " course" : " courses");
-            totalLabel.textContent = money(count * 75);
+            const total = selected.reduce((sum, choice) => sum + Number(choice.dataset.price || 0), 0);
+            totalLabel.textContent = money(total);
             submitButton.disabled = count === 0;
           };
           paymentMethod.addEventListener("change", () => {
@@ -1610,7 +1622,7 @@
             const decision = button.dataset.decision;
             const paymentId = button.dataset.reviewPayment;
             const confirmed = confirm(decision === "verified"
-              ? "Confirm that you checked the payment and want to approve it? This will activate course access."
+              ? "Confirm that you matched the transaction reference and amount with the receipt received through WhatsApp. Approval will activate or extend the student's course access."
               : "Are you sure you want to reject this payment?");
             if (!confirmed) return;
 
