@@ -789,7 +789,7 @@
                         window.location.origin +
                         window.location.pathname.replace(
                             /register\.html$/,
-                            "index.html"
+                            "dashboard.html"
                         )
                 }
 
@@ -811,7 +811,7 @@
                 registerButton.textContent = "Account created";
 
                 setTimeout(() => {
-                    window.location.href = "index.html";
+                    window.location.replace("dashboard.html");
                 }, 1500);
 
                 return;

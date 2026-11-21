@@ -504,8 +504,8 @@ a {
 
 /* SIDEBAR */
 
-.sidebar {
-    position: fixed;    .public-actions .btn {
+@media(max-width:760px) {
+    .public-actions .btn {
         padding: 10px 13px;
         font-size: 12px;
     }
@@ -1036,7 +1036,10 @@ a {
         padding-top: 72px;
         padding-bottom: 72px;
     }
-}    .public-actions .btn {
+}
+
+@media(max-width:760px) {
+    .public-actions .btn {
         padding: 10px 12px;
         font-size: 12px;
     }
@@ -1395,7 +1398,7 @@ a {
 
                 <p>
                     Through a structured learning environment,
-                    students can access their learning resources
+                    students can access structured tutorial materials
                     and continue developing their academic potential.
                 </p>
 
@@ -1964,7 +1967,7 @@ function renderStudentPage(page) {
 
                 <p>
                     Continue your learning journey.
-                    Your courses, resources and assessments are all in one place.
+                    Your courses, tutorial materials and assessments are all in one place.
                 </p>
 
             </div>
@@ -2302,7 +2305,7 @@ async function openCourse(courseId) {
                     <h3>Learning materials coming soon</h3>
                     <p>
                         Your course learning space is ready.
-                        Lessons and downloadable resources will appear here
+                        Tutorial materials and practice resources will appear here
                         once they have been added by your administrator.
                     </p>
                 </div>
@@ -2616,7 +2619,7 @@ async function checkExistingSession() {
 
     if (data.session) {
 
-        await loadApplication(data.session.user);
+        window.location.replace("./dashboard.html");
 
     }
 
@@ -2627,6 +2630,13 @@ if (supabaseClient) {
     checkExistingSession();
 
     supabaseClient.auth.onAuthStateChange((event,session) => {
+
+        if (event === "SIGNED_IN" && session) {
+
+            window.location.replace("./dashboard.html");
+            return;
+
+        }
 
         if (event === "SIGNED_OUT") {
 
