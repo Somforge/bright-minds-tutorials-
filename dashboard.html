@@ -509,7 +509,7 @@
         </button>
 
         <button data-page="payments">
-          <span class="nav-icon">₵</span>Payments
+          <span class="nav-icon">₵</span>Subscribe &amp; payments
         </button>
 
         <button data-page="assessments">
@@ -759,7 +759,7 @@
         }
 
         currentPage = page;
-        pageTitle.textContent = titles[page];
+        pageTitle.textContent = page === "payments" && !isAdmin() ? "Subscribe & payments" : titles[page];
 
         document.querySelectorAll("#mainNav button, #adminNav button")
           .forEach(button => {
@@ -984,7 +984,9 @@
                 `
                 : `
                   <div class="empty">
-                    You do not have any active course subscriptions yet.
+                    <strong style="display:block;color:var(--navy);margin-bottom:6px">You have not subscribed to a course yet.</strong>
+                    Choose the tutorial courses you need, complete your mobile money payment and send the receipt through WhatsApp. Your access will be activated after verification.
+                    <div style="margin-top:14px"><button class="btn" type="button" data-go="payments">Browse courses &amp; subscribe</button></div>
                   </div>
                 `
             }
@@ -993,6 +995,9 @@
           pageContent
             .querySelector('[data-go="courses"]')
             ?.addEventListener("click", () => renderPage("courses"));
+          pageContent
+            .querySelector('[data-go="payments"]')
+            ?.addEventListener("click", () => renderPage("payments"));
         }
       }
 
@@ -1013,9 +1018,13 @@
             </div>
 
             <div class="empty">
-              No active course subscriptions were found on your account.
+              <strong style="display:block;color:var(--navy);margin-bottom:6px">No courses are active on your account yet.</strong>
+              Select the subjects you want and follow the payment instructions to subscribe.
+              <div style="margin-top:14px"><button class="btn" type="button" id="startSubscriptionBtn">Subscribe to courses</button></div>
             </div>
           `;
+          document.getElementById("startSubscriptionBtn")
+            ?.addEventListener("click", () => renderPage("payments"));
           return;
         }
 
