@@ -1625,7 +1625,7 @@
             '</fieldset>',
             '<div style="padding:15px;background:#E6FFFB;border-radius:10px"><div class="muted" style="font-size:12px">Selected courses</div><strong id="selectedCourseCount" style="font-size:18px">0 courses</strong><div class="muted" style="font-size:12px;margin-top:8px">Total to pay</div><strong id="paymentTotal" style="font-size:28px;color:var(--navy)">K0.00</strong><div class="muted" style="font-size:12px">Total is calculated using the current monthly price of each selected course.</div></div>',
             '<label>Payment method<select name="payment_method" id="paymentMethod" required><option value="">Choose method</option><option value="mtn">MTN MoMo</option><option value="airtel">Airtel Money</option></select></label><div id="paymentDestination" class="muted" style="font-size:12px;margin-top:-6px">Choose a payment method to see the matching number and account name.</div>',
-            '<label>Transaction reference<input name="transaction_reference" required maxlength="160" autocomplete="off" placeholder="Enter the transaction/reference number"><span class="muted" style="display:block;font-size:11px;margin-top:5px;font-weight:400">Enter the reference exactly as shown in your MoMo confirmation message.</span></label>',
+            '<label>Transaction reference<input id="transactionReference" name="transaction_reference" required maxlength="160" autocomplete="off" placeholder="Enter the transaction/reference number"><span class="muted" style="display:block;font-size:11px;margin-top:5px;font-weight:400">Enter the reference exactly as shown in your MoMo confirmation message.</span></label>',
             '<div class="muted" style="font-size:12px;padding:12px;background:#F4F7FA;border-radius:8px">After paying, send your screenshot or receipt through WhatsApp to either official Bright Minds number listed above. No file upload is needed here.</div>',
             '<button class="btn" type="submit" id="submitPaymentBtn" disabled>Submit payment for review</button>',
             '</form></div>'
@@ -1654,13 +1654,21 @@
           const submitButton = document.getElementById("submitPaymentBtn");
           const paymentMethod = document.getElementById("paymentMethod");
           const paymentDestination = document.getElementById("paymentDestination");
+          const transactionReference = document.getElementById("transactionReference");
           const updateTotal = () => {
-            const selected = choices.filter(choice => choice.checked);
+            let selected = choices.filter(choice => choice.checked);
+            if (selected.length > 4) {
+              const latestChoice = selected[selected.length - 1];
+              latestChoice.checked = false;
+              selected = choices.filter(choice => choice.checked);
+              showAlert("You can subscribe to a maximum of four courses in one payment.");
+            }
             const count = selected.length;
             countLabel.textContent = count + (count === 1 ? " course" : " courses");
             const total = selected.reduce((sum, choice) => sum + Number(choice.dataset.price || 0), 0);
             totalLabel.textContent = money(total);
-            submitButton.disabled = count === 0;
+            const ready = count >= 1 && count <= 4 && Boolean(paymentMethod.value) && Boolean(transactionReference.value.trim());
+            submitButton.disabled = !ready;
           };
           paymentMethod.addEventListener("change", () => {
             paymentDestination.textContent = paymentMethod.value === "mtn"
@@ -1668,7 +1676,9 @@
               : paymentMethod.value === "airtel"
                 ? "Send to Airtel Money: 0978764356 · Francis Nyendwa"
                 : "Choose a payment method to see the matching number and account name.";
+            updateTotal();
           });
+          transactionReference.addEventListener("input", updateTotal);
           choices.forEach(choice => choice.addEventListener("change", updateTotal));
           updateTotal();
 
