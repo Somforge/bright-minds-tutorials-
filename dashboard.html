@@ -776,11 +776,11 @@
 
         if (error) throw error;
 
-        const today = new Date().toISOString().slice(0, 10);
+        const now = Date.now();
 
         return (data || []).filter(item =>
-          (!item.start_date || item.start_date <= today) &&
-          (!item.end_date || item.end_date >= today)
+          (!item.start_date || new Date(item.start_date).getTime() <= now) &&
+          (!item.end_date || new Date(item.end_date).getTime() >= now)
         );
       }
 
