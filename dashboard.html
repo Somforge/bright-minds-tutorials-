@@ -1019,9 +1019,9 @@
           pageContent
             .querySelector('[data-go="courses"]')
             ?.addEventListener("click", () => renderPage("courses"));
-          pageContent
-            .querySelector('[data-go="payments"]')
-            ?.addEventListener("click", () => renderPage("payments"));
+          pageContent.querySelectorAll('[data-go="payments"]').forEach(button => {
+            button.addEventListener("click", () => renderPage("payments"));
+          });
         }
       }
 
