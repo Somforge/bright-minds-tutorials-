@@ -1123,7 +1123,7 @@
 
         host.innerHTML = '<div style="border-top:1px solid var(--border);padding-top:18px;margin-top:18px">' +
           '<h3 style="color:var(--navy);margin:0 0 12px">Subscription prices · ' + escapeHTML(courseTitle) + '</h3>' +
-          '<form class="form" id="priceForm"><label>Subscription period<select name="duration_months" required><option value="1">1 month</option><option value="3">3 months</option><option value="6">6 months</option></select></label>' +
+          '<form class="form" id="priceForm"><label>Subscription period<select name="duration_months" required><option value="1">1 month</option></select></label>' +
           '<label>Price (ZMW)<input name="price" type="number" min="0.01" step="0.01" required placeholder="e.g. 150.00"></label>' +
           '<div class="inline-actions"><button class="btn" type="submit">Save price</button><button class="btn secondary" type="button" id="closePriceForm">Close</button></div></form>' +
           '<div style="margin-top:16px">' +
@@ -1141,7 +1141,7 @@
           const form = new FormData(event.currentTarget);
           const duration = Number(form.get("duration_months"));
           const price = Number(form.get("price"));
-          if (![1, 3, 6].includes(duration) || !Number.isFinite(price) || price <= 0) {
+          if (duration !== 1 || !Number.isFinite(price) || price <= 0) {
             showAlert("Enter a valid subscription period and positive price.");
             return;
           }
@@ -1455,7 +1455,7 @@
           .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime())[0];
 
         pageContent.innerHTML = [
-          '<div class="welcome"><h1>Subscribe to tutorial courses</h1><p>Choose one or more subjects. Each course is K75 for one month, and you can combine up to four courses in one payment.</p></div>',
+          '<div class="welcome"><h1>Subscribe to tutorial courses</h1><p>Choose one or more subjects. The current monthly price is shown beside each course, and you can combine up to four courses in one payment.</p></div>',
           '<div class="card" style="margin-bottom:20px">',
           '<h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Official payment details</h2>',
           '<div style="display:grid;gap:12px">',
@@ -1468,7 +1468,7 @@
             '<div class="card" style="margin-bottom:20px"><h2 style="margin-top:0;color:var(--navy);font:800 18px Manrope">Choose courses and submit payment</h2>',
             '<p class="muted" style="font-size:13px">If you already have an active subscription, you can renew early. The new month will begin after your current access ends.</p>',
             '<form class="form" id="manualPaymentForm">',
-            '<fieldset style="border:0;padding:0;margin:0;display:grid;gap:12px"><legend style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">Choose your courses (K75 each)</legend>',
+            '<fieldset style="border:0;padding:0;margin:0;display:grid;gap:12px"><legend style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px">Choose your courses (one month each)</legend>',
             courses.map(course => {
               const price = priceByCourse.get(course.id);
               const current = subscriptionFor(course.id);
@@ -1487,7 +1487,7 @@
             '<div class="muted" style="font-size:12px;padding:12px;background:#F4F7FA;border-radius:8px">After paying, send your screenshot or receipt through WhatsApp to either official Bright Minds number listed above. No file upload is needed here.</div>',
             '<button class="btn" type="submit" id="submitPaymentBtn" disabled>Submit payment for review</button>',
             '</form></div>'
-          ].join("") : '<div class="empty" style="margin-bottom:20px">The four payment courses are ready, but they are not published yet. An administrator must publish Mathematics, Physics, Chemistry and Biology before students can select and pay for them.</div>',
+          ].join("") : '<div class="empty" style="margin-bottom:20px">Subscription enrolment is not open yet. Courses will appear here once Bright Minds publishes them with an available monthly price.</div>',
           '<div class="section-head"><h2>My payment submissions</h2></div>',
           historyResult.data?.length ? '<div class="grid">' + historyResult.data.map(payment => {
             const statusLabel = payment.status === "verified" ? "Verified" : payment.status === "rejected" ? "Rejected" : "Awaiting review";
@@ -1603,7 +1603,7 @@
         }
 
         pageContent.innerHTML = [
-          '<div class="welcome"><h1>Payment review</h1><p>Check the transaction reference and proof before approving. Approval activates the course subscription automatically.</p></div>',
+          '<div class="welcome"><h1>Payment review</h1><p>Match the transaction reference and amount with the receipt received through WhatsApp before approving. Approval activates or extends the course subscription automatically.</p></div>',
           '<div class="section-head"><h2>Awaiting review (' + pending.length + ')</h2></div>',
           pending.length ? '<div class="grid">' + pending.map(payment => paymentCard(payment, true)).join("") + '</div>' : '<div class="empty">There are no pending payments.</div>',
           '<div class="section-head"><h2>Previously reviewed</h2></div>',
