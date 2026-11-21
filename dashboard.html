@@ -2119,46 +2119,77 @@
       }
 
       function renderProfile() {
+        const fullName = currentProfile.full_name || "Bright Minds user";
+        const email = currentUser.email || "Email unavailable";
+        const role = (currentProfile.role || "student").toLowerCase();
+        const roleLabel = role === "admin" ? "Administrator" : "Student";
+        const verified = Boolean(currentUser.email_confirmed_at);
+        const createdAt = currentUser.created_at
+          ? new Date(currentUser.created_at).toLocaleDateString("en-ZM", {
+              day: "numeric", month: "long", year: "numeric"
+            })
+          : "Not available";
 
         pageContent.innerHTML = `
           <div class="welcome">
-            <h1>My profile</h1>
-            <p>Your Bright Minds account information.</p>
+            <h1>Account information</h1>
+            <p>Manage your Bright Minds identity and review your account details.</p>
           </div>
 
-          <div class="card" style="max-width:650px">
-
-            <div class="form">
-
-              <label>
-                Full name
-                <input
-                  value="${escapeHTML(currentProfile.full_name || "")}"
-                  disabled>
-              </label>
-
-              <label>
-                Email address
-                <input
-                  value="${escapeHTML(currentUser.email || "")}"
-                  disabled>
-              </label>
-
-              <label>
-                Account role
-                <input
-                  value="${escapeHTML(currentProfile.role || "student")}"
-                  disabled>
-              </label>
-
+          <section class="card" style="max-width:900px;padding:0;overflow:hidden">
+            <div style="padding:26px 28px;background:linear-gradient(120deg,#102B50 0%,#17466B 100%);color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+              <div aria-hidden="true" style="width:66px;height:66px;flex:0 0 66px;border-radius:20px;background:#fff;color:#123354;display:grid;place-items:center;font:800 25px Manrope;box-shadow:0 8px 22px #071d3433">${escapeHTML(initials(fullName))}</div>
+              <div style="flex:1;min-width:180px">
+                <p style="margin:0 0 5px;color:#B9D7E8;font-size:11px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase">Bright Minds account</p>
+                <h2 style="margin:0;color:#fff;font:800 22px Manrope;line-height:1.25">${escapeHTML(fullName)}</h2>
+                <p style="margin:6px 0 0;color:#D7E8F3;font-size:13px;overflow-wrap:anywhere">${escapeHTML(email)}</p>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid #ffffff35;border-radius:999px;background:#ffffff16;color:#fff;font-size:11px;font-weight:800;letter-spacing:.3px">
+                <span style="width:7px;height:7px;border-radius:50%;background:#65E2B8"></span>Signed in
+              </span>
             </div>
 
-            <p class="muted" style="font-size:12px;margin-top:18px">
-              To update your account details, contact
-              brightmindstutorials@gmail.com.
-            </p>
+            <div style="padding:26px 28px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+                <div>
+                  <h3 style="margin:0;color:var(--navy);font:800 16px Manrope">Personal details</h3>
+                  <p class="muted" style="font-size:12px;margin:5px 0 0">The information linked to your account.</p>
+                </div>
+                <span style="padding:7px 11px;border-radius:999px;background:#EAF3FA;color:#245477;font-size:11px;font-weight:800">${escapeHTML(roleLabel)}</span>
+              </div>
 
-          </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+                <div style="padding:16px;border:1px solid var(--border);border-radius:13px;background:#FBFCFE">
+                  <p class="muted" style="margin:0 0 7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px">Full name</p>
+                  <p style="margin:0;color:var(--navy);font-size:14px;font-weight:700;overflow-wrap:anywhere">${escapeHTML(fullName)}</p>
+                </div>
+                <div style="padding:16px;border:1px solid var(--border);border-radius:13px;background:#FBFCFE">
+                  <p class="muted" style="margin:0 0 7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px">Email address</p>
+                  <p style="margin:0;color:var(--navy);font-size:14px;font-weight:700;overflow-wrap:anywhere">${escapeHTML(email)}</p>
+                </div>
+                <div style="padding:16px;border:1px solid var(--border);border-radius:13px;background:#FBFCFE">
+                  <p class="muted" style="margin:0 0 7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px">Account type</p>
+                  <p style="margin:0;color:var(--navy);font-size:14px;font-weight:700">${escapeHTML(roleLabel)}</p>
+                </div>
+                <div style="padding:16px;border:1px solid var(--border);border-radius:13px;background:#FBFCFE">
+                  <p class="muted" style="margin:0 0 7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px">Email verification</p>
+                  <p style="margin:0;color:${verified ? "#087F62" : "#A76512"};font-size:14px;font-weight:800">${verified ? "✓ Verified" : "Not yet verified"}</p>
+                </div>
+                <div style="padding:16px;border:1px solid var(--border);border-radius:13px;background:#FBFCFE">
+                  <p class="muted" style="margin:0 0 7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px">Account created</p>
+                  <p style="margin:0;color:var(--navy);font-size:14px;font-weight:700">${escapeHTML(createdAt)}</p>
+                </div>
+              </div>
+
+              <div style="margin-top:22px;padding:17px 18px;border-radius:13px;background:#F2F7FB;border:1px solid #E0EAF2;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+                <div style="min-width:180px;flex:1">
+                  <h3 style="margin:0 0 5px;color:var(--navy);font:800 14px Manrope">Need to update your details?</h3>
+                  <p class="muted" style="margin:0;font-size:12px;line-height:1.6">Contact the Bright Minds team and include the email address on this account so we can assist you.</p>
+                </div>
+                <a class="btn" href="mailto:brightmindstutorials@gmail.com?subject=Bright%20Minds%20Account%20Update" style="text-decoration:none;white-space:nowrap">Contact support</a>
+              </div>
+            </div>
+          </section>
         `;
       }
 
