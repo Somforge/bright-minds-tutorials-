@@ -415,57 +415,63 @@ loginForm.addEventListener("submit", async function(event) {
 });
 
 // Password recovery.
-document.getElementById("forgotPassword")
-    .addEventListener("click", async function(event) {
+const forgotPasswordLink = document.getElementById("forgotPassword");
+const emailInput = document.getElementById("email");
 
-        event.preventDefault();
+forgotPasswordLink.addEventListener("click", async function(event) {
+    event.preventDefault();
 
-        if (!supabaseClient) return;
-
-        const email =
-            document.getElementById("email").value.trim();
-
-        if (!email) {
-            showMessage(
-                "Enter your email address first, then select Forgot your password.",
-                "error"
-            );
-            return;
-        }
-
+    if (!supabaseClient) {
         showMessage(
-            "Sending password reset instructions...",
-            "success"
+            "The application is currently unavailable. Please try again later.",
+            "error"
         );
+        return;
+    }
 
-        try {
-            const { error } =
-                await supabaseClient.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin +
-                        window.location.pathname.replace(
-                            "login.html",
-                            "index.html"
-                        )
-                });
+    const email = emailInput.value.trim();
 
-            if (error) {
-                showMessage(error.message, "error");
-            } else {
-                showMessage(
-                    "If an account exists for this email, password reset instructions will be sent to it.",
-                    "success"
-                );
-            }
+    if (!email || !emailInput.checkValidity()) {
+        showMessage(
+            "Enter a valid email address in the email field first.",
+            "error"
+        );
+        emailInput.focus();
+        return;
+    }
 
-        } catch (error) {
-            console.error("Password recovery error:", error);
+    forgotPasswordLink.style.pointerEvents = "none";
+    forgotPasswordLink.setAttribute("aria-disabled", "true");
+    forgotPasswordLink.textContent = "Sending reset link...";
+    showMessage("Sending password reset instructions...", "success");
 
+    try {
+        const recoveryRedirect = new URL("./index.html", window.location.href).toString();
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: recoveryRedirect
+        });
+
+        if (error) {
+            showMessage(error.message, "error");
+        } else {
             showMessage(
-                "Unable to send password reset instructions. Please try again.",
-                "error"
+                "If an account exists for this email, password reset instructions will be sent to it. Please check your inbox and spam folder.",
+                "success"
             );
         }
-    });
+
+    } catch (error) {
+        console.error("Password recovery error:", error);
+        showMessage(
+            "Unable to send password reset instructions. Please try again.",
+            "error"
+        );
+    } finally {
+        forgotPasswordLink.style.pointerEvents = "";
+        forgotPasswordLink.removeAttribute("aria-disabled");
+        forgotPasswordLink.textContent = "Forgot your password?";
+    }
+});
 </script>
 
 </body>
