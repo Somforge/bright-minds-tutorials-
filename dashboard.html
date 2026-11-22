@@ -635,6 +635,10 @@
           <span class="nav-icon">⇧</span>Tutorial materials
         </button>
 
+        <button data-page="assessments">
+          <span class="nav-icon">✓</span>Assessments & results
+        </button>
+
         <button data-page="manage-announcements">
           <span class="nav-icon">✎</span>Manage announcements
         </button>
@@ -886,9 +890,7 @@
           }
 
           else if (page === "assessments") {
-            renderPlaceholder(
-              "Assessments and results will appear here when the assessment module is connected."
-            );
+            await renderAssessments();
           }
 
           else if (page === "announcements") {
@@ -2245,6 +2247,193 @@
           passwordInput.value = "";
           confirmInput.value = "";
           showAlert("Your password has been updated successfully.", "success");
+        });
+      }
+
+
+      async function renderAssessments() {
+        return isAdmin() ? renderAdminAssessments() : renderStudentAssessments();
+      }
+
+      async function renderAdminAssessments() {
+        const results = await Promise.all([
+          supabaseClient.from("courses").select("id,title").order("title"),
+          supabaseClient.from("assessments").select("id,title,status,duration_minutes,max_attempts,courses(title),assessment_questions(count)").order("created_at", {ascending:false})
+        ]);
+        if (results[0].error) throw results[0].error;
+        if (results[1].error) throw results[1].error;
+        const courses = results[0].data || [];
+        const assessments = results[1].data || [];
+        pageContent.innerHTML =
+          '<div class="welcome"><h1>Assessments & results</h1><p>Create course tests, publish them for subscribed students and review automatically marked results.</p></div>' +
+          '<div class="card" style="margin-bottom:18px"><h2 style="margin-top:0;color:var(--navy)">Create an assessment</h2>' +
+          (courses.length ? '<form id="assessmentCreateForm"><div class="form">' +
+            '<label>Assessment title<input name="title" required maxlength="180" placeholder="e.g. Mathematics — Algebra Test 1"></label>' +
+            '<label>Course<select name="course_id" required>' + courses.map(x=>'<option value="'+x.id+'">'+escapeHTML(x.title)+'</option>').join("") + '</select></label>' +
+            '<label>Time limit (minutes)<input name="duration_minutes" type="number" min="1" max="300" value="30" required></label>' +
+            '<label>Allowed attempts<input name="max_attempts" type="number" min="1" max="10" value="1" required></label></div>' +
+            '<label style="display:block;margin-top:12px">Instructions<textarea name="instructions" rows="2" maxlength="2000" placeholder="Instructions for students"></textarea></label>' +
+            '<div id="assessmentQuestionHost" style="display:grid;gap:12px;margin-top:16px"></div>' +
+            '<div class="inline-actions" style="margin-top:14px"><button class="btn secondary" type="button" id="addAssessmentQuestion">+ Add question</button><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" name="publish_now"> Publish after saving</label></div>' +
+            '<button class="btn" id="saveAssessmentBtn" type="submit" style="margin-top:16px">Save assessment</button></form>' :
+            '<div class="empty">Create a course first before adding an assessment.</div>') + '</div>' +
+          '<div class="card"><div class="section-head" style="margin-top:0"><h2>Assessment library</h2><span class="pill">'+assessments.length+' total</span></div>' +
+          (assessments.length ? '<div style="display:grid;gap:12px">' + assessments.map(x =>
+            '<div style="padding:14px;border:1px solid var(--border);border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">' +
+            '<div><strong style="color:var(--navy)">'+escapeHTML(x.title)+'</strong><div class="muted" style="font-size:12px;margin-top:5px">'+escapeHTML(x.courses?.title || "Course")+' · '+(x.assessment_questions?.[0]?.count || 0)+' questions · '+x.duration_minutes+' min · '+x.max_attempts+' attempt(s)</div><span class="pill" style="margin-top:7px">'+escapeHTML(x.status)+'</span></div>' +
+            '<div class="inline-actions">' +
+            '<button class="btn '+(x.status==="draft"?"":"secondary")+'" data-assessment-action="'+(x.status==="published"?"close":"publish")+'" data-id="'+x.id+'">'+(x.status==="published"?"Close":x.status==="closed"?"Reopen":"Publish")+'</button>' +
+            '<button class="btn secondary" data-assessment-results="'+x.id+'">View results</button></div></div>').join("") + '</div>' :
+            '<div class="empty">No assessments yet. Create your first assessment above.</div>') + '</div>';
+
+        const host = document.getElementById("assessmentQuestionHost");
+        let nextIndex = 0;
+        function addQuestion() {
+          const n = nextIndex++;
+          const card = document.createElement("div");
+          card.className = "card";
+          card.dataset.qcard = String(n);
+          card.style.cssText = "padding:15px;background:#F8FAFC;box-shadow:none";
+          card.innerHTML = '<div class="section-head" style="margin-top:0"><strong>Question '+(n+1)+'</strong><button class="btn secondary" type="button" data-remove-q="'+n+'" '+(n===0?"disabled":"")+'>Remove</button></div>' +
+            '<label>Question<textarea data-prompt required rows="2" maxlength="4000" placeholder="Enter the question"></textarea></label>' +
+            '<div class="form" style="margin-top:10px">' +
+            [0,1,2,3].map(i=>'<label>Option '+String.fromCharCode(65+i)+'<input data-option="'+i+'" required maxlength="500" placeholder="Answer option"></label>').join("") +
+            '<label>Correct answer<select data-correct>'+[0,1,2,3].map(i=>'<option value="'+i+'">Option '+String.fromCharCode(65+i)+'</option>').join("")+'</select></label>' +
+            '<label>Marks<input data-marks type="number" min="0.5" max="1000" step="0.5" value="1" required></label></div>';
+          host.appendChild(card);
+        }
+        if (host) {
+          addQuestion();
+          document.getElementById("addAssessmentQuestion").addEventListener("click", addQuestion);
+          host.addEventListener("click", event => {
+            const btn = event.target.closest("[data-remove-q]");
+            if (!btn) return;
+            const card = host.querySelector('[data-qcard="'+btn.dataset.removeQ+'"]');
+            if (card && host.querySelectorAll("[data-qcard]").length > 1) card.remove();
+            [...host.querySelectorAll("[data-qcard]")].forEach((el,i)=>el.querySelector("strong").textContent="Question "+(i+1));
+          });
+          document.getElementById("assessmentCreateForm").addEventListener("submit", async event => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            if (!form.reportValidity()) return;
+            const questions = [...host.querySelectorAll("[data-qcard]")].map(card=>({
+              prompt:card.querySelector("[data-prompt]").value.trim(),
+              options:[0,1,2,3].map(i=>card.querySelector('[data-option="'+i+'"]').value.trim()),
+              correct_option:Number(card.querySelector("[data-correct]").value),
+              marks:Number(card.querySelector("[data-marks]").value)
+            }));
+            if (questions.some(q=>!q.prompt || q.options.some(o=>!o))) { showAlert("Complete every question and all four options."); return; }
+            const button=document.getElementById("saveAssessmentBtn");
+            button.disabled=true; button.textContent="Saving…";
+            const values=new FormData(form);
+            try {
+              const created=await supabaseClient.from("assessments").insert({
+                course_id:values.get("course_id"),title:values.get("title").trim(),
+                instructions:values.get("instructions").trim()||null,
+                duration_minutes:Number(values.get("duration_minutes")),
+                max_attempts:Number(values.get("max_attempts")),status:"draft",created_by:currentUser.id
+              }).select("id").single();
+              if(created.error) throw created.error;
+              for(let i=0;i<questions.length;i++){
+                const q=questions[i];
+                const saved=await supabaseClient.from("assessment_questions").insert({
+                  assessment_id:created.data.id,prompt:q.prompt,options:q.options,marks:q.marks,position:i+1
+                }).select("id").single();
+                if(saved.error) throw saved.error;
+                const key=await supabaseClient.from("assessment_answer_keys").insert({
+                  question_id:saved.data.id,correct_option:q.correct_option
+                });
+                if(key.error) throw key.error;
+              }
+              if(values.get("publish_now")==="on"){
+                const published=await supabaseClient.from("assessments").update({status:"published"}).eq("id",created.data.id);
+                if(published.error) throw published.error;
+              }
+              showAlert("Assessment saved successfully.","success");
+              await renderAdminAssessments();
+            } catch(error) {
+              showAlert(error.message||"The assessment could not be saved. Check the assessment library for a draft.");
+              button.disabled=false; button.textContent="Save assessment";
+            }
+          });
+        }
+        pageContent.querySelectorAll("[data-assessment-action]").forEach(btn=>btn.addEventListener("click",async()=>{
+          const status=btn.dataset.assessmentAction==="publish"?"published":"closed";
+          const result=await supabaseClient.from("assessments").update({status}).eq("id",btn.dataset.id);
+          if(result.error){showAlert(result.error.message);return;}
+          await renderAdminAssessments();
+        }));
+        pageContent.querySelectorAll("[data-assessment-results]").forEach(btn=>btn.addEventListener("click",()=>renderAdminAssessmentResults(btn.dataset.assessmentResults)));
+      }
+
+      async function renderAdminAssessmentResults(id) {
+        const results=await Promise.all([
+          supabaseClient.from("assessments").select("id,title,courses(title)").eq("id",id).single(),
+          supabaseClient.from("assessment_attempts").select("id,student_id,started_at,submitted_at,score,max_score,status").eq("assessment_id",id).order("started_at",{ascending:false})
+        ]);
+        if(results[0].error) throw results[0].error;
+        if(results[1].error) throw results[1].error;
+        const assessment=results[0].data, attempts=results[1].data||[];
+        const ids=[...new Set(attempts.map(a=>a.student_id))];
+        let names={};
+        if(ids.length){
+          const profiles=await supabaseClient.from("profiles").select("id,full_name").in("id",ids);
+          if(!profiles.error) (profiles.data||[]).forEach(p=>names[p.id]=p.full_name);
+        }
+        pageContent.innerHTML='<div class="welcome"><h1>Assessment results</h1><p>'+escapeHTML(assessment.title)+' · '+escapeHTML(assessment.courses?.title||"")+'</p></div><div class="card"><div class="section-head" style="margin-top:0"><h2>Student attempts</h2><button class="btn secondary" id="backAssessmentList">Back</button></div>'+
+          (attempts.length?'<div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Started</th><th>Result</th><th>Status</th></tr></thead><tbody>'+attempts.map(a=>'<tr><td>'+escapeHTML(names[a.student_id]||"Student")+'</td><td>'+new Date(a.started_at).toLocaleString()+'</td><td>'+(a.score===null?"—":a.score+" / "+a.max_score+" ("+(a.max_score?Math.round(a.score/a.max_score*100):0)+"%)")+'</td><td>'+escapeHTML(a.status)+'</td></tr>').join("")+'</tbody></table></div>':'<div class="empty">No students have attempted this assessment yet.</div>')+'</div>';
+        document.getElementById("backAssessmentList").addEventListener("click",renderAdminAssessments);
+      }
+
+      async function renderStudentAssessments() {
+        const results=await Promise.all([
+          supabaseClient.from("assessments").select("id,title,instructions,duration_minutes,max_attempts,courses(title),assessment_questions(count)").eq("status","published").order("created_at",{ascending:false}),
+          supabaseClient.from("assessment_attempts").select("id,assessment_id,started_at,score,max_score,status").eq("student_id",currentUser.id).order("started_at",{ascending:false})
+        ]);
+        if(results[0].error) throw results[0].error;
+        if(results[1].error) throw results[1].error;
+        const assessments=results[0].data||[], attempts=results[1].data||[];
+        pageContent.innerHTML='<div class="welcome"><h1>Assessments</h1><p>Test your understanding, practise under timed conditions and track your results.</p></div>'+
+          (assessments.length?'<div style="display:grid;gap:14px">'+assessments.map(a=>{
+            const own=attempts.filter(t=>t.assessment_id===a.id), active=own.find(t=>t.status==="in_progress"), done=own.find(t=>t.status==="submitted"), remaining=Math.max(0,a.max_attempts-own.length);
+            return '<div class="card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:190px"><span class="pill">'+escapeHTML(a.courses?.title||"Course")+'</span><h2 style="margin:12px 0 6px;color:var(--navy)">'+escapeHTML(a.title)+'</h2><p class="muted" style="font-size:13px">'+escapeHTML(a.instructions||"Answer the questions before the time limit expires.")+'</p><div class="muted" style="font-size:12px">'+a.duration_minutes+' minutes · '+(a.assessment_questions?.[0]?.count||0)+' questions · '+remaining+' attempt(s) remaining</div>'+(done?'<p style="font-size:13px;font-weight:700;color:var(--navy)">Latest result: '+done.score+'/'+done.max_score+' ('+(done.max_score?Math.round(done.score/done.max_score*100):0)+'%)</p>':'')+'</div><button class="btn" data-start-assessment="'+a.id+'" '+(!active&&remaining<=0?"disabled":"")+'>'+(active?"Continue attempt":remaining>0?"Start assessment":"Attempts used")+'</button></div></div>';
+          }).join("")+'</div>':'<div class="empty"><strong>No assessments available yet.</strong><p>Assessments published for your active courses will appear here.</p></div>')+
+          (attempts.length?'<div class="card" style="margin-top:18px"><h2 style="margin-top:0;color:var(--navy)">Your assessment history</h2>'+attempts.map(a=>'<div style="padding:10px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:10px"><span>'+new Date(a.started_at).toLocaleString()+'</span><strong>'+(a.status==="submitted"?a.score+'/'+a.max_score+" · "+(a.max_score?Math.round(a.score/a.max_score*100):0)+"%":escapeHTML(a.status))+'</strong></div>').join("")+'</div>':'');
+        pageContent.querySelectorAll("[data-start-assessment]").forEach(btn=>btn.addEventListener("click",async()=>{
+          btn.disabled=true;btn.textContent="Opening…";
+          const started=await supabaseClient.rpc("start_assessment_attempt",{p_assessment_id:btn.dataset.startAssessment});
+          if(started.error){showAlert(started.error.message);await renderStudentAssessments();return;}
+          await renderStudentAssessmentAttempt(btn.dataset.startAssessment,started.data);
+        }));
+      }
+
+      async function renderStudentAssessmentAttempt(assessmentId,attemptId) {
+        const results=await Promise.all([
+          supabaseClient.from("assessments").select("id,title,instructions,duration_minutes").eq("id",assessmentId).single(),
+          supabaseClient.from("assessment_questions").select("id,prompt,options,marks,position").eq("assessment_id",assessmentId).order("position")
+        ]);
+        if(results[0].error) throw results[0].error;
+        if(results[1].error) throw results[1].error;
+        const assessment=results[0].data, questions=results[1].data||[];
+        if(!questions.length) throw new Error("This assessment has no questions yet.");
+        pageContent.innerHTML='<div class="welcome"><h1>'+escapeHTML(assessment.title)+'</h1><p>'+escapeHTML(assessment.instructions||"Select one answer for each question.")+'</p></div>'+
+          '<div class="card" style="margin-bottom:14px;border-left:4px solid var(--teal)"><strong>Timed assessment · '+assessment.duration_minutes+' minutes</strong><p class="muted" style="font-size:12px;margin:5px 0 0">The timer starts when you begin. Submit before time expires.</p></div><form id="studentAssessmentForm">'+
+          questions.map((q,i)=>'<div class="card" style="margin-bottom:14px"><strong style="color:var(--navy)">Question '+(i+1)+' · '+q.marks+' mark(s)</strong><p style="font-weight:600;line-height:1.6">'+escapeHTML(q.prompt)+'</p><div style="display:grid;gap:8px">'+q.options.map((o,n)=>'<label style="display:flex;gap:10px;padding:11px;border:1px solid var(--border);border-radius:9px"><input type="radio" name="answer_'+q.id+'" value="'+n+'"><span><strong>'+String.fromCharCode(65+n)+'.</strong> '+escapeHTML(o)+'</span></label>').join("")+'</div></div>').join("")+
+          '<div class="inline-actions"><button class="btn" id="submitAssessmentBtn" type="submit">Submit answers</button><button class="btn secondary" type="button" id="leaveAssessmentBtn">Leave for now</button></div></form>';
+        document.getElementById("leaveAssessmentBtn").addEventListener("click",renderStudentAssessments);
+        document.getElementById("studentAssessmentForm").addEventListener("submit",async event=>{
+          event.preventDefault();
+          if(!window.confirm("Submit your answers now? You cannot change them afterwards.")) return;
+          const answers=questions.map(q=>{
+            const selected=pageContent.querySelector('input[name="answer_'+q.id+'"]:checked');
+            return selected?{question_id:q.id,selected_option:Number(selected.value)}:null;
+          }).filter(Boolean);
+          const btn=document.getElementById("submitAssessmentBtn");btn.disabled=true;btn.textContent="Marking…";
+          const submitted=await supabaseClient.rpc("submit_assessment_attempt",{p_attempt_id:attemptId,p_answers:answers});
+          if(submitted.error){showAlert(submitted.error.message);btn.disabled=false;btn.textContent="Submit answers";return;}
+          const result=Array.isArray(submitted.data)?submitted.data[0]:submitted.data;
+          pageContent.innerHTML='<div class="card" style="max-width:650px;margin:30px auto;text-align:center;padding:30px"><div style="font-size:36px;color:var(--teal)">✓</div><h1 style="color:var(--navy);font-family:Manrope">Assessment submitted</h1><p class="muted">Your answers have been marked automatically.</p><div style="font-size:38px;font-weight:800;color:var(--navy);margin:18px 0">'+result.score+' / '+result.max_score+'</div><span class="pill">'+(result.max_score?Math.round(result.score/result.max_score*100):0)+'%</span><div style="margin-top:22px"><button class="btn" id="returnAssessments">Return to assessments</button></div></div>';
+          document.getElementById("returnAssessments").addEventListener("click",renderStudentAssessments);
         });
       }
 
