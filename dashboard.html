@@ -2244,49 +2244,70 @@
             showAlert("Your session has expired. Please sign in again.");
             return;
           }
-          const response = await fetch((supabaseUrl.endsWith("/") ? supabaseUrl.slice(0, -1) : supabaseUrl) + "/functions/v1/secure-course-document", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "apikey": supabaseKey,
-              "Authorization": "Bearer " + sessionData.session.access_token
-            },
-            body: JSON.stringify({ action: "download", resourceId, downloadName: downloadName || null })
-          });
-          if (!response.ok) {
-            let message = "The protected document could not be prepared.";
-            try {
-              const payload = await response.json();
-              if (payload.error) message = payload.error;
-            } catch (_) {}
-            showAlert(message);
-            return;
-          }
-          const payload = await response.json();
-          if (!payload?.signedUrl) {
-            showAlert(payload?.error || "The protected download link could not be created.");
-            return;
-          }
-          // Download through a same-origin Blob URL so browsers reliably honour
-          // the material title as the saved filename for this cross-origin file.
-          const fileResponse = await fetch(payload.signedUrl);
-          if (!fileResponse.ok) {
-            throw new Error("The protected document could not be downloaded. Please try again.");
-          }
-          const fileBlob = await fileResponse.blob();
+
+          const functionUrl = (supabaseUrl.endsWith("/") ? supabaseUrl.slice(0, -1) : supabaseUrl) + "/functions/v1/secure-course-document";
           const filename = String(downloadName || "Bright-Minds-document.pdf")
             .replace(/[\\/:*?"<>|\r\n]/g, "-")
             .trim()
             .slice(0, 180) || "Bright-Minds-document.pdf";
-          const objectUrl = URL.createObjectURL(fileBlob);
-          const anchor = document.createElement("a");
-          anchor.href = objectUrl;
-          anchor.download = filename;
-          anchor.rel = "noopener";
-          document.body.appendChild(anchor);
-          anchor.click();
-          anchor.remove();
-          window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+
+          const requestProtectedUrl = async (forceRefresh) => {
+            const response = await fetch(functionUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "apikey": supabaseKey,
+                "Authorization": "Bearer " + sessionData.session.access_token
+              },
+              body: JSON.stringify({ action: "download", resourceId, downloadName: filename, forceRefresh: !!forceRefresh })
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok || !payload?.signedUrl) {
+              throw new Error(payload?.error || "The protected download link could not be created.");
+            }
+            return payload.signedUrl;
+          };
+
+          const fetchCompletePdf = async (signedUrl) => {
+            const response = await fetch(signedUrl, { cache: "no-store" });
+            if (!response.ok) throw new Error("The protected document could not be downloaded.");
+            const contentLength = Number(response.headers.get("content-length") || 0);
+            const bytes = await response.arrayBuffer();
+            const data = new Uint8Array(bytes);
+            const header = new TextDecoder().decode(data.slice(0, 5));
+            const tail = new TextDecoder().decode(data.slice(Math.max(0, data.length - 2048)));
+            if (contentLength && contentLength !== data.byteLength) {
+              throw new Error("The download was incomplete.");
+            }
+            if (data.byteLength < 1000 || header !== "%PDF-" || !/%%EOF\s*$/.test(tail)) {
+              throw new Error("The downloaded PDF is incomplete or damaged.");
+            }
+            return new Blob([bytes], { type: "application/pdf" });
+          };
+
+          try {
+            let signedUrl = await requestProtectedUrl(false);
+            let fileBlob;
+            try {
+              fileBlob = await fetchCompletePdf(signedUrl);
+            } catch (_) {
+              // Replace a possibly damaged cached copy and make one clean retry.
+              signedUrl = await requestProtectedUrl(true);
+              fileBlob = await fetchCompletePdf(signedUrl);
+            }
+
+            const objectUrl = URL.createObjectURL(fileBlob);
+            const anchor = document.createElement("a");
+            anchor.href = objectUrl;
+            anchor.download = filename;
+            anchor.rel = "noopener";
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+          } catch (error) {
+            showAlert(error.message || "The protected PDF could not be downloaded completely. Please try again.");
+          }
           return;
         }
 
