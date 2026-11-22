@@ -529,7 +529,7 @@
                     name="password"
                     class="password-input"
                     placeholder="Create a secure password"
-                    minlength="8"
+                    minlength="12"
                     maxlength="72"
                     autocomplete="new-password"
                     required
@@ -690,6 +690,13 @@
     });
 
 
+    // Passwords must meet the same standard used by account recovery and password changes.
+function isStrongBrightMindsPassword(password) {
+    return password.length >= 12 && password.length <= 72 &&
+        /[a-z]/.test(password) && /[A-Z]/.test(password) &&
+        /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
+}
+
     // PASSWORD STRENGTH FEEDBACK
 
     function checkPasswordStrength(password) {
@@ -774,11 +781,12 @@
             return;
         }
 
-        if (password.length < 8) {
+        if (!isStrongBrightMindsPassword(password)) {
             showMessage(
-                "Your password must contain at least 8 characters.",
+                "Use 12–72 characters, including uppercase and lowercase letters, a number and a symbol.",
                 "error"
             );
+            passwordInput.focus();
             return;
         }
 
