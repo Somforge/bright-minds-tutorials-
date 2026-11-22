@@ -2054,10 +2054,12 @@
                   },
                   onSuccess: resolve
                 });
-                resumable.findPreviousUploads().then(previous => {
-                  if (previous.length) resumable.resumeFromPreviousUpload(previous[0]);
-                  resumable.start();
-                }).catch(reject);
+                // Each upload gets a fresh UUID path above, so an earlier TUS
+                // session belongs to a different Storage object. Do not resume a
+                // browser-cached session for this new path: stale sessions can make
+                // the library issue a failing HEAD request before the upload starts.
+                // TUS still retries interrupted requests during this upload.
+                resumable.start();
               });
             } else {
               status.textContent = "Uploading file…";
