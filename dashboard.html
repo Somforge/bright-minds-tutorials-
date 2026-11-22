@@ -2251,7 +2251,7 @@
               "apikey": supabaseKey,
               "Authorization": "Bearer " + sessionData.session.access_token
             },
-            body: JSON.stringify({ action: "download", resourceId })
+            body: JSON.stringify({ action: "download", resourceId, downloadName: downloadName || null })
           });
           if (!response.ok) {
             let message = "The protected document could not be prepared.";
@@ -2262,15 +2262,18 @@
             showAlert(message);
             return;
           }
-          const blob = await response.blob();
-          const objectUrl = URL.createObjectURL(blob);
+          const payload = await response.json();
+          if (!payload?.signedUrl) {
+            showAlert(payload?.error || "The protected download link could not be created.");
+            return;
+          }
           const anchor = document.createElement("a");
-          anchor.href = objectUrl;
+          anchor.href = payload.signedUrl;
           anchor.download = downloadName || "Bright-Minds-document.pdf";
+          anchor.rel = "noopener";
           document.body.appendChild(anchor);
           anchor.click();
           anchor.remove();
-          window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
           return;
         }
 
