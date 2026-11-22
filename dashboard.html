@@ -955,7 +955,7 @@
           }
 
           else if (page === "profile") {
-            renderProfile();
+            await renderProfile();
           }
 
           else if (page === "manage-courses") {
@@ -2328,7 +2328,7 @@
         });
       }
 
-      function renderProfile() {
+      async function renderProfile() {
         const fullName = currentProfile.full_name || "Bright Minds user";
         const email = currentUser.email || "Email unavailable";
         const role = (currentProfile.role || "student").toLowerCase();
