@@ -446,7 +446,7 @@ forgotPasswordLink.addEventListener("click", async function(event) {
     showMessage("Sending password reset instructions...", "success");
 
     try {
-        const recoveryRedirect = new URL("./index.html", window.location.href).toString();
+        const recoveryRedirect = new URL("./index.html?flow=recovery", window.location.href).toString();
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: recoveryRedirect
         });
