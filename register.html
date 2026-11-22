@@ -550,7 +550,7 @@
             </div>
 
             <p class="strength-text" id="strengthText">
-                Use at least 8 characters.
+                Use at least 12 characters.
             </p>
         </div>
 
@@ -565,7 +565,7 @@
                     name="confirmPassword"
                     class="password-input"
                     placeholder="Enter your password again"
-                    minlength="8"
+                    minlength="12"
                     maxlength="72"
                     autocomplete="new-password"
                     required
@@ -703,7 +703,7 @@ function isStrongBrightMindsPassword(password) {
 
         let score = 0;
 
-        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
         if (/[a-z]/.test(password)) score++;
         if (/[A-Z]/.test(password)) score++;
         if (/[0-9]/.test(password)) score++;
