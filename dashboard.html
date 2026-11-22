@@ -2087,6 +2087,38 @@
               status.textContent = "Upload complete. Saving details…";
             }
 
+            // Confirm the object exists before saving its database record. A completed
+            // TUS callback alone must not leave a published resource pointing at a missing file.
+            const pathParts = uploadedPath.split("/");
+            const uploadFolder = pathParts.slice(0, -1).join("/");
+            const uploadLeaf = pathParts[pathParts.length - 1];
+            const checkStoredObject = async () => {
+              const listed = await supabaseClient.storage.from("course-resources")
+                .list(uploadFolder, { search: uploadLeaf, limit: 10 });
+              if (listed.error) throw listed.error;
+              return (listed.data || []).some(item => item.name === uploadLeaf);
+            };
+            let objectConfirmed = await checkStoredObject();
+            if (!objectConfirmed) {
+              status.textContent = "Verifying uploaded file…";
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              objectConfirmed = await checkStoredObject();
+            }
+            if (!objectConfirmed) {
+              status.textContent = "Completing file upload…";
+              const verifiedFallback = await supabaseClient.storage.from("course-resources")
+                .upload(uploadedPath, file, {
+                  upsert: true,
+                  contentType: file.type,
+                  cacheControl: "3600"
+                });
+              if (verifiedFallback.error) throw verifiedFallback.error;
+              objectConfirmed = await checkStoredObject();
+            }
+            if (!objectConfirmed) {
+              throw new Error("The upload finished but the file could not be verified in storage. No document record was created. Please try again.");
+            }
+
             button.textContent = "Saving resource details…";
             const insert = await supabaseClient.from("course_resources").insert({
               course_id: courseId,
@@ -2155,11 +2187,14 @@
         });
       }
 
-      async function openCourseResource(path) {
+      async function openCourseResource(path, downloadName) {
         const result = await supabaseClient.storage.from("course-resources")
-          .createSignedUrl(path, 300);
+          .createSignedUrl(path, 300, downloadName ? { download: downloadName } : {});
         if (result.error) {
-          showAlert(result.error.message || "The resource file could not be opened.");
+          const message = /not found|object not found/i.test(result.error.message || "")
+            ? "This document's stored file is missing. Please contact the administrator so it can be uploaded again."
+            : (result.error.message || "The resource file could not be opened.");
+          showAlert(message);
           return;
         }
         window.open(result.data.signedUrl, "_blank", "noopener,noreferrer");
@@ -2185,13 +2220,17 @@
               (resource.academic_year ? ' · ' + resource.academic_year : '') + '</p>' +
               (resource.description ? '<p style="font-size:13px">' + escapeHTML(resource.description) + '</p>' : '') +
               '<p class="muted" style="font-size:11px;overflow-wrap:anywhere">' + escapeHTML(resource.original_file_name) + '</p>' +
-              '<button class="btn" type="button" data-student-resource="' + escapeHTML(resource.resource_path) + '">Open / download</button></article>'
+              '<button class="btn" type="button" data-student-resource="' + escapeHTML(resource.resource_path) + '" data-download-name="' +
+              escapeHTML((String(resource.title || "Bright Minds material").replace(/[\\/:*?"<>|]/g, "-")) + (resource.original_file_name && resource.original_file_name.includes(".") ? "." + resource.original_file_name.split(".").pop().replace(/[^a-zA-Z0-9]/g, "") : "")) +
+              '">Open / download</button></article>'
             ).join("") + '</div>' : '<section class="card" style="max-width:760px;margin:0 auto;text-align:center;padding:34px 24px"><div aria-hidden="true" style="width:58px;height:58px;margin:0 auto 16px;border-radius:16px;background:#E6FFFB;color:#087F78;display:grid;place-items:center;font-size:27px">▤</div><h2 style="color:var(--navy);font:800 19px Manrope;margin:0 0 9px">Your tutorial materials are being prepared</h2><p class="muted" style="font-size:14px;line-height:1.7;max-width:560px;margin:0 auto 12px">There are no materials published for this course just yet. New tutorial sheets, past examination papers and worked solutions will appear here as they are released.</p><p style="font-size:12px;color:var(--muted);margin:0 0 20px">Your active subscription remains in place. Please check this page again or visit announcements for updates.</p><div class="inline-actions" style="justify-content:center"><button class="btn secondary" type="button" id="viewCourseAnnouncements">View announcements</button><button class="btn" type="button" id="backToCourses">Back to my courses</button></div></section>'
         ].join("");
         document.getElementById("backToCourses")?.addEventListener("click", () => renderPage("courses"));
         document.getElementById("viewCourseAnnouncements")?.addEventListener("click", () => renderPage("announcements"));
         pageContent.querySelectorAll("[data-student-resource]").forEach(button => {
-          button.addEventListener("click", () => openCourseResource(button.dataset.studentResource));
+          button.addEventListener("click", () =>
+            openCourseResource(button.dataset.studentResource, button.dataset.downloadName)
+          );
         });
       }
 
