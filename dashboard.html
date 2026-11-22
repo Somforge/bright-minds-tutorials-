@@ -400,6 +400,11 @@
       color: var(--muted);
       text-align: center;
     }
+    
+    .upload-progress { width:100%; height:10px; margin-top:10px; border:0; border-radius:99px; overflow:hidden; background:#EAF0F5; accent-color:var(--teal); }
+    .upload-progress::-webkit-progress-bar { background:#EAF0F5; border-radius:99px; }
+    .upload-progress::-webkit-progress-value { background:var(--teal); border-radius:99px; transition:width .15s ease; }
+    .upload-progress::-moz-progress-bar { background:var(--teal); border-radius:99px; }
 
     .mobile-menu {
       display: none;
@@ -700,6 +705,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
   <script src="./supabase-config.js?v=20261121-1"></script>
 
   <script>
@@ -1907,6 +1913,7 @@
           supabaseClient.from("course_resources")
             .select("id,course_id,module_id,title,resource_type,description,academic_year,resource_path,original_file_name,file_size_bytes,is_published,created_at,courses(title),modules(title)")
             .order("created_at", { ascending: false })
+            .range(0, 99)
         ]);
         if (courseResult.error) throw courseResult.error;
         if (moduleResult.error) throw moduleResult.error;
@@ -1935,10 +1942,10 @@
           '<label>Description (optional)<textarea name="description" rows="3" maxlength="1000" placeholder="Briefly describe what students will find in this file"></textarea></label>',
           '<label>Choose file (PDF, Word, PowerPoint, JPG or PNG; maximum 20 MB)<input name="resource_file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpeg,image/png" required></label>',
           '<label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="publish_now" style="width:auto;margin:0"> Make available to subscribed students immediately</label>',
-          '<div class="inline-actions"><button class="btn" type="submit" id="resourceUploadBtn">Upload tutorial material</button></div>',
+          '<div class="inline-actions"><button class="btn" type="submit" id="resourceUploadBtn">Upload tutorial material</button></div><progress id="resourceUploadProgress" class="upload-progress" max="100" value="0" hidden></progress><p id="resourceUploadStatus" class="muted" style="font-size:12px;margin:0" aria-live="polite"></p>',
           '<p class="muted" style="font-size:12px;margin:0">If you leave the publish box unticked, the file is saved as a draft and only administrators can see it.</p>',
           '</form></div>',
-          '<div class="section-head"><h2>Uploaded tutorial materials (' + resources.length + ')</h2></div>',
+          '<div class="section-head"><h2>Recent tutorial materials (' + resources.length + (resources.length === 100 ? ' shown' : '') + ')</h2></div><p class="muted" style="font-size:12px;margin:-6px 0 12px">For a faster dashboard, this list shows the 100 most recently uploaded files.</p>',
           resources.length ? '<div class="card"><div style="padding:16px 16px 0"><label for="resourceSearch" class="muted">Find a tutorial material</label><input id="resourceSearch" type="search" placeholder="Search by title, course, topic or file name" style="width:100%;max-width:460px"></div><div class="table-wrap"><table class="table"><thead><tr><th>Tutorial material</th><th>Course / topic</th><th>Category</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
             resources.map(resource => '<tr data-resource-row data-search="' + escapeHTML([resource.title, resource.original_file_name, resource.courses?.title, resource.modules?.title, resourceTypeLabels[resource.resource_type] || resource.resource_type].filter(Boolean).join(" ").toLowerCase()) + '"><td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
               (resource.academic_year ? '<div class="muted">Year: ' + resource.academic_year + '</div>' : '') + '</td>' +
@@ -2008,9 +2015,58 @@
           try {
             const extension = (file.name.split(".").pop() || "file").toLowerCase().replace(/[^a-z0-9]/g, "");
             uploadedPath = courseId + "/" + crypto.randomUUID() + "." + (extension || "file");
-            const upload = await supabaseClient.storage.from("course-resources")
-              .upload(uploadedPath, file, { upsert: false, contentType: file.type });
-            if (upload.error) throw upload.error;
+            const progress = document.getElementById("resourceUploadProgress");
+            const status = document.getElementById("resourceUploadStatus");
+            progress.hidden = false;
+            progress.value = 0;
+
+            if (file.size > 6 * 1024 * 1024) {
+              if (!window.tus || !window.tus.Upload) {
+                throw new Error("The resumable upload service did not load. Refresh the page and try again.");
+              }
+              status.textContent = "Preparing a resumable upload…";
+              const { data: { session } } = await supabaseClient.auth.getSession();
+              if (!session?.access_token) throw new Error("Your session has expired. Please sign in again.");
+              await new Promise((resolve, reject) => {
+                const resumable = new window.tus.Upload(file, {
+                  endpoint: "https://wdzgkkbhhceogzwuiuji.storage.supabase.co/storage/v1/upload/resumable",
+                  retryDelays: [0, 3000, 5000, 10000, 20000],
+                  headers: {
+                    authorization: "Bearer " + session.access_token,
+                    apikey: supabaseKey
+                  },
+                  uploadDataDuringCreation: true,
+                  removeFingerprintOnSuccess: true,
+                  chunkSize: 6 * 1024 * 1024,
+                  metadata: {
+                    bucketName: "course-resources",
+                    objectName: uploadedPath,
+                    contentType: file.type,
+                    cacheControl: "3600"
+                  },
+                  onError: reject,
+                  onProgress(bytesUploaded, bytesTotal) {
+                    const percent = Math.round((bytesUploaded / bytesTotal) * 100);
+                    progress.value = percent;
+                    status.textContent = "Uploading " + percent + "% · " +
+                      (bytesUploaded / 1048576).toFixed(1) + " of " +
+                      (bytesTotal / 1048576).toFixed(1) + " MB";
+                  },
+                  onSuccess: resolve
+                });
+                resumable.findPreviousUploads().then(previous => {
+                  if (previous.length) resumable.resumeFromPreviousUpload(previous[0]);
+                  resumable.start();
+                }).catch(reject);
+              });
+            } else {
+              status.textContent = "Uploading file…";
+              const upload = await supabaseClient.storage.from("course-resources")
+                .upload(uploadedPath, file, { upsert: false, contentType: file.type, cacheControl: "3600" });
+              if (upload.error) throw upload.error;
+              progress.value = 100;
+              status.textContent = "Upload complete. Saving details…";
+            }
 
             button.textContent = "Saving resource details…";
             const insert = await supabaseClient.from("course_resources").insert({
