@@ -1967,7 +1967,7 @@
           supabaseClient.from("courses").select("id,title").order("title"),
           supabaseClient.from("modules").select("id,course_id,title,position").order("position"),
           supabaseClient.from("course_resources")
-            .select("id,course_id,module_id,title,resource_type,description,academic_year,resource_path,original_file_name,file_size_bytes,is_published,created_at,courses(title),modules(title)")
+            .select("id,course_id,module_id,title,resource_type,description,academic_year,resource_path,original_file_name,mime_type,file_size_bytes,is_published,created_at,courses(title),modules(title)")
             .order("created_at", { ascending: false })
             .range(0, 99)
         ]);
@@ -1993,15 +1993,18 @@
           { type: "solution", title: "Worked Solutions", description: "Worked answers and marking guides." },
           { type: "other", title: "Other Resources", description: "Additional materials for this course." }
         ];
-        const renderAdminResourceRow = resource =>
-          '<tr data-resource-row data-search="' + escapeHTML([resource.title, resource.original_file_name, resource.courses?.title, resource.modules?.title, resourceTypeLabels[resource.resource_type] || resource.resource_type].filter(Boolean).join(" ").toLowerCase()) + '">' +
+        const renderAdminResourceRow = resource => {
+          const isPdf = (resource.mime_type || "").toLowerCase() === "application/pdf" || /\\.pdf$/i.test(resource.original_file_name || "");
+          const publishBlocked = !resource.is_published && !isPdf;
+          return '<tr data-resource-row data-search="' + escapeHTML([resource.title, resource.original_file_name, resource.courses?.title, resource.modules?.title, resourceTypeLabels[resource.resource_type] || resource.resource_type].filter(Boolean).join(" ").toLowerCase()) + '">' +
             '<td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
               (resource.academic_year ? '<div class="muted">Year: ' + resource.academic_year + '</div>' : '') + '</td>' +
             '<td>' + escapeHTML(resource.courses?.title || "Course") + '<div class="muted">' + escapeHTML(resource.modules?.title || "General resource") + '</div></td>' +
-            '<td><span class="pill" style="' + (resource.is_published ? '' : 'background:#F0F4F8;color:#627D98') + '">' + (resource.is_published ? 'Published' : 'Draft') + '</span></td>' +
+            '<td><span class="pill" style="' + (resource.is_published ? '' : 'background:#F0F4F8;color:#627D98') + '">' + (resource.is_published ? 'Published' : 'Draft') + '</span>' + (!isPdf ? '<div class="muted" style="font-size:11px;margin-top:5px">PDF required for student access</div>' : '') + '</td>' +
             '<td><div class="inline-actions"><button class="btn secondary" type="button" data-resource-open="' + escapeHTML(resource.resource_path) + '">View file</button>' +
-              '<button class="btn secondary" type="button" data-resource-toggle="' + escapeHTML(resource.id) + '" data-published="' + resource.is_published + '">' + (resource.is_published ? 'Unpublish' : 'Publish') + '</button>' +
+              '<button class="btn secondary" type="button" data-resource-toggle="' + escapeHTML(resource.id) + '" data-published="' + resource.is_published + '" ' + (publishBlocked ? 'disabled title="Convert this file to PDF before publishing"' : '') + '>' + (resource.is_published ? 'Unpublish' : 'Publish') + '</button>' +
               '<button class="btn danger" type="button" data-resource-delete="' + escapeHTML(resource.id) + '" data-path="' + escapeHTML(resource.resource_path) + '">Delete</button></div></td></tr>';
+        };
         pageContent.innerHTML = [
           '<div class="welcome"><h1>Course tutorial materials</h1><p>Upload tutorial sheets, past examination papers, worked solutions and practice materials. Files stay private until you publish them to students with an active subscription.</p></div>',
           '<div class="card"><div class="section-head" style="margin-top:0"><h2>Upload tutorial material</h2></div>',
@@ -2015,7 +2018,7 @@
           '<label>Choose file (PDF, Word, PowerPoint, JPG or PNG; maximum 20 MB)<input name="resource_file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpeg,image/png" required></label>',
           '<label style="display:flex;align-items:center;gap:9px"><input type="checkbox" name="publish_now" style="width:auto;margin:0"> Make available to subscribed students immediately</label>',
           '<div class="inline-actions"><button class="btn" type="submit" id="resourceUploadBtn">Upload tutorial material</button></div><progress id="resourceUploadProgress" class="upload-progress" max="100" value="0" hidden></progress><p id="resourceUploadStatus" class="muted" style="font-size:12px;margin:0" aria-live="polite"></p>',
-          '<p class="muted" style="font-size:12px;margin:0">If you leave the publish box unticked, the file is saved as a draft and only administrators can see it.</p>',
+          '<p class="muted" style="font-size:12px;margin:0">Only valid PDFs can be published for password-protected student downloads. Other supported formats can be saved as administrator-only drafts until a PDF version is available.</p>',
           '</form></div>',
           '<div class="section-head"><h2>Manage tutorial materials (' + resources.length + (resources.length === 100 ? ' shown' : '') + ')</h2></div><p class="muted" style="font-size:12px;margin:-6px 0 12px">The 100 most recently uploaded files are grouped by their destination folder. Use search to find a title, course, topic or file name.</p>',
           '<div class="card"><div style="padding:16px 16px 0"><label for="resourceSearch" class="muted">Find a tutorial material</label><input id="resourceSearch" type="search" placeholder="Search by title, course, topic or file name" style="width:100%;max-width:460px"></div><div style="padding:16px">' +
@@ -2068,6 +2071,19 @@
           if (!(file instanceof File) || !file.size || file.size > 20971520 || !allowed.includes(file.type)) {
             showAlert("Choose a supported PDF, Word, PowerPoint, JPG or PNG file no larger than 20 MB.");
             return;
+          }
+          const isPdfUpload = file.type === "application/pdf" || /\\.pdf$/i.test(file.name || "");
+          if (values.get("publish_now") === "on" && !isPdfUpload) {
+            showAlert("Only PDF files can be published for password-protected student downloads. Upload this file as a draft or convert it to PDF first.");
+            return;
+          }
+          if (isPdfUpload) {
+            const pdfHeader = new TextDecoder().decode(await file.slice(0, 5).arrayBuffer());
+            const pdfTail = new TextDecoder().decode(await file.slice(Math.max(0, file.size - 2048)).arrayBuffer());
+            if (pdfHeader !== "%PDF-" || !/%%EOF\\s*$/.test(pdfTail)) {
+              showAlert("This file does not appear to be a complete, valid PDF. Please check the file and try again.");
+              return;
+            }
           }
           const courseId = values.get("course_id");
           const selectedModule = values.get("module_id") || null;
@@ -2229,6 +2245,12 @@
         pageContent.querySelectorAll("[data-resource-toggle]").forEach(button => {
           button.addEventListener("click", async () => {
             const publish = button.dataset.published !== "true";
+            const resource = resources.find(item => item.id === button.dataset.resourceToggle);
+            const isPdf = resource && ((resource.mime_type || "").toLowerCase() === "application/pdf" || /\\.pdf$/i.test(resource.original_file_name || ""));
+            if (publish && !isPdf) {
+              showAlert("Convert this material to a valid PDF before publishing it to students. Student downloads must be password-protected.");
+              return;
+            }
             button.disabled = true;
             const result = await supabaseClient.from("course_resources")
               .update({ is_published: publish }).eq("id", button.dataset.resourceToggle);
@@ -2350,7 +2372,7 @@
       async function renderStudentCourseResources(courseId, courseTitle) {
         setLoading("Loading tutorial materials…");
         const result = await supabaseClient.from("course_resources")
-          .select("id,title,resource_type,description,academic_year,resource_path,original_file_name,created_at,modules(title)")
+          .select("id,title,resource_type,description,academic_year,resource_path,original_file_name,mime_type,created_at,modules(title)")
           .eq("course_id", courseId)
           .eq("is_published", true)
           .order("created_at", { ascending: false });
@@ -2370,16 +2392,19 @@
             : "";
           const downloadName = String(resource.title || "Bright Minds material")
             .replace(/[\\/:*?"<>|]/g, "-") + extension;
+          const isPdf = (resource.mime_type || "").toLowerCase() === "application/pdf" || extension.toLowerCase() === ".pdf";
+          const fileTypeLabel = extension ? extension.slice(1).toUpperCase() : "FILE";
           return '<article class="card" style="box-shadow:none;padding:17px;border-radius:12px">' +
             '<div style="display:flex;align-items:flex-start;gap:12px">' +
-              '<div aria-hidden="true" style="width:38px;height:42px;flex:0 0 38px;border-radius:9px;background:#E6FFFB;color:#087F78;display:grid;place-items:center;font-size:19px">PDF</div>' +
+              '<div aria-hidden="true" style="width:38px;height:42px;flex:0 0 38px;border-radius:9px;background:#E6FFFB;color:#087F78;display:grid;place-items:center;font-size:11px;font-weight:800">' + fileTypeLabel + '</div>' +
               '<div style="min-width:0;flex:1"><h3 style="color:var(--navy);font:700 14px Manrope;margin:1px 0 5px;overflow-wrap:anywhere">' + escapeHTML(resource.title) + '</h3>' +
               '<p class="muted" style="font-size:11px;margin:0;line-height:1.5">' + escapeHTML(resource.modules?.title || "General course resource") +
               (resource.academic_year ? " · " + escapeHTML(resource.academic_year) : "") + '</p></div></div>' +
             (resource.description ? '<p style="font-size:12px;line-height:1.55;margin:12px 0 0">' + escapeHTML(resource.description) + '</p>' : '') +
             '<p class="muted" style="font-size:10px;overflow-wrap:anywhere;margin:10px 0">' + escapeHTML(resource.original_file_name || "") + '</p>' +
-            '<button class="btn" style="width:100%" type="button" data-student-resource="' + escapeAttr(resource.id) +
-            '" data-download-name="' + escapeAttr(downloadName) + '">Open / download</button></article>';
+            (isPdf
+              ? '<button class="btn" style="width:100%" type="button" data-student-resource="' + escapeAttr(resource.id) + '" data-download-name="' + escapeAttr(downloadName) + '">Open / download</button>'
+              : '<p class="muted" style="font-size:12px;line-height:1.5;margin:10px 0 0">A PDF version is required before this material can be opened securely. Please contact the course administrator.</p>') + '</article>';
         };
         const folderMarkup = folderDefinitions.map((folder, index) => {
           const items = resources.filter(resource => resource.resource_type === folder.type);
