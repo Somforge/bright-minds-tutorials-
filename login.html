@@ -445,6 +445,7 @@ forgotPasswordLink.addEventListener("click", async function(event) {
     forgotPasswordLink.textContent = "Sending reset link...";
     showMessage("Sending password reset instructions...", "success");
 
+    let resetSent = false;
     try {
         const recoveryRedirect = new URL("./index.html?flow=recovery", window.location.href).toString();
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
@@ -452,24 +453,43 @@ forgotPasswordLink.addEventListener("click", async function(event) {
         });
 
         if (error) {
-            showMessage(error.message, "error");
+            const message = String(error.message || "").toLowerCase();
+            if (error.status === 429 || /rate limit|too many|email rate limit/.test(message)) {
+                showMessage("A reset email was requested too recently or the email sending limit has been reached. Please wait before trying again, and check your inbox and spam folder for an earlier message.", "error");
+            } else {
+                showMessage("We could not send reset instructions right now. Check the email address and try again later.", "error");
+            }
         } else {
+            resetSent = true;
             showMessage(
-                "If an account exists for this email, password reset instructions will be sent to it. Please check your inbox and spam folder.",
+                "If an account exists for this email, password reset instructions will be sent to it. Please check your inbox and spam folder. You can request another link after 60 seconds.",
                 "success"
             );
         }
 
     } catch (error) {
         console.error("Password recovery error:", error);
-        showMessage(
-            "Unable to send password reset instructions. Please try again.",
-            "error"
-        );
+        showMessage("Unable to send password reset instructions. Please try again later.", "error");
     } finally {
-        forgotPasswordLink.style.pointerEvents = "";
-        forgotPasswordLink.removeAttribute("aria-disabled");
-        forgotPasswordLink.textContent = "Forgot your password?";
+        if (resetSent) {
+            let seconds = 60;
+            forgotPasswordLink.textContent = "Request another link in " + seconds + "s";
+            const cooldown = window.setInterval(() => {
+                seconds -= 1;
+                if (seconds <= 0) {
+                    window.clearInterval(cooldown);
+                    forgotPasswordLink.style.pointerEvents = "";
+                    forgotPasswordLink.removeAttribute("aria-disabled");
+                    forgotPasswordLink.textContent = "Forgot your password?";
+                } else {
+                    forgotPasswordLink.textContent = "Request another link in " + seconds + "s";
+                }
+            }, 1000);
+        } else {
+            forgotPasswordLink.style.pointerEvents = "";
+            forgotPasswordLink.removeAttribute("aria-disabled");
+            forgotPasswordLink.textContent = "Forgot your password?";
+        }
     }
 });
 </script>
