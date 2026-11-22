@@ -1950,11 +1950,11 @@
       }
 
       const resourceTypeLabels = {
-        lecture_note: "Additional material",
-        tutorial_sheet: "Tutorial sheet",
-        past_paper: "Past examination paper",
-        solution: "Worked solutions / marking guides",
-        other: "Other tutorial material"
+        lecture_note: "BM Notes",
+        tutorial_sheet: "Tutorial Sheets",
+        past_paper: "Past Papers",
+        solution: "Worked Solutions",
+        other: "Other Resources"
       };
 
       async function renderAdminResources() {
@@ -2332,21 +2332,53 @@
           .order("created_at", { ascending: false });
         if (result.error) throw result.error;
         const resources = result.data || [];
+        const folderDefinitions = [
+          { type: "tutorial_sheet", title: "Tutorial Sheets", icon: "▤", description: "Practice questions and tutorial exercises." },
+          { type: "lecture_note", title: "BM Notes", icon: "▧", description: "Bright Minds notes and learning materials." },
+          { type: "past_paper", title: "Past Papers", icon: "▥", description: "Past examination papers for revision." },
+          { type: "solution", title: "Worked Solutions", icon: "✓", description: "Worked answers and marking guides." },
+          { type: "other", title: "Other Resources", icon: "▣", description: "Additional materials for this course." }
+        ];
+        const escapeAttr = value => escapeHTML(String(value ?? ""));
+        const renderResourceCard = resource => {
+          const extension = resource.original_file_name && resource.original_file_name.includes(".")
+            ? "." + resource.original_file_name.split(".").pop().replace(/[^a-zA-Z0-9]/g, "")
+            : "";
+          const downloadName = String(resource.title || "Bright Minds material")
+            .replace(/[\\/:*?"<>|]/g, "-") + extension;
+          return '<article class="card" style="box-shadow:none;padding:17px;border-radius:12px">' +
+            '<div style="display:flex;align-items:flex-start;gap:12px">' +
+              '<div aria-hidden="true" style="width:38px;height:42px;flex:0 0 38px;border-radius:9px;background:#E6FFFB;color:#087F78;display:grid;place-items:center;font-size:19px">PDF</div>' +
+              '<div style="min-width:0;flex:1"><h3 style="color:var(--navy);font:700 14px Manrope;margin:1px 0 5px;overflow-wrap:anywhere">' + escapeHTML(resource.title) + '</h3>' +
+              '<p class="muted" style="font-size:11px;margin:0;line-height:1.5">' + escapeHTML(resource.modules?.title || "General course resource") +
+              (resource.academic_year ? " · " + escapeHTML(resource.academic_year) : "") + '</p></div></div>' +
+            (resource.description ? '<p style="font-size:12px;line-height:1.55;margin:12px 0 0">' + escapeHTML(resource.description) + '</p>' : '') +
+            '<p class="muted" style="font-size:10px;overflow-wrap:anywhere;margin:10px 0">' + escapeHTML(resource.original_file_name || "") + '</p>' +
+            '<button class="btn" style="width:100%" type="button" data-student-resource="' + escapeAttr(resource.id) +
+            '" data-download-name="' + escapeAttr(downloadName) + '">Open / download</button></article>';
+        };
+        const folderMarkup = folderDefinitions.map((folder, index) => {
+          const items = resources.filter(resource => resource.resource_type === folder.type);
+          return '<details class="course-folder" ' + (items.length && index === 0 ? "open" : "") +
+            ' style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)">' +
+            '<summary style="list-style:none;cursor:pointer;padding:18px 20px;display:flex;align-items:center;gap:14px">' +
+              '<span aria-hidden="true" style="width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:#E6FFFB;color:#087F78;display:grid;place-items:center;font-size:22px">' + folder.icon + '</span>' +
+              '<span style="flex:1;min-width:0"><strong style="display:block;color:var(--navy);font:800 15px Manrope">' + folder.title + '</strong>' +
+              '<span class="muted" style="display:block;font-size:12px;margin-top:4px">' + folder.description + '</span></span>' +
+              '<span style="flex:0 0 auto;display:flex;align-items:center;gap:8px"><span class="pill">' + items.length + (items.length === 1 ? " file" : " files") + '</span>' +
+              '<span class="muted" aria-hidden="true" style="font-size:18px">⌄</span></span>' +
+            '</summary>' +
+            '<div style="border-top:1px solid #EAF0F5;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:13px">' +
+              (items.length ? items.map(renderResourceCard).join("") : '<p class="muted" style="grid-column:1/-1;font-size:13px;margin:3px 0">No materials in this folder yet.</p>') +
+            '</div></details>';
+        }).join("");
         pageTitle.textContent = courseTitle || "Tutorial materials";
         pageContent.innerHTML = [
-          '<div class="welcome"><h1>' + escapeHTML(courseTitle || "Tutorial materials") + '</h1><p>Tutorial materials available with your active subscription.</p></div>',
-          '<div class="inline-actions" style="margin-bottom:16px"><button class="btn secondary" type="button" id="backToCourses">← Back to my courses</button></div>',
-          resources.length ? '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">' +
-            resources.map(resource => '<article class="card"><span class="pill">' + escapeHTML(resourceTypeLabels[resource.resource_type] || resource.resource_type) + '</span>' +
-              '<h3 style="color:var(--navy);margin:12px 0 6px">' + escapeHTML(resource.title) + '</h3>' +
-              '<p class="muted" style="font-size:12px">' + escapeHTML(resource.modules?.title || "General course resource") +
-              (resource.academic_year ? ' · ' + resource.academic_year : '') + '</p>' +
-              (resource.description ? '<p style="font-size:13px">' + escapeHTML(resource.description) + '</p>' : '') +
-              '<p class="muted" style="font-size:11px;overflow-wrap:anywhere">' + escapeHTML(resource.original_file_name) + '</p>' +
-              '<button class="btn" type="button" data-student-resource="' + escapeHTML(resource.id) + '" data-download-name="' +
-              escapeHTML((String(resource.title || "Bright Minds material").replace(/[\\/:*?"<>|]/g, "-")) + (resource.original_file_name && resource.original_file_name.includes(".") ? "." + resource.original_file_name.split(".").pop().replace(/[^a-zA-Z0-9]/g, "") : "")) +
-              '">Open / download</button></article>'
-            ).join("") + '</div>' : '<section class="card" style="max-width:760px;margin:0 auto;text-align:center;padding:34px 24px"><div aria-hidden="true" style="width:58px;height:58px;margin:0 auto 16px;border-radius:16px;background:#E6FFFB;color:#087F78;display:grid;place-items:center;font-size:27px">▤</div><h2 style="color:var(--navy);font:800 19px Manrope;margin:0 0 9px">Your tutorial materials are being prepared</h2><p class="muted" style="font-size:14px;line-height:1.7;max-width:560px;margin:0 auto 12px">There are no materials published for this course just yet. New tutorial sheets, past examination papers and worked solutions will appear here as they are released.</p><p style="font-size:12px;color:var(--muted);margin:0 0 20px">Your active subscription remains in place. Please check this page again or visit announcements for updates.</p><div class="inline-actions" style="justify-content:center"><button class="btn secondary" type="button" id="viewCourseAnnouncements">View announcements</button><button class="btn" type="button" id="backToCourses">Back to my courses</button></div></section>'
+          '<div class="welcome"><h1>' + escapeHTML(courseTitle || "My course") + '</h1><p>Your course materials are organised into folders. Open a folder to browse its documents.</p></div>',
+          '<div class="inline-actions" style="margin-bottom:18px"><button class="btn secondary" type="button" id="backToCourses">← Back to my courses</button></div>',
+          resources.length
+            ? '<div style="display:grid;gap:13px">' + folderMarkup + '</div>'
+            : '<section class="card" style="max-width:760px;margin:0 auto;text-align:center;padding:34px 24px"><div aria-hidden="true" style="width:58px;height:58px;margin:0 auto 16px;border-radius:16px;background:#E6FFFB;color:#087F78;display:grid;place-items:center;font-size:27px">▤</div><h2 style="color:var(--navy);font:800 19px Manrope;margin:0 0 9px">Your tutorial materials are being prepared</h2><p class="muted" style="font-size:14px;line-height:1.7;max-width:560px;margin:0 auto 12px">There are no materials published for this course just yet. New tutorial sheets, BM Notes, past examination papers and worked solutions will appear here as they are released.</p><p style="font-size:12px;color:var(--muted);margin:0 0 20px">Your active subscription remains in place. Please check this page again or visit announcements for updates.</p><div class="inline-actions" style="justify-content:center"><button class="btn secondary" type="button" id="viewCourseAnnouncements">View announcements</button><button class="btn" type="button" id="backToCourses">Back to my courses</button></div></section>'
         ].join("");
         document.getElementById("backToCourses")?.addEventListener("click", () => renderPage("courses"));
         document.getElementById("viewCourseAnnouncements")?.addEventListener("click", () => renderPage("announcements"));
