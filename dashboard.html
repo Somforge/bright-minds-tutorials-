@@ -1994,7 +1994,7 @@
           { type: "other", title: "Other Resources", description: "Additional materials for this course." }
         ];
         const renderAdminResourceRow = resource => {
-          const isPdf = (resource.mime_type || "").toLowerCase() === "application/pdf" || /\\.pdf$/i.test(resource.original_file_name || "");
+          const isPdf = (resource.mime_type || "").toLowerCase() === "application/pdf" || /\.pdf$/i.test(resource.original_file_name || "");
           const publishBlocked = !resource.is_published && !isPdf;
           return '<tr data-resource-row data-search="' + escapeHTML([resource.title, resource.original_file_name, resource.courses?.title, resource.modules?.title, resourceTypeLabels[resource.resource_type] || resource.resource_type].filter(Boolean).join(" ").toLowerCase()) + '">' +
             '<td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
@@ -2072,7 +2072,7 @@
             showAlert("Choose a supported PDF, Word, PowerPoint, JPG or PNG file no larger than 20 MB.");
             return;
           }
-          const isPdfUpload = file.type === "application/pdf" || /\\.pdf$/i.test(file.name || "");
+          const isPdfUpload = file.type === "application/pdf" || /\.pdf$/i.test(file.name || "");
           if (values.get("publish_now") === "on" && !isPdfUpload) {
             showAlert("Only PDF files can be published for password-protected student downloads. Upload this file as a draft or convert it to PDF first.");
             return;
@@ -2080,7 +2080,7 @@
           if (isPdfUpload) {
             const pdfHeader = new TextDecoder().decode(await file.slice(0, 5).arrayBuffer());
             const pdfTail = new TextDecoder().decode(await file.slice(Math.max(0, file.size - 2048)).arrayBuffer());
-            if (pdfHeader !== "%PDF-" || !/%%EOF\\s*$/.test(pdfTail)) {
+            if (pdfHeader !== "%PDF-" || !/%%EOF\s*$/.test(pdfTail)) {
               showAlert("This file does not appear to be a complete, valid PDF. Please check the file and try again.");
               return;
             }
@@ -2246,7 +2246,7 @@
           button.addEventListener("click", async () => {
             const publish = button.dataset.published !== "true";
             const resource = resources.find(item => item.id === button.dataset.resourceToggle);
-            const isPdf = resource && ((resource.mime_type || "").toLowerCase() === "application/pdf" || /\\.pdf$/i.test(resource.original_file_name || ""));
+            const isPdf = resource && ((resource.mime_type || "").toLowerCase() === "application/pdf" || /\.pdf$/i.test(resource.original_file_name || ""));
             if (publish && !isPdf) {
               showAlert("Convert this material to a valid PDF before publishing it to students. Student downloads must be password-protected.");
               return;
