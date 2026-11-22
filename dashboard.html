@@ -2275,7 +2275,7 @@
           }
           const fileBlob = await fileResponse.blob();
           const filename = String(downloadName || "Bright-Minds-document.pdf")
-            .replace(/[\\/:*?"<>|\\r\\n]/g, "-")
+            .replace(/[\\/:*?"<>|\r\n]/g, "-")
             .trim()
             .slice(0, 180) || "Bright-Minds-document.pdf";
           const objectUrl = URL.createObjectURL(fileBlob);
