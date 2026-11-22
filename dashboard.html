@@ -1981,6 +1981,22 @@
           escapeHTML(module.title) + '</option>'
         ).join("");
 
+        const adminFolderDefinitions = [
+          { type: "tutorial_sheet", title: "Tutorial Sheets", description: "Practice questions and tutorial exercises." },
+          { type: "lecture_note", title: "BM Notes", description: "Bright Minds notes and learning materials." },
+          { type: "past_paper", title: "Past Papers", description: "Past examination papers for revision." },
+          { type: "solution", title: "Worked Solutions", description: "Worked answers and marking guides." },
+          { type: "other", title: "Other Resources", description: "Additional materials for this course." }
+        ];
+        const renderAdminResourceRow = resource =>
+          '<tr data-resource-row data-search="' + escapeHTML([resource.title, resource.original_file_name, resource.courses?.title, resource.modules?.title, resourceTypeLabels[resource.resource_type] || resource.resource_type].filter(Boolean).join(" ").toLowerCase()) + '">' +
+            '<td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
+              (resource.academic_year ? '<div class="muted">Year: ' + resource.academic_year + '</div>' : '') + '</td>' +
+            '<td>' + escapeHTML(resource.courses?.title || "Course") + '<div class="muted">' + escapeHTML(resource.modules?.title || "General resource") + '</div></td>' +
+            '<td><span class="pill" style="' + (resource.is_published ? '' : 'background:#F0F4F8;color:#627D98') + '">' + (resource.is_published ? 'Published' : 'Draft') + '</span></td>' +
+            '<td><div class="inline-actions"><button class="btn secondary" type="button" data-resource-open="' + escapeHTML(resource.resource_path) + '">View file</button>' +
+              '<button class="btn secondary" type="button" data-resource-toggle="' + escapeHTML(resource.id) + '" data-published="' + resource.is_published + '">' + (resource.is_published ? 'Unpublish' : 'Publish') + '</button>' +
+              '<button class="btn danger" type="button" data-resource-delete="' + escapeHTML(resource.id) + '" data-path="' + escapeHTML(resource.resource_path) + '">Delete</button></div></td></tr>';
         pageContent.innerHTML = [
           '<div class="welcome"><h1>Course tutorial materials</h1><p>Upload tutorial sheets, past examination papers, worked solutions and practice materials. Files stay private until you publish them to students with an active subscription.</p></div>',
           '<div class="card"><div class="section-head" style="margin-top:0"><h2>Upload tutorial material</h2></div>',
@@ -1996,17 +2012,20 @@
           '<div class="inline-actions"><button class="btn" type="submit" id="resourceUploadBtn">Upload tutorial material</button></div><progress id="resourceUploadProgress" class="upload-progress" max="100" value="0" hidden></progress><p id="resourceUploadStatus" class="muted" style="font-size:12px;margin:0" aria-live="polite"></p>',
           '<p class="muted" style="font-size:12px;margin:0">If you leave the publish box unticked, the file is saved as a draft and only administrators can see it.</p>',
           '</form></div>',
-          '<div class="section-head"><h2>Recent tutorial materials (' + resources.length + (resources.length === 100 ? ' shown' : '') + ')</h2></div><p class="muted" style="font-size:12px;margin:-6px 0 12px">For a faster dashboard, this list shows the 100 most recently uploaded files.</p>',
-          resources.length ? '<div class="card"><div style="padding:16px 16px 0"><label for="resourceSearch" class="muted">Find a tutorial material</label><input id="resourceSearch" type="search" placeholder="Search by title, course, topic or file name" style="width:100%;max-width:460px"></div><div class="table-wrap"><table class="table"><thead><tr><th>Tutorial material</th><th>Course / topic</th><th>Category</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
-            resources.map(resource => '<tr data-resource-row data-search="' + escapeHTML([resource.title, resource.original_file_name, resource.courses?.title, resource.modules?.title, resourceTypeLabels[resource.resource_type] || resource.resource_type].filter(Boolean).join(" ").toLowerCase()) + '"><td><strong>' + escapeHTML(resource.title) + '</strong><div class="muted">' + escapeHTML(resource.original_file_name) + '</div>' +
-              (resource.academic_year ? '<div class="muted">Year: ' + resource.academic_year + '</div>' : '') + '</td>' +
-              '<td>' + escapeHTML(resource.courses?.title || "Course") + '<div class="muted">' + escapeHTML(resource.modules?.title || "General resource") + '</div></td>' +
-              '<td>' + escapeHTML(resourceTypeLabels[resource.resource_type] || resource.resource_type) + '</td>' +
-              '<td><span class="pill" style="' + (resource.is_published ? '' : 'background:#F0F4F8;color:#627D98') + '">' + (resource.is_published ? 'Published' : 'Draft') + '</span></td>' +
-              '<td><div class="inline-actions"><button class="btn secondary" type="button" data-resource-open="' + escapeHTML(resource.resource_path) + '">View file</button>' +
-              '<button class="btn secondary" type="button" data-resource-toggle="' + escapeHTML(resource.id) + '" data-published="' + resource.is_published + '">' + (resource.is_published ? 'Unpublish' : 'Publish') + '</button>' +
-              '<button class="btn danger" type="button" data-resource-delete="' + escapeHTML(resource.id) + '" data-path="' + escapeHTML(resource.resource_path) + '">Delete</button></div></td></tr>'
-            ).join("") + '</tbody></table></div></div>' : '<div class="empty">No tutorial materials have been uploaded yet. Add your first tutorial sheet, past paper or worked solution here.</div>'
+          '<div class="section-head"><h2>Manage tutorial materials (' + resources.length + (resources.length === 100 ? ' shown' : '') + ')</h2></div><p class="muted" style="font-size:12px;margin:-6px 0 12px">The 100 most recently uploaded files are grouped by their destination folder. Use search to find a title, course, topic or file name.</p>',
+          '<div class="card"><div style="padding:16px 16px 0"><label for="resourceSearch" class="muted">Find a tutorial material</label><input id="resourceSearch" type="search" placeholder="Search by title, course, topic or file name" style="width:100%;max-width:460px"></div><div style="padding:16px">' +
+            adminFolderDefinitions.map(folder => {
+              const folderResources = resources.filter(resource => resource.resource_type === folder.type);
+              return '<details open style="border:1px solid #E3EAF1;border-radius:12px;margin:0 0 12px;overflow:hidden">' +
+                '<summary style="cursor:pointer;padding:14px 16px;background:#F7F9FC;color:var(--navy);font-weight:800;display:flex;justify-content:space-between;gap:12px;align-items:center">' +
+                  '<span>' + folder.title + '<span class="muted" style="font-weight:500;margin-left:9px">' + folder.description + '</span></span>' +
+                  '<span class="pill">' + folderResources.length + ' files</span></summary>' +
+                (folderResources.length ? '<div class="table-wrap"><table class="table"><thead><tr><th>Tutorial material</th><th>Course / topic</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>' +
+                  folderResources.map(renderAdminResourceRow).join("") + '</tbody></table></div>' :
+                  '<p class="muted" style="padding:14px 16px;margin:0">No files in this folder yet.</p>') +
+                '</details>';
+            }).join("") +
+          '</div></div>'
         ].join("");
 
         const resourceSearch = document.getElementById("resourceSearch");
