@@ -2194,7 +2194,7 @@
             showAlert("Your session has expired. Please sign in again.");
             return;
           }
-          const response = await fetch(supabaseUrl.replace(/\\/$/, "") + "/functions/v1/secure-course-document", {
+          const response = await fetch((supabaseUrl.endsWith("/") ? supabaseUrl.slice(0, -1) : supabaseUrl) + "/functions/v1/secure-course-document", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
