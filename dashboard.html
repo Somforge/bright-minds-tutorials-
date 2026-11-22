@@ -914,6 +914,10 @@
       async function renderPage(page) {
 
         if (!titles[page]) return;
+        if (assessmentCountdownInterval) {
+          clearInterval(assessmentCountdownInterval);
+          assessmentCountdownInterval = null;
+        }
 
         if (page.startsWith("manage-") && !isAdmin()) {
           showAlert("You do not have permission to open that page.");
