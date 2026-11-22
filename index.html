@@ -2778,63 +2778,69 @@ async function logout() {
 }
 
 /* =====================================
-   RESTORE EXISTING SESSION
+   RESTORE EXISTING SESSION / PASSWORD RECOVERY
 ===================================== */
 
-async function checkExistingSession() {
+// Supabase may return recovery details in the query string (PKCE)
+// or in the URL hash (implicit flow). The explicit flow marker is
+// added to the reset email redirect so neither flow is mistaken for login.
+function isPasswordRecoveryRedirect() {
+    const query = new URLSearchParams(window.location.search);
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    return query.get("flow") === "recovery" ||
+        query.get("type") === "recovery" ||
+        hash.get("type") === "recovery";
+}
 
+async function checkExistingSession() {
     if (!supabaseClient) return;
 
-    const {data,error} = await supabaseClient.auth.getSession();
+    const recoveryRedirect = isPasswordRecoveryRedirect();
+    const { data, error } = await supabaseClient.auth.getSession();
 
     if (error) {
-
         console.error("Session retrieval error:", error);
-
         return;
-
     }
 
-    const isPasswordRecovery = window.location.hash.includes("type=recovery");
+    if (recoveryRedirect) {
+        if (data.session) openPasswordRecovery();
+        return;
+    }
 
-    if (data.session && !isPasswordRecovery) {
-
+    if (data.session) {
         window.location.replace("./dashboard.html");
-
     }
-
 }
 
 if (supabaseClient) {
-
-    checkExistingSession();
-
-    supabaseClient.auth.onAuthStateChange((event,session) => {
+    // Register the listener before checking the session. This prevents a
+    // fast INITIAL_SESSION/SIGNED_IN event from navigating away first.
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (isPasswordRecoveryRedirect() && session) {
+            openPasswordRecovery();
+            return;
+        }
 
         if (event === "PASSWORD_RECOVERY" && session) {
             openPasswordRecovery();
             return;
         }
 
-        if (event === "SIGNED_IN" && session && !window.location.hash.includes("type=recovery")) {
-
+        if (event === "SIGNED_IN" && session) {
             window.location.replace("./dashboard.html");
             return;
-
         }
 
         if (event === "SIGNED_OUT") {
-
             currentUser = null;
             currentProfile = null;
-
             appPage.classList.add("hidden");
             welcomePage.classList.remove("hidden");
-
         }
-
     });
 
+    checkExistingSession();
 }
 
 </script>
