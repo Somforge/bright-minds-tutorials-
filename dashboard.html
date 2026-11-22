@@ -2318,14 +2318,11 @@
         document.getElementById("viewCourseAnnouncements")?.addEventListener("click", () => renderPage("announcements"));
         pageContent.querySelectorAll("[data-student-resource]").forEach(button => {
           button.addEventListener("click", async () => {
-            const originalLabel = button.textContent;
             button.disabled = true;
-            button.textContent = "Protecting & downloading…";
             try {
               await openCourseResource(null, button.dataset.downloadName, button.dataset.studentResource);
             } finally {
               button.disabled = false;
-              button.textContent = originalLabel;
             }
           });
         });
