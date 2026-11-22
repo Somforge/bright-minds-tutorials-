@@ -747,6 +747,7 @@
       let currentUser = null;
       let currentProfile = null;
       let currentPage = "overview";
+      let assessmentCountdownInterval = null;
 
       const titles = {
         overview: "Overview",
@@ -2768,33 +2769,85 @@
       }
 
       async function renderStudentAssessmentAttempt(assessmentId,attemptId) {
+        if (assessmentCountdownInterval) {
+          clearInterval(assessmentCountdownInterval);
+          assessmentCountdownInterval = null;
+        }
         const results=await Promise.all([
           supabaseClient.from("assessments").select("id,title,instructions,duration_minutes").eq("id",assessmentId).single(),
-          supabaseClient.from("assessment_questions").select("id,prompt,options,marks,position").eq("assessment_id",assessmentId).order("position")
+          supabaseClient.from("assessment_questions").select("id,prompt,options,marks,position").eq("assessment_id",assessmentId).order("position"),
+          supabaseClient.from("assessment_attempts").select("started_at").eq("id",attemptId).single()
         ]);
         if(results[0].error) throw results[0].error;
         if(results[1].error) throw results[1].error;
+        if(results[2].error) throw results[2].error;
         const assessment=results[0].data, questions=results[1].data||[];
         if(!questions.length) throw new Error("This assessment has no questions yet.");
+        const deadline=new Date(results[2].data.started_at).getTime()+assessment.duration_minutes*60*1000;
         pageContent.innerHTML='<div class="welcome"><h1>'+escapeHTML(assessment.title)+'</h1><p>'+escapeHTML(assessment.instructions||"Select one answer for each question.")+'</p></div>'+
-          '<div class="card" style="margin-bottom:14px;border-left:4px solid var(--teal)"><strong>Timed assessment · '+assessment.duration_minutes+' minutes</strong><p class="muted" style="font-size:12px;margin:5px 0 0">The timer starts when you begin. Submit before time expires.</p></div><form id="studentAssessmentForm">'+
+          '<div class="card" style="margin-bottom:14px;border-left:4px solid var(--teal)"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><strong>Time remaining</strong><strong id="assessmentCountdown" role="timer" aria-live="off" style="font:800 24px Manrope;color:var(--navy);font-variant-numeric:tabular-nums">--:--</strong></div><p class="muted" style="font-size:12px;margin:5px 0 0">Your time is measured from when you first started. Answers will be submitted automatically when time runs out.</p></div><form id="studentAssessmentForm">'+
           questions.map((q,i)=>'<div class="card" style="margin-bottom:14px"><strong style="color:var(--navy)">Question '+(i+1)+' · '+q.marks+' mark(s)</strong><p style="font-weight:600;line-height:1.6">'+escapeHTML(q.prompt)+'</p><div style="display:grid;gap:8px">'+q.options.map((o,n)=>'<label style="display:flex;gap:10px;padding:11px;border:1px solid var(--border);border-radius:9px"><input type="radio" name="answer_'+q.id+'" value="'+n+'"><span><strong>'+String.fromCharCode(65+n)+'.</strong> '+escapeHTML(o)+'</span></label>').join("")+'</div></div>').join("")+
           '<div class="inline-actions"><button class="btn" id="submitAssessmentBtn" type="submit">Submit answers</button><button class="btn secondary" type="button" id="leaveAssessmentBtn">Leave for now</button></div></form>';
-        document.getElementById("leaveAssessmentBtn").addEventListener("click",renderStudentAssessments);
-        document.getElementById("studentAssessmentForm").addEventListener("submit",async event=>{
-          event.preventDefault();
-          if(!window.confirm("Submit your answers now? You cannot change them afterwards.")) return;
+        const form=document.getElementById("studentAssessmentForm");
+        const submitButton=document.getElementById("submitAssessmentBtn");
+        let submissionStarted=false;
+        const showAssessmentResult=(result,expired)=>{
+          if(assessmentCountdownInterval){clearInterval(assessmentCountdownInterval);assessmentCountdownInterval=null;}
+          pageContent.innerHTML='<div class="card" style="max-width:650px;margin:30px auto;text-align:center;padding:30px"><div style="font-size:36px;color:var(--teal)">'+(expired?'⌛':'✓')+'</div><h1 style="color:var(--navy);font-family:Manrope">'+(expired?'Time expired':'Assessment submitted')+'</h1><p class="muted">'+(expired?'Your time ran out. Your answers were submitted and marked automatically.':'Your answers have been marked automatically.')+'</p><div style="font-size:38px;font-weight:800;color:var(--navy);margin:18px 0">'+result.score+' / '+result.max_score+'</div><span class="pill">'+(result.max_score?Math.round(result.score/result.max_score*100):0)+'%</span><div style="margin-top:22px"><button class="btn" id="returnAssessments">Return to assessments</button></div></div>';
+          document.getElementById("returnAssessments").addEventListener("click",renderStudentAssessments);
+        };
+        const submitAssessment=async(autoSubmit)=>{
+          if(submissionStarted)return;
+          submissionStarted=true;
+          if(assessmentCountdownInterval){clearInterval(assessmentCountdownInterval);assessmentCountdownInterval=null;}
+          submitButton.disabled=true;
+          submitButton.textContent=autoSubmit?"Submitting…":"Marking…";
           const answers=questions.map(q=>{
             const selected=pageContent.querySelector('input[name="answer_'+q.id+'"]:checked');
             return selected?{question_id:q.id,selected_option:Number(selected.value)}:null;
           }).filter(Boolean);
-          const btn=document.getElementById("submitAssessmentBtn");btn.disabled=true;btn.textContent="Marking…";
           const submitted=await supabaseClient.rpc("submit_assessment_attempt",{p_attempt_id:attemptId,p_answers:answers});
-          if(submitted.error){showAlert(submitted.error.message);btn.disabled=false;btn.textContent="Submit answers";return;}
+          if(submitted.error){
+            submissionStarted=false;
+            showAlert(submitted.error.message||"Your answers could not be submitted. Please try again.");
+            submitButton.disabled=false;
+            submitButton.textContent="Submit answers";
+            if(Date.now()<deadline)startCountdown();
+            return;
+          }
           const result=Array.isArray(submitted.data)?submitted.data[0]:submitted.data;
-          pageContent.innerHTML='<div class="card" style="max-width:650px;margin:30px auto;text-align:center;padding:30px"><div style="font-size:36px;color:var(--teal)">✓</div><h1 style="color:var(--navy);font-family:Manrope">Assessment submitted</h1><p class="muted">Your answers have been marked automatically.</p><div style="font-size:38px;font-weight:800;color:var(--navy);margin:18px 0">'+result.score+' / '+result.max_score+'</div><span class="pill">'+(result.max_score?Math.round(result.score/result.max_score*100):0)+'%</span><div style="margin-top:22px"><button class="btn" id="returnAssessments">Return to assessments</button></div></div>';
-          document.getElementById("returnAssessments").addEventListener("click",renderStudentAssessments);
+          const status=await supabaseClient.from("assessment_attempts").select("status").eq("id",attemptId).single();
+          showAssessmentResult(result,autoSubmit||status.data?.status==="expired");
+        };
+        document.getElementById("leaveAssessmentBtn").addEventListener("click",()=>{
+          if(assessmentCountdownInterval){clearInterval(assessmentCountdownInterval);assessmentCountdownInterval=null;}
+          renderStudentAssessments();
         });
+        form.addEventListener("submit",async event=>{
+          event.preventDefault();
+          if(submissionStarted)return;
+          if(!window.confirm("Submit your answers now? You cannot change them afterwards."))return;
+          await submitAssessment(false);
+        });
+        const startCountdown=()=>{
+          const display=document.getElementById("assessmentCountdown");
+          if(!display)return;
+          const update=()=>{
+            const remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));
+            const minutes=Math.floor(remaining/60),seconds=remaining%60;
+            display.textContent=String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0");
+            if(remaining<=60){display.style.color="var(--danger)";display.setAttribute("aria-live","polite");}
+            if(remaining<=0){
+              display.textContent="00:00";
+              display.setAttribute("aria-live","assertive");
+              if(assessmentCountdownInterval){clearInterval(assessmentCountdownInterval);assessmentCountdownInterval=null;}
+              submitAssessment(true);
+            }
+          };
+          update();
+          if(Date.now()<deadline)assessmentCountdownInterval=setInterval(update,1000);
+        };
+        startCountdown();
       }
 
       function renderPlaceholder(message) {
