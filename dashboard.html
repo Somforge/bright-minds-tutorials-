@@ -952,9 +952,11 @@
           if (removed.error) throw removed.error;
         }
 
+        // Friendly names must be unique across factors. Use a fresh name so
+        // an earlier interrupted setup cannot block this administrator.
         const enrolled = await supabaseClient.auth.mfa.enroll({
           factorType: "totp",
-          friendlyName: "Bright Minds administrator"
+          friendlyName: "Bright Minds administrator " + Date.now()
         });
         if (enrolled.error) throw enrolled.error;
 
