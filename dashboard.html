@@ -2027,40 +2027,57 @@
               status.textContent = "Preparing a resumable upload…";
               const { data: { session } } = await supabaseClient.auth.getSession();
               if (!session?.access_token) throw new Error("Your session has expired. Please sign in again.");
-              await new Promise((resolve, reject) => {
-                const resumable = new window.tus.Upload(file, {
-                  endpoint: "https://wdzgkkbhhceogzwuiuji.storage.supabase.co/storage/v1/upload/resumable",
-                  retryDelays: [0, 3000, 5000, 10000, 20000],
-                  headers: {
-                    authorization: "Bearer " + session.access_token,
-                    apikey: supabaseKey
-                  },
-                  uploadDataDuringCreation: true,
-                  removeFingerprintOnSuccess: true,
-                  chunkSize: 6 * 1024 * 1024,
-                  metadata: {
-                    bucketName: "course-resources",
-                    objectName: uploadedPath,
+              try {
+                await new Promise((resolve, reject) => {
+                  const resumable = new window.tus.Upload(file, {
+                    endpoint: "https://wdzgkkbhhceogzwuiuji.storage.supabase.co/storage/v1/upload/resumable",
+                    retryDelays: [0, 3000, 5000, 10000, 20000],
+                    headers: {
+                      authorization: "Bearer " + session.access_token,
+                      apikey: supabaseKey
+                    },
+                    uploadDataDuringCreation: true,
+                    // Do not reuse a browser-stored upload URL from an earlier
+                    // attempt. Every upload has a new object path; stale TUS
+                    // sessions can otherwise trigger a failing HEAD request.
+                    storeFingerprintForResuming: false,
+                    chunkSize: 6 * 1024 * 1024,
+                    metadata: {
+                      bucketName: "course-resources",
+                      objectName: uploadedPath,
+                      contentType: file.type,
+                      cacheControl: "3600"
+                    },
+                    onError: reject,
+                    onProgress(bytesUploaded, bytesTotal) {
+                      const percent = Math.round((bytesUploaded / bytesTotal) * 100);
+                      progress.value = percent;
+                      status.textContent = "Uploading " + percent + "% · " +
+                        (bytesUploaded / 1048576).toFixed(1) + " of " +
+                        (bytesTotal / 1048576).toFixed(1) + " MB";
+                    },
+                    onSuccess: resolve
+                  });
+                  resumable.start();
+                });
+              } catch (resumableError) {
+                // The accepted maximum is 20 MB, so use the standard Storage
+                // upload as a fallback if the TUS protocol/session fails.
+                status.textContent = "Resumable upload could not continue. Trying the direct upload…";
+                progress.value = 0;
+                const directUpload = await supabaseClient.storage.from("course-resources")
+                  .upload(uploadedPath, file, {
+                    upsert: false,
                     contentType: file.type,
                     cacheControl: "3600"
-                  },
-                  onError: reject,
-                  onProgress(bytesUploaded, bytesTotal) {
-                    const percent = Math.round((bytesUploaded / bytesTotal) * 100);
-                    progress.value = percent;
-                    status.textContent = "Uploading " + percent + "% · " +
-                      (bytesUploaded / 1048576).toFixed(1) + " of " +
-                      (bytesTotal / 1048576).toFixed(1) + " MB";
-                  },
-                  onSuccess: resolve
-                });
-                // Each upload gets a fresh UUID path above, so an earlier TUS
-                // session belongs to a different Storage object. Do not resume a
-                // browser-cached session for this new path: stale sessions can make
-                // the library issue a failing HEAD request before the upload starts.
-                // TUS still retries interrupted requests during this upload.
-                resumable.start();
-              });
+                  });
+                if (directUpload.error) {
+                  throw new Error(
+                    "Resumable upload failed (" + (resumableError.message || "connection error") +
+                    "). Direct upload also failed: " + directUpload.error.message
+                  );
+                }
+              }
             } else {
               status.textContent = "Uploading file…";
               const upload = await supabaseClient.storage.from("course-resources")
