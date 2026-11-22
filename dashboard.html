@@ -2440,16 +2440,19 @@
             </div>
             <form id="changePasswordForm" style="margin-top:20px;max-width:560px">
               <div class="form">
+                <label>Current password
+                  <input id="currentAccountPassword" type="password" autocomplete="current-password" placeholder="Confirm your current password" required>
+                </label>
                 <label>New password
-                  <input id="newAccountPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required>
+                  <input id="newAccountPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" placeholder="12–72 characters with a number and symbol" required>
                 </label>
                 <label>Confirm new password
-                  <input id="confirmAccountPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Enter the new password again" required>
+                  <input id="confirmAccountPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" placeholder="Enter the new password again" required>
                 </label>
               </div>
               <div class="inline-actions" style="margin-top:16px;align-items:center">
                 <button class="btn" id="saveAccountPassword" type="submit">Update password</button>
-                <span class="muted" style="font-size:11px">Use at least 8 characters.</span>
+                <span class="muted" style="font-size:11px">Use 12–72 characters, including upper/lowercase letters, a number and a symbol.</span>
               </div>
             </form>
           </section>
@@ -2484,11 +2487,20 @@
         document.getElementById("changePasswordForm")?.addEventListener("submit", async event => {
           event.preventDefault();
           clearAlert();
+          const currentPasswordInput = document.getElementById("currentAccountPassword");
           const passwordInput = document.getElementById("newAccountPassword");
           const confirmInput = document.getElementById("confirmAccountPassword");
+          const currentPassword = currentPasswordInput.value;
           const password = passwordInput.value;
-          if (password.length < 8) {
-            showAlert("Your new password must contain at least 8 characters.");
+          if (!currentPassword) {
+            showAlert("Enter your current password to confirm this change.");
+            currentPasswordInput.focus();
+            return;
+          }
+          if (password.length < 12 || password.length > 72 ||
+              !/[a-z]/.test(password) || !/[A-Z]/.test(password) ||
+              !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+            showAlert("Use 12–72 characters, including uppercase and lowercase letters, a number and a symbol.");
             passwordInput.focus();
             return;
           }
@@ -2497,19 +2509,32 @@
             confirmInput.focus();
             return;
           }
-          const button = document.getElementById("saveAccountPassword");
-          button.disabled = true;
-          button.textContent = "Updating password…";
-          const { error } = await supabaseClient.auth.updateUser({ password });
-          button.disabled = false;
-          button.textContent = "Update password";
-          if (error) {
-            showAlert(error.message || "We could not update your password. Please try again.");
+          if (password === currentPassword) {
+            showAlert("Choose a new password that is different from your current password.");
+            passwordInput.focus();
             return;
           }
-          passwordInput.value = "";
-          confirmInput.value = "";
-          showAlert("Your password has been updated successfully.", "success");
+          const button = document.getElementById("saveAccountPassword");
+          button.disabled = true;
+          button.textContent = "Confirming and updating…";
+          try {
+            const reauthenticated = await supabaseClient.auth.signInWithPassword({
+              email: currentUser.email,
+              password: currentPassword
+            });
+            if (reauthenticated.error) throw new Error("Your current password could not be confirmed. Check it and try again.");
+            const updated = await supabaseClient.auth.updateUser({ password });
+            if (updated.error) throw updated.error;
+            currentPasswordInput.value = "";
+            passwordInput.value = "";
+            confirmInput.value = "";
+            showAlert("Your password has been updated successfully.", "success");
+          } catch (error) {
+            showAlert(error.message || "We could not update your password. Please try again.");
+          } finally {
+            button.disabled = false;
+            button.textContent = "Update password";
+          }
         });
       }
 
