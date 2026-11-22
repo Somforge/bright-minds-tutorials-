@@ -2809,6 +2809,7 @@
         const form=document.getElementById("studentAssessmentForm");
         const submitButton=document.getElementById("submitAssessmentBtn");
         let submissionStarted=false;
+        const pendingDraftSaves=new Map();
         const saveAssessmentDraft=()=>{
           const draft={};
           questions.forEach(q=>{
@@ -2822,8 +2823,16 @@
           const input=event.target;
           if(input.matches('input[type="radio"]')){
             const questionId=input.name.slice("answer_".length);
-            supabaseClient.rpc("save_assessment_answer_draft",{p_attempt_id:attemptId,p_question_id:questionId,p_selected_option:Number(input.value)}).then(({error})=>{
-              if(error)showAlert(error.message||"Your answer could not be saved to your account. It remains saved on this device.");
+            const previousSave=pendingDraftSaves.get(questionId)||Promise.resolve();
+            const savePromise=previousSave.catch(()=>{}).then(async()=>{
+              const {error}=await supabaseClient.rpc("save_assessment_answer_draft",{p_attempt_id:attemptId,p_question_id:questionId,p_selected_option:Number(input.value)});
+              if(error)throw error;
+            });
+            pendingDraftSaves.set(questionId,savePromise);
+            savePromise.catch(error=>{
+              if(form.isConnected)showAlert(error.message||"Your answer could not be saved to your account. It remains saved on this device.");
+            }).finally(()=>{
+              if(pendingDraftSaves.get(questionId)===savePromise)pendingDraftSaves.delete(questionId);
             });
           }
         });
