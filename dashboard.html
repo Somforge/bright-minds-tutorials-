@@ -705,7 +705,7 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <script src="./supabase-config.js?v=20261121-1"></script>
 
   <script>
@@ -720,6 +720,28 @@
       const pageContent = document.getElementById("pageContent");
       const alertBox = document.getElementById("alertBox");
       const pageTitle = document.getElementById("pageTitle");
+
+      let supabaseLibraryPromise = null;
+
+      function loadSupabaseLibrary() {
+        if (window.supabase && window.supabase.createClient) return Promise.resolve();
+        if (!supabaseLibraryPromise) {
+          supabaseLibraryPromise = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+            script.async = true;
+            script.onload = () => window.supabase && window.supabase.createClient
+              ? resolve()
+              : reject(new Error("The Supabase client library could not be initialized."));
+            script.onerror = () => reject(new Error("The Supabase client library could not be loaded. Check your connection and try again."));
+            document.head.appendChild(script);
+          }).catch(error => {
+            supabaseLibraryPromise = null;
+            throw error;
+          });
+        }
+        return supabaseLibraryPromise;
+      }
 
       let supabaseClient = null;
       let currentUser = null;
@@ -801,7 +823,7 @@
 
       async function init() {
 
-        if (!window.supabase || !supabaseUrl || !supabaseKey) {
+        if (!supabaseUrl || !supabaseKey) {
           const reason = !window.supabase
             ? "The Supabase client library did not load. Check your internet connection or try again."
             : "The Supabase project settings did not load. Refresh the page to fetch the latest configuration.";
@@ -811,6 +833,13 @@
               <p>${escapeHTML(reason)}</p>
               <button class="btn btn-primary" type="button" onclick="window.location.reload()">Try again</button>
             </div>`;
+          return;
+        }
+
+        try {
+          await loadSupabaseLibrary();
+        } catch (error) {
+          pageContent.innerHTML = `<div class="empty"><strong>Unable to connect to Bright Minds.</strong><p>${escapeHTML(error.message)}</p><button class="btn" type="button" onclick="window.location.reload()">Try again</button></div>`;
           return;
         }
 
