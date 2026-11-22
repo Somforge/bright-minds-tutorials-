@@ -34,6 +34,22 @@
       font-family: "DM Sans", sans-serif;
     }
 
+    /* Keep the dashboard shell hidden until the account role and MFA status
+       have been checked. During MFA, show only the verification screen. */
+    body.auth-pending .app { visibility: hidden; }
+    body.mfa-required .sidebar,
+    body.mfa-required .topbar,
+    body.mfa-required .sidebar-backdrop { display: none !important; }
+    body.mfa-required .main { margin-left: 0; }
+    body.mfa-required .content {
+      min-height: 100vh;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+    }
+    body.mfa-required #alertBox { width: 100%; max-width: 620px; }
+
+
     button, input { font: inherit; }
     button { cursor: pointer; }
 
@@ -587,7 +603,7 @@
   </style>
 </head>
 
-<body>
+<body class="auth-pending">
   <div class="app">
 
     <aside class="sidebar" id="sidebar">
@@ -823,6 +839,8 @@
       }
 
       function renderAdminMfaGate({ factorId, qrCode = "", secret = "", mode = "challenge" }) {
+        document.body.classList.remove("auth-pending");
+        document.body.classList.add("mfa-required");
         const enrolling = mode === "enroll";
         pageContent.innerHTML = `
           <section class="card" style="max-width:620px;margin:30px auto;padding:28px">
@@ -1021,6 +1039,7 @@
             .single();
 
         if (profileError || !profile) {
+          document.body.classList.remove("auth-pending");
           pageContent.innerHTML = `
             <div class="empty">
               We could not load your account profile.
@@ -1043,6 +1062,7 @@
           if (!mfaVerified) return;
         }
 
+        document.body.classList.remove("auth-pending", "mfa-required");
         document.getElementById("userName").textContent =
           profile.full_name || currentUser.email || "Bright Minds user";
 
@@ -3156,6 +3176,7 @@
         });
 
       init().catch(error => {
+        document.body.classList.remove("auth-pending", "mfa-required");
         pageContent.innerHTML = `
           <div class="empty">
             The dashboard could not be started.
