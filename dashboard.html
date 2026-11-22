@@ -2267,13 +2267,26 @@
             showAlert(payload?.error || "The protected download link could not be created.");
             return;
           }
+          // Download through a same-origin Blob URL so browsers reliably honour
+          // the material title as the saved filename for this cross-origin file.
+          const fileResponse = await fetch(payload.signedUrl);
+          if (!fileResponse.ok) {
+            throw new Error("The protected document could not be downloaded. Please try again.");
+          }
+          const fileBlob = await fileResponse.blob();
+          const filename = String(downloadName || "Bright-Minds-document.pdf")
+            .replace(/[\\/:*?"<>|\\r\\n]/g, "-")
+            .trim()
+            .slice(0, 180) || "Bright-Minds-document.pdf";
+          const objectUrl = URL.createObjectURL(fileBlob);
           const anchor = document.createElement("a");
-          anchor.href = payload.signedUrl;
-          anchor.download = downloadName || "Bright-Minds-document.pdf";
+          anchor.href = objectUrl;
+          anchor.download = filename;
           anchor.rel = "noopener";
           document.body.appendChild(anchor);
           anchor.click();
           anchor.remove();
+          window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
           return;
         }
 
