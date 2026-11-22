@@ -885,8 +885,8 @@
           const input = document.getElementById("adminMfaCode");
           const button = document.getElementById("adminMfaVerify");
           const status = document.getElementById("adminMfaStatus");
-          const code = input.value.replace(/\\D/g, "").slice(0, 6);
-          if (!/^\\d{6}$/.test(code)) {
+          const code = input.value.replace(/\D/g, "").slice(0, 6);
+          if (!/^\d{6}$/.test(code)) {
             status.textContent = "Enter all six digits from your authenticator app.";
             input.focus();
             return;
