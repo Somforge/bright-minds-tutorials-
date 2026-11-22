@@ -7,6 +7,7 @@
   <title>Dashboard | Bright Minds Tutorials</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 
@@ -705,7 +706,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
   <script src="./supabase-config.js?v=20261121-1"></script>
 
   <script>
@@ -766,6 +766,28 @@
           .map(part => part[0] || "")
           .join("")
           .toUpperCase();
+      }
+
+      let tusClientLoadPromise = null;
+
+      function loadTusClient() {
+        if (window.tus && window.tus.Upload) return Promise.resolve();
+        if (!tusClientLoadPromise) {
+          tusClientLoadPromise = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js";
+            script.async = true;
+            script.onload = () => window.tus && window.tus.Upload
+              ? resolve()
+              : reject(new Error("The resumable upload service could not be initialized."));
+            script.onerror = () => reject(new Error("The resumable upload service did not load. Check your connection and try again."));
+            document.head.appendChild(script);
+          }).catch(error => {
+            tusClientLoadPromise = null;
+            throw error;
+          });
+        }
+        return tusClientLoadPromise;
       }
 
       function setLoading(message = "Loading…") {
@@ -2021,9 +2043,8 @@
             progress.value = 0;
 
             if (file.size > 6 * 1024 * 1024) {
-              if (!window.tus || !window.tus.Upload) {
-                throw new Error("The resumable upload service did not load. Refresh the page and try again.");
-              }
+              status.textContent = "Preparing the resumable upload service…";
+              await loadTusClient();
               status.textContent = "Preparing a resumable upload…";
               const { data: { session } } = await supabaseClient.auth.getSession();
               if (!session?.access_token) throw new Error("Your session has expired. Please sign in again.");
