@@ -1738,9 +1738,9 @@ a {
         <p>Choose a new password for your Bright Minds account. Use at least 8 characters and keep it somewhere safe.</p>
         <form id="passwordRecoveryForm">
             <label for="recoveryPassword">New password</label>
-            <input id="recoveryPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
+            <input id="recoveryPassword" type="password" autocomplete="new-password" minlength="12" maxlength="72" required placeholder="12–72 characters with a number and symbol">
             <label for="recoveryPasswordConfirm">Confirm new password</label>
-            <input id="recoveryPasswordConfirm" type="password" autocomplete="new-password" minlength="8" required placeholder="Enter the password again">
+            <input id="recoveryPasswordConfirm" type="password" autocomplete="new-password" minlength="12" maxlength="72" required placeholder="Enter the password again">
             <div class="recovery-feedback" id="recoveryFeedback" role="status" aria-live="polite"></div>
             <button type="submit" id="recoverySubmit">Update password</button>
         </form>
@@ -1808,6 +1808,12 @@ const recoveryForm = document.getElementById("passwordRecoveryForm");
 const recoveryFeedback = document.getElementById("recoveryFeedback");
 const recoverySubmit = document.getElementById("recoverySubmit");
 
+function isStrongBrightMindsPassword(password) {
+    return password.length >= 12 && password.length <= 72 &&
+        /[a-z]/.test(password) && /[A-Z]/.test(password) &&
+        /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
+}
+
 function showRecoveryFeedback(message, type) {
     recoveryFeedback.textContent = message;
     recoveryFeedback.className = "recovery-feedback " + type;
@@ -1825,8 +1831,9 @@ recoveryForm.addEventListener("submit", async function(event) {
     const password = document.getElementById("recoveryPassword").value;
     const confirmation = document.getElementById("recoveryPasswordConfirm").value;
 
-    if (password.length < 8) {
-        showRecoveryFeedback("Your password must contain at least 8 characters.", "error");
+    if (!isStrongBrightMindsPassword(password)) {
+        showRecoveryFeedback("Use 12–72 characters, including uppercase and lowercase letters, a number and a symbol.", "error");
+        document.getElementById("recoveryPassword").focus();
         return;
     }
 
