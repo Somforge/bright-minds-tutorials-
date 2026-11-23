@@ -1179,6 +1179,7 @@
             courses (
               id,
               title,
+              course_code,
               description,
               subject
             )
@@ -1406,7 +1407,7 @@
                 <span class="pill">Active subscription</span>
 
                 <h2 style="font:800 18px Manrope;color:var(--navy);margin:15px 0 7px">
-                  ${escapeHTML(item.courses?.title || "Course")}
+                  ${escapeHTML(item.courses?.title || "Course")} <span class="muted" style="font-size:12px;font-weight:700">${escapeHTML(item.courses?.course_code || "")}</span>
                 </h2>
 
                 <p class="muted" style="font-size:13px">
@@ -1439,7 +1440,7 @@
       async function renderManageCourses() {
         const { data, error } = await supabaseClient
           .from("courses")
-          .select("id,title,description,subject,is_published,created_at")
+          .select("id,title,course_code,description,subject,is_published,created_at")
           .order("created_at", { ascending: false });
         if (error) throw error;
 
@@ -1461,7 +1462,7 @@
               const priceSummary = availablePrices.length
                 ? availablePrices.map(price => price.duration_months + ' mo · ' + money(price.price) + ' ' + escapeHTML(price.currency || "ZMW")).join('<br>')
                 : 'No active prices';
-              return '<tr><td><strong>' + escapeHTML(course.title) + '</strong><div class="muted">' + escapeHTML(course.description || "") + '</div></td>' +
+              return '<tr><td><strong>' + escapeHTML(course.title) + '</strong><div class="muted" style="font-weight:700">' + escapeHTML(course.course_code || "") + '</div><div class="muted">' + escapeHTML(course.description || "") + '</div></td>' +
                 '<td>' + escapeHTML(course.subject || "—") + '</td><td>' + priceSummary + '</td>' +
                 '<td><span class="pill" style="' + (course.is_published ? "" : "background:#F0F4F8;color:#627D98") + '">' + (course.is_published ? "Published" : "Draft") + '</span></td>' +
                 '<td><div class="inline-actions"><button class="btn secondary" data-manage-prices="' + escapeHTML(course.id) + '" data-course-title="' + escapeHTML(course.title) + '">Set prices</button>' +
@@ -1589,6 +1590,7 @@
 
             const payload = {
               title: String(form.get("title") || "").trim(),
+              course_code: (() => { const words = String(form.get("title") || "").trim().split(/\s+/).filter(Boolean); const prefix = words.length > 1 ? words.map(word => word[0]).join("") : (words[0] || "").slice(0, 2); return prefix.toUpperCase() + " 110"; })(),
               subject: String(form.get("subject") || "").trim() || null,
               description: String(form.get("description") || "").trim() || null,
               is_published: false
@@ -1792,7 +1794,7 @@
         const [coursesResult, pricesResult, subscriptionsResult, historyResult] = await Promise.all([
           supabaseClient
             .from("courses")
-            .select("id,title,description,subject")
+            .select("id,title,course_code,description,subject")
             .in("title", ["Mathematics", "Physics", "Chemistry", "Biology"])
             .eq("is_published", true),
           supabaseClient
@@ -2140,7 +2142,7 @@
 
       async function renderAdminResources() {
         const [courseResult, moduleResult, resourceResult] = await Promise.all([
-          supabaseClient.from("courses").select("id,title").order("title"),
+          supabaseClient.from("courses").select("id,title,course_code").order("title"),
           supabaseClient.from("modules").select("id,course_id,title,position").order("position"),
           supabaseClient.from("course_resources")
             .select("id,course_id,module_id,title,resource_type,description,academic_year,resource_path,original_file_name,mime_type,file_size_bytes,is_published,created_at,courses(title),modules(title)")
@@ -2155,7 +2157,7 @@
         const modules = moduleResult.data || [];
         const resources = resourceResult.data || [];
         const options = courses.map(course =>
-          '<option value="' + escapeHTML(course.id) + '">' + escapeHTML(course.title) + '</option>'
+          '<option value="' + escapeHTML(course.id) + '">' + escapeHTML(course.title + (course.course_code ? " · " + course.course_code : "")) + '</option>'
         ).join("");
         const moduleOptions = modules.map(module =>
           '<option value="' + escapeHTML(module.id) + '" data-course="' + escapeHTML(module.course_id) + '">' +
