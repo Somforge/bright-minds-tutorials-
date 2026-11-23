@@ -1874,7 +1874,7 @@
             '<div class="muted" style="font-size:12px;padding:12px;background:#F4F7FA;border-radius:8px">After paying, send your screenshot or receipt through WhatsApp to either official Bright Minds number listed above. No file upload is needed here.</div>',
             '<button class="btn" type="submit" id="submitPaymentBtn" disabled>Submit payment for review</button>',
             '</form></div>'
-          ].join("") : '<div class="empty" style="margin-bottom:20px">Subscription enrolment is not open yet. Courses will appear here once Bright Minds publishes them with an available monthly price.</div>',
+          ].join("") : '<div class="empty" style="margin-bottom:20px">There are currently no courses available for subscription. Please contact Bright Minds through one of the official WhatsApp numbers above for assistance.</div>',
           '<div class="section-head"><h2>My payment submissions</h2></div>',
           historyResult.data?.length ? '<div class="grid">' + historyResult.data.map(payment => {
             const statusLabel = payment.status === "verified" ? "Verified" : payment.status === "rejected" ? "Rejected" : "Awaiting review";
