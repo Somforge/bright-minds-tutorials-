@@ -990,6 +990,7 @@
       async function init() {
 
         if (!supabaseUrl || !supabaseKey) {
+          document.body.classList.remove("auth-pending");
           const reason = !window.supabase
             ? "The Supabase client library did not load. Check your internet connection or try again."
             : "The Supabase project settings did not load. Refresh the page to fetch the latest configuration.";
@@ -1005,6 +1006,7 @@
         try {
           await loadSupabaseLibrary();
         } catch (error) {
+          document.body.classList.remove("auth-pending");
           pageContent.innerHTML = `<div class="empty"><strong>Unable to connect to Bright Minds.</strong><p>${escapeHTML(error.message)}</p><button class="btn" type="button" onclick="window.location.reload()">Try again</button></div>`;
           return;
         }
@@ -1020,6 +1022,8 @@
         } = await supabaseClient.auth.getSession();
 
         if (sessionError) {
+          document.body.classList.remove("auth-pending");
+          pageContent.innerHTML = `<div class="empty"><strong>Your sign-in session could not be checked.</strong><p>Please refresh the page or sign in again.</p></div>`;
           showAlert(sessionError.message);
           return;
         }
