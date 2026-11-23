@@ -2408,6 +2408,7 @@ async function loadStudentCourses() {
                         <div class="course-icon">📘</div>
 
                         <h4>${escapeHTML(course.title || course.name || course.course_name || "Course")}</h4>
+                        <p style="font-size:12px;font-weight:700;color:var(--teal)">${escapeHTML(course.course_code || "")}</p>
 
                         <p>
                             ${escapeHTML(course.description || "Your learning materials and lessons will be available here.")}
@@ -2602,7 +2603,7 @@ async function loadAdminCourses() {
     if (!box || !supabaseClient) return;
     try {
         const {data,error} = await supabaseClient.from("courses")
-            .select("id,title,description,subject,price,is_published,created_at")
+            .select("id,title,course_code,description,subject,price,is_published,created_at")
             .order("created_at",{ascending:false});
         if (error) throw error;
         message.textContent = `${(data || []).length} course(s)`;
@@ -2610,7 +2611,7 @@ async function loadAdminCourses() {
             box.innerHTML = `<div class="empty-state"><div style="font-size:36px">📚</div><h3>No courses created yet</h3><p>Select “Add Course” to create your first course.</p></div>`;
             return;
         }
-        box.innerHTML = `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Course</th><th>Subject</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>${data.map(c=>`<tr><td><strong>${escapeHTML(c.title)}</strong><br><span style="color:var(--muted)">${escapeHTML((c.description||"").slice(0,90))}</span></td><td>${escapeHTML(c.subject||"—")}</td><td><span class="status-pill ${c.is_published?"":"off"}">${c.is_published?"Published":"Draft"}</span></td><td><div class="table-actions"><button onclick="editCourse('${c.id}')">Edit</button><button onclick="toggleCoursePublication('${c.id}',${!c.is_published})">${c.is_published?"Unpublish":"Publish"}</button></div></td></tr>`).join("")}</tbody></table></div>`;
+        box.innerHTML = `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Course</th><th>Subject</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>${data.map(c=>`<tr><td><strong>${escapeHTML(c.title)}</strong><br><span style="display:block;font-size:12px;font-weight:700;color:var(--teal)">${escapeHTML(c.course_code || "")}</span><span style="color:var(--muted)">${escapeHTML((c.description||"").slice(0,90))}</span></td><td>${escapeHTML(c.subject||"—")}</td><td><span class="status-pill ${c.is_published?"":"off"}">${c.is_published?"Published":"Draft"}</span></td><td><div class="table-actions"><button onclick="editCourse('${c.id}')">Edit</button><button onclick="toggleCoursePublication('${c.id}',${!c.is_published})">${c.is_published?"Unpublish":"Publish"}</button></div></td></tr>`).join("")}</tbody></table></div>`;
     } catch(error) {
         console.error("Admin course retrieval error:",error);
         box.innerHTML = `<div class="empty-state"><h3>Unable to load courses</h3><p>${escapeHTML(error.message || "Please check your administrator permissions and try again.")}</p><button class="admin-action" onclick="loadAdminCourses()">Retry</button></div>`;
@@ -2631,7 +2632,7 @@ function showCourseForm(course=null) {
 function closeCourseForm(){const modal=document.getElementById("adminCourseModal");if(modal)modal.remove();}
 
 async function editCourse(id){
-    try{const {data,error}=await supabaseClient.from("courses").select("id,title,description,subject,price,is_published").eq("id",id).single();if(error)throw error;showCourseForm(data);}
+    try{const {data,error}=await supabaseClient.from("courses").select("id,title,course_code,description,subject,price,is_published").eq("id",id).single();if(error)throw error;showCourseForm(data);}
     catch(error){alert("Could not retrieve this course: "+error.message);}
 }
 
@@ -2642,7 +2643,7 @@ async function saveCourse(event){
     const title=document.getElementById("adminCourseTitle").value.trim();
     const price=Number(document.getElementById("adminCoursePrice").value||0);
     if(!title||!Number.isFinite(price)||price<0){alert("Enter a valid course title and price.");if(button){button.disabled=false;button.textContent=id?"Save Changes":"Create Course";}return;}
-    const record={title,subject:document.getElementById("adminCourseSubject").value.trim()||null,description:document.getElementById("adminCourseDescription").value.trim()||null,price,is_published:document.getElementById("adminCoursePublished").checked};
+    const words=title.split(/\s+/).filter(Boolean);const prefix=words.length>1?words.map(word=>word[0]).join(""):(words[0]||"").slice(0,2);const record={title,course_code:prefix.toUpperCase()+" 110",subject:document.getElementById("adminCourseSubject").value.trim()||null,description:document.getElementById("adminCourseDescription").value.trim()||null,price,is_published:document.getElementById("adminCoursePublished").checked};
     try{
         const result=id?await supabaseClient.from("courses").update(record).eq("id",id):await supabaseClient.from("courses").insert(record);
         if(result.error)throw result.error;
