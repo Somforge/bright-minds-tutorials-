@@ -9,7 +9,7 @@
 
 
 <title>Bright Minds Tutorials | Learn. Understand. Excel.</title>
-<meta name="description" content="Welcome to Bright Minds Tutorials. A learning environment built around understanding, curiosity and academic excellence.">
+<meta name="description" content="Bright Minds Tutorials supports CBU first-year students with organised course materials, tutorial practice and exam preparation.">
 
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1434,6 +1434,23 @@ a {
     .recovery-card { padding: 26px 21px; }
 }
 
+
+/* CBU FIRST-YEAR STUDY PATHWAY */
+.first-year-pathway{padding:88px 9%;background:#F4F7FA}
+.pathway-inner{max-width:1150px;margin:auto}
+.pathway-heading{max-width:720px;margin:0 auto 38px;text-align:center}
+.pathway-heading .section-label{margin-bottom:13px}
+.pathway-heading h2{font-family:"Manrope",sans-serif;font-size:clamp(28px,4vw,40px);line-height:1.2;letter-spacing:-1.2px;margin-bottom:13px;color:var(--navy)}
+.pathway-heading p{color:var(--text);font-size:15px;line-height:1.8}
+.pathway-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.pathway-step{background:#fff;border:1px solid var(--border);border-radius:13px;padding:23px 20px;box-shadow:0 8px 24px rgba(16,42,67,.045)}
+.pathway-number{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:#DDF8F5;color:#008F83;font-weight:800;margin-bottom:17px}
+.pathway-step h3{font:800 16px "Manrope",sans-serif;color:var(--navy);margin-bottom:9px}
+.pathway-step p{font-size:13px;line-height:1.75;color:var(--text)}
+.pathway-note{max-width:850px;margin:24px auto 0;padding:15px 18px;border-left:3px solid var(--turquoise);background:#fff;border-radius:0 9px 9px 0;color:#486581;font-size:13px;line-height:1.7}
+@media(max-width:900px){.pathway-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.first-year-pathway{padding:65px 7%}.pathway-grid{grid-template-columns:1fr}.pathway-step{padding:20px}}
+
 </style>
 </head>
 
@@ -1580,6 +1597,39 @@ a {
 
         </div>
 
+    </section>
+
+    <section class="first-year-pathway" aria-labelledby="firstYearHeading">
+        <div class="pathway-inner">
+            <div class="pathway-heading">
+                <div class="section-label">A SMARTER START AT CBU</div>
+                <h2 id="firstYearHeading">Make your first year count.</h2>
+                <p>Use Bright Minds as a simple study system: understand each topic, practise what you learn and prepare steadily for your assessments.</p>
+            </div>
+            <div class="pathway-grid">
+                <article class="pathway-step">
+                    <div class="pathway-number">01</div>
+                    <h3>Choose your course</h3>
+                    <p>Open the courses available to your account. Check the course code so you are studying the correct subject.</p>
+                </article>
+                <article class="pathway-step">
+                    <div class="pathway-number">02</div>
+                    <h3>Build understanding</h3>
+                    <p>Start with BM Notes and your lecture material. Focus on understanding the idea before memorising details.</p>
+                </article>
+                <article class="pathway-step">
+                    <div class="pathway-number">03</div>
+                    <h3>Practise actively</h3>
+                    <p>Attempt tutorial sheets without looking at the answers first. Mark difficult questions and revisit the concepts behind them.</p>
+                </article>
+                <article class="pathway-step">
+                    <div class="pathway-number">04</div>
+                    <h3>Prepare for exams</h3>
+                    <p>Use past papers under timed conditions, then study worked solutions to understand how to improve your answers.</p>
+                </article>
+            </div>
+            <div class="pathway-note"><strong>First-year tip:</strong> Do a little work consistently each week. Keep up with lectures, attempt tutorial questions early and use past papers to identify gaps—not just to memorise answers. Learning materials will be added to the portal as they are prepared.</div>
+        </div>
     </section>
 
     <section class="cta">
